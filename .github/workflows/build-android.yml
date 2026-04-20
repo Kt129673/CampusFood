@@ -20,6 +20,9 @@ on:
       - 'app/**'
   workflow_dispatch: # Allow manual trigger
 
+env:
+  JAVA_TOOL_OPTIONS: "-Djava.awt.headless=true"
+
 jobs:
   build:
     name: Build APK
