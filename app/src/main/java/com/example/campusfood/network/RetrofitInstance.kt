@@ -1,6 +1,5 @@
 package com.example.campusfood.network
 
-import com.example.campusfood.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
