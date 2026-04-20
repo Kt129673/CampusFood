@@ -16,11 +16,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.campusfood.ui.screens.MenuScreen
+import com.example.campusfood.ui.screens.CartScreen
+import com.example.campusfood.ui.screens.CartViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material.icons.automirrored.filled.List
 
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
+    val cartViewModel: CartViewModel = viewModel()
     val items = listOf(
         NavigationItem("Menu", Screen.Menu.route, Icons.AutoMirrored.Filled.List),
         NavigationItem("Cart", Screen.Cart.route, Icons.Default.ShoppingCart),
@@ -59,12 +63,18 @@ fun MainScreen() {
         ) {
             composable(Screen.Menu.route) {
                 MenuScreen(
-                    onProductClick = { /* Handle cart */ },
+                    onProductClick = { product ->
+                        cartViewModel.addToCart(product)
+                        // Optional: Show snackbar or toast
+                    },
                     onCartClick = { navController.navigate(Screen.Cart.route) }
                 )
             }
             composable(Screen.Cart.route) {
-                PlaceholderScreen("Cart Screen")
+                CartScreen(
+                    onCheckoutClick = { /* Handle checkout */ },
+                    viewModel = cartViewModel
+                )
             }
             composable(Screen.Orders.route) {
                 PlaceholderScreen("My Orders")
