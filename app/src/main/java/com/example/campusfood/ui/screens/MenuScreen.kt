@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusfood.model.Product
+import com.example.campusfood.ui.components.ErrorState
 import com.example.campusfood.ui.components.ProductCard
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -97,14 +99,10 @@ fun MenuScreen(
                     }
                 }
                 is MenuUiState.Error -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
-                        Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
-                            Text(text = "Error: ${state.message}", color = MaterialTheme.colorScheme.error)
-                            Button(onClick = { viewModel.getProducts() }) {
-                                Text("Retry")
-                            }
-                        }
-                    }
+                    ErrorState(
+                        message = state.message,
+                        onRetry = { viewModel.getProducts() }
+                    )
                 }
                 is MenuUiState.Success -> {
                     val filteredProducts = state.products.filter {

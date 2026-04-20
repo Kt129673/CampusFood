@@ -1,6 +1,8 @@
 package com.example.campusfood.network
 
+import com.example.campusfood.model.ApiResponse
 import com.example.campusfood.model.CartItem
+import com.example.campusfood.model.Order
 import com.example.campusfood.model.Product
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -10,14 +12,20 @@ import retrofit2.http.Path
 
 interface ApiService {
     @GET("products")
-    suspend fun getProducts(): List<Product>
+    suspend fun getProducts(): ApiResponse<List<Product>>
 
     @GET("cart")
-    suspend fun getCartItems(): List<CartItem>
+    suspend fun getCartItems(): ApiResponse<List<CartItem>>
 
     @POST("cart")
-    suspend fun addToCart(@Body cartItem: CartItem): CartItem
+    suspend fun addToCart(@Body cartItem: CartItem): ApiResponse<CartItem>
 
     @DELETE("cart/{id}")
-    suspend fun removeFromCart(@Path("id") id: Long)
+    suspend fun removeFromCart(@Path("id") id: Long): ApiResponse<Unit>
+
+    @GET("orders")
+    suspend fun getOrders(): ApiResponse<List<Order>>
+
+    @POST("orders")
+    suspend fun placeOrder(@Body order: Order): ApiResponse<Order>
 }

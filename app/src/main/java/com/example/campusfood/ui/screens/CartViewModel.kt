@@ -63,4 +63,10 @@ class CartViewModel : ViewModel() {
             }
         }
     }
+
+    fun clearCart() {
+        // Implementation for clearing cart on backend if needed
+        // For now, we refresh the state
+        getCartItems()
+    }
 }

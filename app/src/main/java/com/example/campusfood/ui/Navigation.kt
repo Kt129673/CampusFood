@@ -4,7 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.campusfood.ui.screens.CartScreen
+import com.example.campusfood.ui.screens.CartViewModel
 import com.example.campusfood.ui.screens.MenuScreen
+import com.example.campusfood.ui.screens.OrderScreen
+import com.example.campusfood.ui.screens.OrderViewModel
+import com.example.campusfood.ui.screens.ProfileScreen
 
 sealed class Screen(val route: String) {
     object Menu : Screen("menu")
@@ -15,11 +21,14 @@ sealed class Screen(val route: String) {
 
 @Composable
 fun AppNavigation(navController: NavHostController) {
+    val cartViewModel: CartViewModel = viewModel()
+    val orderViewModel: OrderViewModel = viewModel()
+
     NavHost(navController = navController, startDestination = Screen.Menu.route) {
         composable(Screen.Menu.route) {
             MenuScreen(
-                onProductClick = {
-                    // Navigate to details or add to cart
+                onProductClick = { product ->
+                    cartViewModel.addToCart(product)
                 },
                 onCartClick = {
                     navController.navigate(Screen.Cart.route)
@@ -27,13 +36,20 @@ fun AppNavigation(navController: NavHostController) {
             )
         }
         composable(Screen.Cart.route) {
-            // CartScreen()
+            CartScreen(
+                viewModel = cartViewModel,
+                onCheckoutClick = {
+                    navController.navigate(Screen.Orders.route) {
+                        popUpTo(Screen.Menu.route)
+                    }
+                }
+            )
         }
         composable(Screen.Orders.route) {
-            // OrdersScreen()
+            OrderScreen(viewModel = orderViewModel)
         }
         composable(Screen.Profile.route) {
-            // ProfileScreen()
+            ProfileScreen()
         }
     }
 }
