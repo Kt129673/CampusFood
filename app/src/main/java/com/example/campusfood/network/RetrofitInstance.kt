@@ -1,5 +1,6 @@
 package com.example.campusfood.network
 
+import com.example.campusfood.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -9,13 +10,14 @@ import java.util.concurrent.TimeUnit
 object RetrofitInstance {
 
     /**
-     * Base URL for the Spring Boot backend.
-     *
-     * Emulator → Local PC:   "http://10.0.2.2:8080/api/"
-     * Physical Device (WiFi): "http://<YOUR_PC_IP>:8080/api/"
-     * Production:             "https://api.campusfood.com/api/"
+     * Development (Debug) -> Local PC Emulator
+     * Production (Release) -> Live AWS Server
      */
-    private const val BASE_URL = "http://Campusfood-backend-env.eba-nwhwij87.eu-north-1.elasticbeanstalk.com/api/"
+    private val BASE_URL = if (BuildConfig.DEBUG) {
+        "http://10.0.2.2:8080/api/"
+    } else {
+        "http://Campusfood-backend-env.eba-nwhwij87.eu-north-1.elasticbeanstalk.com/api/"
+    }
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
