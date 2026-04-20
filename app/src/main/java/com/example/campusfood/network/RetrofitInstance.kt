@@ -15,7 +15,7 @@ object RetrofitInstance {
      * Physical Device (WiFi): "http://<YOUR_PC_IP>:8080/api/"
      * Production:             "https://api.campusfood.com/api/"
      */
-    private const val BASE_URL = "http://10.0.2.2:8080/api/"
+    private const val BASE_URL = "http://Campusfood-backend-env.eba-nwhwij87.eu-north-1.elasticbeanstalk.com/api/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
