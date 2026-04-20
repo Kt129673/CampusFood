@@ -11,7 +11,9 @@ object RetrofitInstance {
     /**
      * Connecting to the live AWS Elastic Beanstalk Server
      */
-    private val BASE_URL = "http://Campusfood-backend-env.eba-nwhwij87.eu-north-1.elasticbeanstalk.com/api/"
+    private const val IS_LOCAL = false // Change to true for local debugging
+    private val BASE_URL = if (IS_LOCAL) "http://10.0.2.2:5000/api/" 
+                           else "http://Campusfood-backend-env.eba-nwhwij87.eu-north-1.elasticbeanstalk.com/api/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
