@@ -1,0 +1,88 @@
+# ===========================
+# Android / Gradle
+# ===========================
+*.iml
+*.hprof
+.gradle/
+/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+
+# ===========================
+# IDE - Android Studio / IntelliJ
+# ===========================
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.idea/dictionaries/
+.idea/shelf/
+.idea/httpRequests/
+.idea/dbnavigator.xml
+*.swp
+*~
+
+# ===========================
+# Signing & Keystore
+# ===========================
+*.jks
+*.keystore
+signing.properties
+
+# ===========================
+# OS Generated Files
+# ===========================
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ===========================
+# Kotlin / KSP
+# ===========================
+*.kotlin_module
+
+# ===========================
+# Google Services
+# ===========================
+google-services.json
+
+# ===========================
+# Crash & Log Files
+# ===========================
+*.log
+crash-reports/
+
+# ===========================
+# APK / AAB / Bundle Output
+# ===========================
+*.apk
+*.aab
+*.ap_
+*.dex
+output.json
+
+# ===========================
+# Proguard
+# ===========================
+/app/proguard-merged-config.txt
+
+# ===========================
+# Misc
+# ===========================
+*.class
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+.env
+.env.*
