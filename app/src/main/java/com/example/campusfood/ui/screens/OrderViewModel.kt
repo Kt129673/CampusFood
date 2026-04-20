@@ -27,8 +27,12 @@ class OrderViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.value = OrderUiState.Loading
             try {
-                val orders = RetrofitInstance.api.getOrders()
-                _uiState.value = OrderUiState.Success(orders)
+                val response = RetrofitInstance.api.getOrders()
+                if (response.success && response.data != null) {
+                    _uiState.value = OrderUiState.Success(response.data)
+                } else {
+                    _uiState.value = OrderUiState.Error(response.message)
+                }
             } catch (e: Exception) {
                 _uiState.value = OrderUiState.Error(e.message ?: "Unknown error")
             }

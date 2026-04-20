@@ -28,8 +28,12 @@ class CartViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.value = CartUiState.Loading
             try {
-                val items = RetrofitInstance.api.getCartItems()
-                _uiState.value = CartUiState.Success(items)
+                val response = RetrofitInstance.api.getCartItems()
+                if (response.success && response.data != null) {
+                    _uiState.value = CartUiState.Success(response.data)
+                } else {
+                    _uiState.value = CartUiState.Error(response.message)
+                }
             } catch (e: Exception) {
                 _uiState.value = CartUiState.Error(e.message ?: "Unknown error")
             }

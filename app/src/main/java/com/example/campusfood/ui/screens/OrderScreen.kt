@@ -76,17 +76,17 @@ fun OrderCard(order: Order) {
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
-                StatusBadge(status = order.status)
+                StatusBadge(status = order.status ?: "UNKNOWN")
             }
             Text(
-                text = order.orderTime,
+                text = order.orderTime ?: "",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             order.items.forEach { item ->
                 Text(
-                    "${item.productName} x ${item.quantity}",
+                    "Product ID: ${item.productId} x ${item.quantity}",
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -97,7 +97,7 @@ fun OrderCard(order: Order) {
             ) {
                 Text("Total", fontWeight = FontWeight.Bold)
                 Text(
-                    "$${String.format("%.2f", order.totalAmount)}",
+                    "$${String.format("%.2f", order.totalAmount ?: 0.0)}",
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )

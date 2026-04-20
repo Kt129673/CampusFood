@@ -27,8 +27,12 @@ class MenuViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.value = MenuUiState.Loading
             try {
-                val products = RetrofitInstance.api.getProducts()
-                _uiState.value = MenuUiState.Success(products)
+                val response = RetrofitInstance.api.getProducts()
+                if (response.success && response.data != null) {
+                    _uiState.value = MenuUiState.Success(response.data)
+                } else {
+                    _uiState.value = MenuUiState.Error(response.message)
+                }
             } catch (e: Exception) {
                 _uiState.value = MenuUiState.Error(e.message ?: "Unknown error occurred")
             }
