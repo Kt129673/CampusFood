@@ -10,14 +10,9 @@ import java.util.concurrent.TimeUnit
 object RetrofitInstance {
 
     /**
-     * Development (Debug) -> Local PC Emulator
-     * Production (Release) -> Live AWS Server
+     * Connecting to the live AWS Elastic Beanstalk Server
      */
-    private val BASE_URL = if (BuildConfig.DEBUG) {
-        "http://10.0.2.2:8080/api/"
-    } else {
-        "http://Campusfood-backend-env.eba-nwhwij87.eu-north-1.elasticbeanstalk.com/api/"
-    }
+    private val BASE_URL = "http://Campusfood-backend-env.eba-nwhwij87.eu-north-1.elasticbeanstalk.com/api/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
