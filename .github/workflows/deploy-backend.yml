@@ -1,0 +1,57 @@
+# ===========================
+# CampusFood Backend - AWS Deployment Pipeline (Java Base)
+# ===========================
+# Triggers on push to main branch (backend changes only)
+# Builds JAR -> Deploys straight to Elastic Beanstalk (Java Corretto Platform)
+
+name: Deploy Backend to AWS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+  workflow_dispatch: # Allow manual trigger
+
+env:
+  AWS_REGION: eu-north-1
+  EB_APP_NAME: campusfood-backend
+  EB_ENV_NAME: Campusfood-backend-env
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build JAR
+        working-directory: backend
+        run: mvn clean package -DskipTests -B
+
+      - name: Deploy to Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: ${{ env.EB_APP_NAME }}
+          environment_name: ${{ env.EB_ENV_NAME }}
+          version_label: "v-${{ github.sha }}"
+          region: ${{ env.AWS_REGION }}
+          deployment_package: backend/target/backend-0.0.1-SNAPSHOT.jar
+          wait_for_deployment: true
+
+      - name: Deployment Summary
+        run: |
+          echo "✅ Backend deployed successfully using Java Corretto!"
+          echo "🌍 Region: ${{ env.AWS_REGION }}"
+          echo "🚀 Environment: ${{ env.EB_ENV_NAME }}"
