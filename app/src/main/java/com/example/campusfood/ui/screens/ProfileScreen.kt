@@ -14,7 +14,18 @@ import androidx.compose.ui.unit.dp
 fun ProfileScreen() {
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("My Profile") })
+            TopAppBar(
+                title = { 
+                    androidx.compose.material3.Text(
+                        "My Profile", 
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold
+                    ) 
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
         }
     ) { innerPadding ->
         Column(

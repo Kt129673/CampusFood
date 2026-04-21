@@ -24,7 +24,13 @@ fun CartScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("My Cart") })
+            TopAppBar(
+                title = { Text("My Cart", fontWeight = FontWeight.ExtraBold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
         },
         bottomBar = {
             if (uiState is CartUiState.Success) {
@@ -44,21 +50,21 @@ fun CartScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text("Total:", style = MaterialTheme.typography.titleLarge)
+                                Text("Total:", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                                 Text(
-                                    "$${String.format("%.2f", total)}",
-                                    style = MaterialTheme.typography.titleLarge,
+                                    "₹${String.format("%.2f", total)}",
+                                    style = MaterialTheme.typography.headlineMedium,
                                     color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Black
                                 )
                             }
                             Spacer(modifier = Modifier.height(16.dp))
                             Button(
                                 onClick = onCheckoutClick,
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = MaterialTheme.shapes.medium
+                                modifier = Modifier.fillMaxWidth().height(56.dp),
+                                shape = MaterialTheme.shapes.large
                             ) {
-                                Text("Checkout")
+                                Text("Checkout", style = MaterialTheme.typography.titleMedium)
                             }
                         }
                     }
@@ -109,24 +115,35 @@ fun CartScreen(
 fun CartItemCard(item: CartItem, onRemove: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(12.dp)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(item.productName, style = MaterialTheme.typography.titleMedium)
                 Text(
-                    "$${String.format("%.2f", item.price)} x ${item.quantity}",
-                    style = MaterialTheme.typography.bodyMedium
+                    item.productName,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    "₹${String.format("%.2f", item.price)} x ${item.quantity}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             IconButton(onClick = onRemove) {
-                Icon(Icons.Default.Delete, contentDescription = "Remove", tint = MaterialTheme.colorScheme.error)
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = "Remove",
+                    tint = MaterialTheme.colorScheme.error
+                )
             }
         }
     }

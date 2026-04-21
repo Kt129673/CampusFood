@@ -21,7 +21,13 @@ fun OrderScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("My Orders") })
+            TopAppBar(
+                title = { Text("My Orders", fontWeight = FontWeight.ExtraBold) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
@@ -97,7 +103,7 @@ fun OrderCard(order: Order) {
             ) {
                 Text("Total", fontWeight = FontWeight.Bold)
                 Text(
-                    "$${String.format("%.2f", order.totalAmount ?: 0.0)}",
+                    "₹${String.format("%.2f", order.totalAmount ?: 0.0)}",
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
                 )
