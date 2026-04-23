@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.util.Locale
 import com.example.campusfood.model.ProductRequest
 import com.example.campusfood.ui.theme.*
 
@@ -36,7 +37,7 @@ fun AdminProductFormScreen(
 
     // Load product for editing
     LaunchedEffect(productId) {
-        if (isEditing && productId != null) {
+        if (isEditing) {
             adminViewModel.loadProductById(productId)
         } else {
             adminViewModel.clearSelectedProduct()
@@ -59,7 +60,7 @@ fun AdminProductFormScreen(
             val p = selectedProduct!!
             name = p.name
             description = p.description ?: ""
-            price = String.format("%.0f", p.price)
+            price = String.format(Locale.getDefault(), "%.0f", p.price)
             category = p.category
             imageUrl = p.imageUrl ?: ""
             stock = "${p.stock ?: 0}"
@@ -195,7 +196,7 @@ fun AdminProductFormScreen(
                     onValueChange = { category = it },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor(),
+                        .menuAnchor(MenuAnchorType.PrimaryEditable),
                     label = { Text("Category *") },
                     leadingIcon = { Icon(Icons.Default.Category, null, tint = Color(0xFF7B1FA2), modifier = Modifier.size(20.dp)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory) },
@@ -287,7 +288,7 @@ fun AdminProductFormScreen(
                         available = available,
                         initialStock = stock.toIntOrNull() ?: 0
                     )
-                    if (isEditing && productId != null) {
+                    if (isEditing) {
                         adminViewModel.updateProduct(productId, request, onBack)
                     } else {
                         adminViewModel.createProduct(request, onBack)

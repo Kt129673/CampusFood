@@ -123,7 +123,7 @@ fun CartScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     Text(
-                                        "₹${String.format("%.2f", total)}",
+                                        "₹${String.format(java.util.Locale.getDefault(), "%.2f", total)}",
                                         style = MaterialTheme.typography.titleLarge,
                                         color = OrangePrimary,
                                         fontWeight = FontWeight.Black
@@ -338,7 +338,7 @@ fun CartItemCard(
                             fontSize = 13.sp
                         )
                         Text(
-                            "₹${String.format("%.0f", item.price)} each",
+                            "₹${String.format(java.util.Locale.getDefault(), "%.0f", item.price)} each",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -407,7 +407,7 @@ fun CartItemCard(
 
                     // Item total
                     Text(
-                        "₹${String.format("%.0f", item.price * item.quantity)}",
+                        "₹${String.format(java.util.Locale.getDefault(), "%.0f", item.price * item.quantity)}",
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Black,
                         color = OrangePrimary

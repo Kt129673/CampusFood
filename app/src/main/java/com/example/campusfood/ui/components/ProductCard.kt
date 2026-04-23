@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.util.Locale
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.campusfood.model.Product
@@ -133,7 +134,7 @@ fun ProductCard(
                 ) {
                     // Price
                     Text(
-                        text = "₹${String.format("%.0f", product.price)}",
+                        text = "₹${String.format(Locale.getDefault(), "%.0f", product.price)}",
                         style = MaterialTheme.typography.titleMedium,
                         color = OrangePrimary,
                         fontWeight = FontWeight.Black

@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import java.util.Locale
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.campusfood.model.Product
@@ -353,7 +354,7 @@ private fun AdminProductCard(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                "₹${String.format("%.0f", product.price)}",
+                                "₹${String.format(Locale.getDefault(), "%.0f", product.price)}",
                                 style = MaterialTheme.typography.bodySmall,
                                 fontWeight = FontWeight.Bold,
                                 color = OrangePrimary

@@ -9,10 +9,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.DeliveryDining
-import androidx.compose.material.icons.filled.Inventory2
-import androidx.compose.material.icons.filled.Pending
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -233,7 +229,7 @@ fun OrderCard(order: OrderResponse, onCancel: () -> Unit) {
                         fontSize = 12.sp
                     )
                     Text(
-                        "₹${String.format("%.0f", item.totalPrice ?: (item.unitPrice ?: 0.0) * item.quantity)}",
+                        "₹${String.format(java.util.Locale.getDefault(), "%.0f", item.totalPrice ?: ((item.unitPrice ?: 0.0) * item.quantity))}",
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 12.sp
@@ -276,7 +272,7 @@ fun OrderCard(order: OrderResponse, onCancel: () -> Unit) {
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        "₹${String.format("%.2f", order.totalAmount)}",
+                        "₹${String.format(java.util.Locale.getDefault(), "%.2f", order.totalAmount)}",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Black,
                         color = OrangePrimary
@@ -334,7 +330,7 @@ private fun formatDateTime(isoString: String): String {
         } else {
             isoString
         }
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         isoString
     }
 }

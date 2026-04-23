@@ -310,7 +310,7 @@ private fun AdminOrderCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "₹${String.format("%.2f", order.totalAmount)}",
+                    "₹${String.format(java.util.Locale.getDefault(), "%.2f", order.totalAmount)}",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Black,
                     color = OrangePrimary
