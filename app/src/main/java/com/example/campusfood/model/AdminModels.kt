@@ -49,3 +49,14 @@ data class ProductRequest(
 data class InventoryUpdateRequest(
     val quantity: Int
 )
+
+/**
+ * Response model for image upload.
+ */
+@JsonClass(generateAdapter = true)
+data class ImageUploadResponse(
+    val imageUrl: String,
+    val fileName: String?,
+    val fileSize: Long?,
+    val contentType: String?
+)

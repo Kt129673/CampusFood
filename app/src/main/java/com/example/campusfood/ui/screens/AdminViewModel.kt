@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import okhttp3.MultipartBody
 
 sealed interface AdminOrdersState {
     data object Loading : AdminOrdersState
@@ -201,6 +202,23 @@ class AdminViewModel : ViewModel() {
 
     fun clearProductAction() {
         _productActionState.value = AdminProductActionState.Idle
+    }
+
+    fun uploadProductImage(filePart: MultipartBody.Part, onSuccess: (String) -> Unit) {
+        viewModelScope.launch {
+            _productActionState.value = AdminProductActionState.Loading
+            try {
+                val response = RetrofitInstance.api.uploadProductImage(filePart)
+                if (response.success && response.data != null) {
+                    _productActionState.value = AdminProductActionState.Idle // Reset so we don't show success msg for just image upload
+                    onSuccess(response.data.imageUrl)
+                } else {
+                    _productActionState.value = AdminProductActionState.Error(response.message)
+                }
+            } catch (e: Exception) {
+                _productActionState.value = AdminProductActionState.Error(e.message ?: "Failed to upload image")
+            }
+        }
     }
 
     fun clearSelectedProduct() {

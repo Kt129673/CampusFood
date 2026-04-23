@@ -18,6 +18,10 @@ import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Multipart
+import retrofit2.http.Part
+import okhttp3.MultipartBody
+import com.example.campusfood.model.ImageUploadResponse
 
 interface ApiService {
 
@@ -92,6 +96,12 @@ interface ApiService {
 
     @DELETE("admin/products/{id}")
     suspend fun adminDeleteProduct(@Path("id") id: Long): ApiResponse<Any?>
+
+    @Multipart
+    @POST("images/upload/product")
+    suspend fun uploadProductImage(
+        @Part file: MultipartBody.Part
+    ): ApiResponse<ImageUploadResponse>
 
     // ========================
     // Admin - Inventory

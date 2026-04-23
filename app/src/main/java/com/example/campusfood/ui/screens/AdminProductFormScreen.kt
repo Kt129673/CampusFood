@@ -21,6 +21,16 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.Locale
+import java.io.File
+import java.io.FileOutputStream
+import android.net.Uri
+import android.provider.OpenableColumns
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
 import com.example.campusfood.model.ProductRequest
 import com.example.campusfood.ui.theme.*
 
@@ -53,6 +63,37 @@ fun AdminProductFormScreen(
     var stock by remember { mutableStateOf("100") }
     var available by remember { mutableStateOf(true) }
     var formInitialized by remember { mutableStateOf(false) }
+    
+    val context = LocalContext.current
+    var isUploading by remember { mutableStateOf(false) }
+
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let {
+            isUploading = true
+            try {
+                // Copy to temp file
+                val extension = context.contentResolver.getType(it)?.split("/")?.lastOrNull() ?: "jpg"
+                val tempFile = File.createTempFile("upload_", ".$extension", context.cacheDir)
+                val inputStream = context.contentResolver.openInputStream(it)
+                val outputStream = FileOutputStream(tempFile)
+                inputStream?.copyTo(outputStream)
+                inputStream?.close()
+                outputStream.close()
+
+                val requestFile = tempFile.asRequestBody(context.contentResolver.getType(it)?.toMediaTypeOrNull() ?: "image/*".toMediaTypeOrNull())
+                val body = MultipartBody.Part.createFormData("file", tempFile.name, requestFile)
+
+                adminViewModel.uploadProductImage(body) { uploadedUrl ->
+                    imageUrl = uploadedUrl
+                    isUploading = false
+                }
+            } catch (e: Exception) {
+                isUploading = false
+            }
+        }
+    }
 
     // Populate form when product loads (edit mode)
     LaunchedEffect(selectedProduct) {
@@ -223,17 +264,36 @@ fun AdminProductFormScreen(
             Spacer(Modifier.height(12.dp))
 
             // Image URL
-            OutlinedTextField(
-                value = imageUrl,
-                onValueChange = { imageUrl = it },
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Image URL") },
-                leadingIcon = { Icon(Icons.Default.Image, null, tint = Color(0xFF7B1FA2), modifier = Modifier.size(20.dp)) },
-                shape = RoundedCornerShape(12.dp),
-                singleLine = true,
-                colors = adminFieldColors(),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
-            )
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                OutlinedTextField(
+                    value = imageUrl,
+                    onValueChange = { imageUrl = it },
+                    modifier = Modifier.weight(1f),
+                    label = { Text("Image URL") },
+                    leadingIcon = { Icon(Icons.Default.Image, null, tint = Color(0xFF7B1FA2), modifier = Modifier.size(20.dp)) },
+                    shape = RoundedCornerShape(12.dp),
+                    singleLine = true,
+                    colors = adminFieldColors(),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                )
+
+                FilledTonalButton(
+                    onClick = { imagePickerLauncher.launch("image/*") },
+                    modifier = Modifier.height(56.dp).padding(top = 8.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.filledTonalButtonColors(containerColor = Color(0xFF7B1FA2).copy(alpha = 0.1f))
+                ) {
+                    if (isUploading || actionState is AdminProductActionState.Loading && name.isEmpty()) {
+                        CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color(0xFF7B1FA2), strokeWidth = 2.dp)
+                    } else {
+                        Icon(Icons.Default.Upload, contentDescription = "Upload", tint = Color(0xFF7B1FA2))
+                    }
+                }
+            }
 
             Spacer(Modifier.height(12.dp))
 

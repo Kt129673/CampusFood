@@ -35,7 +35,7 @@ public class S3Service {
     private String region;
 
     private static final List<String> ALLOWED_CONTENT_TYPES = Arrays.asList(
-            "image/jpeg", "image/png", "image/webp", "image/gif"
+            "image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif"
     );
 
     private static final long MAX_FILE_SIZE = 15 * 1024 * 1024; // 15MB
