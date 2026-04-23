@@ -1,5 +1,7 @@
 package com.example.campusfood.ui
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -9,6 +11,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -38,7 +41,9 @@ fun MainScreen() {
 
     val isLoggedIn by authViewModel.isLoggedIn.collectAsStateWithLifecycle()
     val currentUser by authViewModel.currentUser.collectAsStateWithLifecycle()
+    val authState by authViewModel.authState.collectAsStateWithLifecycle()
     val cartState by cartViewModel.uiState.collectAsStateWithLifecycle()
+    val isPlacingOrder by orderViewModel.isPlacingOrder.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -53,6 +58,36 @@ fun MainScreen() {
     LaunchedEffect(currentUser) {
         currentUser?.let { user ->
             orderViewModel.setUserId(user.id)
+        }
+    }
+
+    // FIX #1: Handle login/logout navigation reactively instead of via startDestination
+    // Navigate to login when logged out
+    LaunchedEffect(isLoggedIn) {
+        if (!isLoggedIn) {
+            navController.navigate(Screen.Login.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
+
+    // FIX #2: Navigate on auth success using authState so currentUser is guaranteed populated
+    LaunchedEffect(authState) {
+        if (authState is AuthUiState.Success) {
+            val user = (authState as AuthUiState.Success).user
+            val dest = if (user.role == "ADMIN") Screen.AdminDashboard.route else Screen.Menu.route
+            navController.navigate(dest) {
+                popUpTo(Screen.Login.route) { inclusive = true }
+            }
+        }
+    }
+
+    // FIX #11: Refresh orders when navigating to the Orders tab
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+    LaunchedEffect(currentRoute) {
+        if (currentRoute == Screen.Orders.route) {
+            orderViewModel.getOrders()
         }
     }
 
@@ -72,19 +107,9 @@ fun MainScreen() {
         )
     }
 
-    // Determine start destination
-    val startDestination = when {
-        !isLoggedIn -> Screen.Login.route
-        isAdmin -> Screen.AdminDashboard.route
-        else -> Screen.Menu.route
-    }
-
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentRoute = navBackStackEntry?.destination?.route
-
             if (isLoggedIn && currentRoute != Screen.Login.route) {
                 NavigationBar(
                     containerColor = MaterialTheme.colorScheme.surface,
@@ -138,7 +163,7 @@ fun MainScreen() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = startDestination,
+            startDestination = Screen.Login.route,
             modifier = Modifier.padding(innerPadding)
         ) {
             // Login Screen
@@ -146,11 +171,7 @@ fun MainScreen() {
                 LoginScreen(
                     authViewModel = authViewModel,
                     onLoginSuccess = {
-                        val dest = if (currentUser?.role == "ADMIN") Screen.AdminDashboard.route
-                                   else Screen.Menu.route
-                        navController.navigate(dest) {
-                            popUpTo(Screen.Login.route) { inclusive = true }
-                        }
+                        // Navigation is now handled reactively via LaunchedEffect(authState)
                     }
                 )
             }
@@ -207,7 +228,8 @@ fun MainScreen() {
                             }
                         }
                     },
-                    viewModel = cartViewModel
+                    viewModel = cartViewModel,
+                    isPlacingOrder = isPlacingOrder
                 )
             }
 
@@ -222,9 +244,7 @@ fun MainScreen() {
                     user = currentUser,
                     onLogout = {
                         authViewModel.logout()
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(0) { inclusive = true }
-                        }
+                        // Navigation handled reactively via LaunchedEffect(isLoggedIn)
                     }
                 )
             }

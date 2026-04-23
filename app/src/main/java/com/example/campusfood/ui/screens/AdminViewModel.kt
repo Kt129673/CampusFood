@@ -55,9 +55,14 @@ class AdminViewModel : ViewModel() {
                 )
                 if (response.success) {
                     loadAllOrders()
+                } else {
+                    // Refresh to show current state even on failure
+                    loadAllOrders()
                 }
-            } catch (_: Exception) { }
-            finally {
+            } catch (_: Exception) {
+                // Refresh to get current state so UI isn't stuck
+                loadAllOrders()
+            } finally {
                 _statusUpdateLoading.value = null
             }
         }

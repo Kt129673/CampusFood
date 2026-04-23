@@ -22,6 +22,7 @@ class UserSessionManager(private val context: Context) {
         private val KEY_USER_MOBILE = stringPreferencesKey("user_mobile")
         private val KEY_USER_EMAIL = stringPreferencesKey("user_email")
         private val KEY_USER_ROLE = stringPreferencesKey("user_role")
+        private val KEY_USER_CREATED_AT = stringPreferencesKey("user_created_at")
         private val KEY_IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
     }
 
@@ -38,7 +39,8 @@ class UserSessionManager(private val context: Context) {
                 name = name,
                 mobile = prefs[KEY_USER_MOBILE],
                 email = prefs[KEY_USER_EMAIL],
-                role = prefs[KEY_USER_ROLE] ?: "CUSTOMER"
+                role = prefs[KEY_USER_ROLE] ?: "CUSTOMER",
+                createdAt = prefs[KEY_USER_CREATED_AT]
             )
         } else null
     }
@@ -50,6 +52,7 @@ class UserSessionManager(private val context: Context) {
             prefs[KEY_USER_MOBILE] = user.mobile ?: ""
             prefs[KEY_USER_EMAIL] = user.email ?: ""
             prefs[KEY_USER_ROLE] = user.role
+            prefs[KEY_USER_CREATED_AT] = user.createdAt ?: ""
             prefs[KEY_IS_LOGGED_IN] = true
         }
     }

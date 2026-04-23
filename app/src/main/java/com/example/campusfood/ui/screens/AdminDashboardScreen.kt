@@ -237,6 +237,13 @@ private fun AdminOrderCard(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    if (order.createdAt != null) {
+                        Text(
+                            text = formatAdminDateTime(order.createdAt),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                        )
+                    }
                 }
                 StatusBadge(status = order.status)
             }
@@ -384,5 +391,33 @@ private fun getStatusColor(status: String): Color {
         "DELIVERED" -> GreenSuccess
         "CANCELLED" -> RedError
         else -> MaterialTheme.colorScheme.onSurfaceVariant
+    }
+}
+
+/**
+ * Formats an ISO date string for admin dashboard display.
+ */
+private fun formatAdminDateTime(isoString: String): String {
+    return try {
+        val parts = isoString.split("T")
+        if (parts.size == 2) {
+            val dateParts = parts[0].split("-")
+            val time = parts[1].substringBefore(".").substring(0, 5)
+            if (dateParts.size == 3) {
+                val months = listOf(
+                    "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                )
+                val monthIndex = dateParts[1].toIntOrNull() ?: 0
+                val monthName = months.getOrElse(monthIndex) { dateParts[1] }
+                "${dateParts[2]} $monthName at $time"
+            } else {
+                "${parts[0]} at $time"
+            }
+        } else {
+            isoString
+        }
+    } catch (_: Exception) {
+        isoString
     }
 }

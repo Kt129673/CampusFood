@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -24,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,7 +38,8 @@ import com.example.campusfood.ui.theme.OrangePrimaryDark
 @Composable
 fun CartScreen(
     onCheckoutClick: (String) -> Unit,
-    viewModel: CartViewModel
+    viewModel: CartViewModel,
+    isPlacingOrder: Boolean = false
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var deliveryAddress by remember { mutableStateOf("Campus Dorm A, Room 101") }
@@ -148,7 +149,7 @@ fun CartScreen(
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            // Checkout button
+                            // FIX #12: Checkout button with loading state to prevent double-tap
                             Button(
                                 onClick = { onCheckoutClick(deliveryAddress) },
                                 modifier = Modifier
@@ -161,20 +162,35 @@ fun CartScreen(
                                 elevation = ButtonDefaults.buttonElevation(
                                     defaultElevation = 4.dp
                                 ),
-                                enabled = deliveryAddress.isNotBlank()
+                                enabled = deliveryAddress.isNotBlank() && !isPlacingOrder
                             ) {
-                                Icon(
-                                    Icons.Default.ShoppingCart,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Spacer(Modifier.width(8.dp))
-                                Text(
-                                    "Place Order",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
+                                if (isPlacingOrder) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(22.dp),
+                                        color = Color.White,
+                                        strokeWidth = 2.dp
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        "Placing Order...",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                } else {
+                                    Icon(
+                                        Icons.Default.ShoppingCart,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        "Place Order",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                }
                             }
                         }
                     }
@@ -201,7 +217,7 @@ fun CartScreen(
                 }
                 is CartUiState.Success -> {
                     if (state.items.isEmpty()) {
-                        // Empty cart state
+                        // Improved empty cart state
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -210,7 +226,7 @@ fun CartScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text("🛒", fontSize = 64.sp)
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
                             Text(
                                 "Your cart is empty",
                                 style = MaterialTheme.typography.titleLarge,
@@ -222,7 +238,8 @@ fun CartScreen(
                                 "Browse the menu and add some\ndelicious items to get started!",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                                lineHeight = 22.sp
+                                lineHeight = 22.sp,
+                                textAlign = TextAlign.Center
                             )
                         }
                     } else {
@@ -239,7 +256,7 @@ fun CartScreen(
                                     onRemove = { viewModel.removeFromCart(item.productId) }
                                 )
                             }
-                            // Bottom spacing
+                            // Bottom spacing for checkout bar
                             item { Spacer(modifier = Modifier.height(100.dp)) }
                         }
                     }

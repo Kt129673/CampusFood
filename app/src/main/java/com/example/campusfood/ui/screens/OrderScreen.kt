@@ -17,9 +17,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BorderStroke
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -144,12 +144,16 @@ fun OrderScreen(
                             )
                         }
                     } else {
+                        // FIX #14: Sort orders newest-first
+                        val sortedOrders = remember(state.orders) {
+                            state.orders.sortedByDescending { it.id }
+                        }
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(16.dp),
                             verticalArrangement = Arrangement.spacedBy(14.dp)
                         ) {
-                            items(state.orders, key = { it.id }) { order ->
+                            items(sortedOrders, key = { it.id }) { order ->
                                 OrderCard(
                                     order = order,
                                     onCancel = {
@@ -269,6 +273,7 @@ fun OrderCard(order: OrderResponse, onCancel: () -> Unit) {
                     )
                 }
 
+                // FIX #3: Replaced broken `outlinedButtonBorder.copy(width=1.dp)` with proper BorderStroke
                 if (order.status == "PLACED") {
                     OutlinedButton(
                         onClick = onCancel,
@@ -276,8 +281,9 @@ fun OrderCard(order: OrderResponse, onCancel: () -> Unit) {
                         colors = ButtonDefaults.outlinedButtonColors(
                             contentColor = MaterialTheme.colorScheme.error
                         ),
-                        border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
-                            width = 1.dp
+                        border = BorderStroke(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
                         )
                     ) {
                         Icon(
@@ -303,9 +309,19 @@ private fun formatDateTime(isoString: String): String {
     return try {
         val parts = isoString.split("T")
         if (parts.size == 2) {
-            val date = parts[0] // 2026-04-23
+            val dateParts = parts[0].split("-") // 2026-04-23
             val time = parts[1].substringBefore(".").substring(0, 5) // 12:30
-            "$date at $time"
+            if (dateParts.size == 3) {
+                val months = listOf(
+                    "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                )
+                val monthIndex = dateParts[1].toIntOrNull() ?: 0
+                val monthName = months.getOrElse(monthIndex) { dateParts[1] }
+                "${dateParts[2]} $monthName ${dateParts[0]} at $time"
+            } else {
+                "${parts[0]} at $time"
+            }
         } else {
             isoString
         }

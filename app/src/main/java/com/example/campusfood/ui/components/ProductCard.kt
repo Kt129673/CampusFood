@@ -6,14 +6,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -27,7 +24,6 @@ import coil.request.ImageRequest
 import com.example.campusfood.model.Product
 import com.example.campusfood.ui.theme.GreenSuccess
 import com.example.campusfood.ui.theme.OrangePrimary
-import com.example.campusfood.ui.theme.OrangePrimaryDark
 
 @Composable
 fun ProductCard(

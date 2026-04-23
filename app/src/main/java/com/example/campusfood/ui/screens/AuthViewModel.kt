@@ -24,7 +24,7 @@ sealed interface AuthUiState {
 
 class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
-    val sessionManager = UserSessionManager(application)
+    private val sessionManager = UserSessionManager(application)
 
     private val _authState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val authState: StateFlow<AuthUiState> = _authState.asStateFlow()

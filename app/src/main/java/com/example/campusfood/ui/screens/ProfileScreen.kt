@@ -182,6 +182,13 @@ fun ProfileScreen(
                 label = "User ID",
                 value = "#${user?.id ?: "—"}"
             )
+            if (!user?.createdAt.isNullOrBlank()) {
+                ProfileInfoRow(
+                    icon = Icons.Default.CalendarMonth,
+                    label = "Member Since",
+                    value = formatProfileDate(user?.createdAt ?: "")
+                )
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -350,5 +357,27 @@ private fun ProfileMenuItem(
             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
             modifier = Modifier.size(20.dp)
         )
+    }
+}
+
+/**
+ * Formats an ISO date string to a display-friendly format for the profile.
+ */
+private fun formatProfileDate(isoString: String): String {
+    return try {
+        val parts = isoString.split("T")[0].split("-")
+        if (parts.size == 3) {
+            val months = listOf(
+                "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+            )
+            val monthIndex = parts[1].toIntOrNull() ?: 0
+            val monthName = months.getOrElse(monthIndex) { parts[1] }
+            "${parts[2]} $monthName ${parts[0]}"
+        } else {
+            isoString.split("T")[0]
+        }
+    } catch (_: Exception) {
+        isoString
     }
 }

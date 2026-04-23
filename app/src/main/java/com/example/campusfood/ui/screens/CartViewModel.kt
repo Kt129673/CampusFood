@@ -16,66 +16,78 @@ sealed interface CartUiState {
 /**
  * Cart is managed locally in-memory.
  * No backend cart API exists — cart persists only during the app session.
+ * Uses synchronized list for thread safety.
  */
 class CartViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<CartUiState>(CartUiState.Success(emptyList()))
     val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
 
-    private val cartItems = mutableListOf<CartItem>()
+    // FIX #5: Thread-safe cart using synchronizedList
+    private val cartItems = java.util.Collections.synchronizedList(mutableListOf<CartItem>())
 
     fun addToCart(product: Product) {
-        val existing = cartItems.find { it.productId == product.id }
-        if (existing != null) {
-            val index = cartItems.indexOf(existing)
-            cartItems[index] = existing.copy(quantity = existing.quantity + 1)
-        } else {
-            cartItems.add(
-                CartItem(
-                    productId = product.id ?: 0,
-                    productName = product.name,
-                    quantity = 1,
-                    price = product.price,
-                    imageUrl = product.imageUrl,
-                    category = product.category
-                )
-            )
-        }
-        _uiState.value = CartUiState.Success(cartItems.toList())
-    }
-
-    fun removeFromCart(productId: Long) {
-        cartItems.removeAll { it.productId == productId }
-        _uiState.value = CartUiState.Success(cartItems.toList())
-    }
-
-    fun incrementQuantity(productId: Long) {
-        val index = cartItems.indexOfFirst { it.productId == productId }
-        if (index >= 0) {
-            val item = cartItems[index]
-            cartItems[index] = item.copy(quantity = item.quantity + 1)
-            _uiState.value = CartUiState.Success(cartItems.toList())
-        }
-    }
-
-    fun decrementQuantity(productId: Long) {
-        val index = cartItems.indexOfFirst { it.productId == productId }
-        if (index >= 0) {
-            val item = cartItems[index]
-            if (item.quantity > 1) {
-                cartItems[index] = item.copy(quantity = item.quantity - 1)
+        synchronized(cartItems) {
+            val existing = cartItems.find { it.productId == product.id }
+            if (existing != null) {
+                val index = cartItems.indexOf(existing)
+                cartItems[index] = existing.copy(quantity = existing.quantity + 1)
             } else {
-                cartItems.removeAt(index)
+                cartItems.add(
+                    CartItem(
+                        productId = product.id ?: 0,
+                        productName = product.name,
+                        quantity = 1,
+                        price = product.price,
+                        imageUrl = product.imageUrl,
+                        category = product.category
+                    )
+                )
             }
             _uiState.value = CartUiState.Success(cartItems.toList())
         }
     }
 
-    fun clearCart() {
-        cartItems.clear()
-        _uiState.value = CartUiState.Success(emptyList())
+    fun removeFromCart(productId: Long) {
+        synchronized(cartItems) {
+            cartItems.removeAll { it.productId == productId }
+            _uiState.value = CartUiState.Success(cartItems.toList())
+        }
     }
 
-    val itemCount: Int get() = cartItems.sumOf { it.quantity }
+    fun incrementQuantity(productId: Long) {
+        synchronized(cartItems) {
+            val index = cartItems.indexOfFirst { it.productId == productId }
+            if (index >= 0) {
+                val item = cartItems[index]
+                cartItems[index] = item.copy(quantity = item.quantity + 1)
+                _uiState.value = CartUiState.Success(cartItems.toList())
+            }
+        }
+    }
 
-    val totalAmount: Double get() = cartItems.sumOf { it.price * it.quantity }
+    fun decrementQuantity(productId: Long) {
+        synchronized(cartItems) {
+            val index = cartItems.indexOfFirst { it.productId == productId }
+            if (index >= 0) {
+                val item = cartItems[index]
+                if (item.quantity > 1) {
+                    cartItems[index] = item.copy(quantity = item.quantity - 1)
+                } else {
+                    cartItems.removeAt(index)
+                }
+                _uiState.value = CartUiState.Success(cartItems.toList())
+            }
+        }
+    }
+
+    fun clearCart() {
+        synchronized(cartItems) {
+            cartItems.clear()
+            _uiState.value = CartUiState.Success(emptyList())
+        }
+    }
+
+    val itemCount: Int get() = synchronized(cartItems) { cartItems.sumOf { it.quantity } }
+
+    val totalAmount: Double get() = synchronized(cartItems) { cartItems.sumOf { it.price * it.quantity } }
 }

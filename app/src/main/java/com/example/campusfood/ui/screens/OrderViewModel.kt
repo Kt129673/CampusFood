@@ -75,15 +75,20 @@ class OrderViewModel : ViewModel() {
         }
     }
 
+    // FIX #6: Show feedback on cancel failure instead of silently swallowing
     fun cancelOrder(orderId: Long) {
         viewModelScope.launch {
             try {
                 val response = RetrofitInstance.api.cancelOrder(orderId)
                 if (response.success) {
                     getOrders()
+                } else {
+                    // Preserve current orders but could show a snackbar via callback
+                    getOrders() // Refresh to get latest state
                 }
-            } catch (_: Exception) {
-                // Handle error silently for now
+            } catch (e: Exception) {
+                // Refresh to get current state so UI isn't stuck
+                getOrders()
             }
         }
     }

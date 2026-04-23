@@ -222,7 +222,8 @@ fun MenuScreen(
             is MenuUiState.Success -> {
                 val filteredProducts = state.products.filter {
                     (selectedCategory == "All" || it.category.equals(selectedCategory, ignoreCase = true)) &&
-                            it.name.contains(searchQuery, ignoreCase = true)
+                            (it.name.contains(searchQuery, ignoreCase = true) ||
+                             it.description?.contains(searchQuery, ignoreCase = true) == true)
                 }
 
                 if (filteredProducts.isEmpty()) {
