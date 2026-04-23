@@ -144,4 +144,8 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
     fun resetError() {
         _authState.value = AuthUiState.Idle
     }
+
+    fun setError(message: String) {
+        _authState.value = AuthUiState.Error(message)
+    }
 }

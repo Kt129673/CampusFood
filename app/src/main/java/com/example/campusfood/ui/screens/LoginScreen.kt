@@ -65,10 +65,20 @@ fun LoginScreen(
                 val email = account?.email ?: ""
                 if (email.isNotBlank()) {
                     authViewModel.loginWithGoogle(name, email)
+                } else {
+                    authViewModel.setError("Google account does not have an email address.")
                 }
             } catch (e: ApiException) {
                 Log.e("LoginScreen", "Google sign-in failed: ${e.statusCode}", e)
+                if (e.statusCode == 10) {
+                    authViewModel.setError("Google Sign-In Error (Code 10): App SHA-1 is not registered in Google Cloud Console.")
+                } else {
+                    authViewModel.setError("Google sign-in failed (Code: ${e.statusCode}).")
+                }
             }
+        } else {
+            // User canceled or Google Play Services had an issue
+            authViewModel.setError("Google sign-in was canceled or failed to start.")
         }
     }
 
