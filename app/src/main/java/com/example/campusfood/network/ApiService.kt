@@ -91,7 +91,7 @@ interface ApiService {
     ): ApiResponse<Product>
 
     @DELETE("admin/products/{id}")
-    suspend fun adminDeleteProduct(@Path("id") id: Long): ApiResponse<Void>
+    suspend fun adminDeleteProduct(@Path("id") id: Long): ApiResponse<Any?>
 
     // ========================
     // Admin - Inventory

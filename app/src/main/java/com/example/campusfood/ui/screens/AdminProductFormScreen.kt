@@ -20,7 +20,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.campusfood.model.Product
 import com.example.campusfood.model.ProductRequest
 import com.example.campusfood.ui.theme.*
 
