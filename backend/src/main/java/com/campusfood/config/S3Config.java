@@ -8,10 +8,13 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Configures the AWS S3 client bean used for image storage operations.
  * Reads credentials and region from application.properties.
  */
+@Slf4j
 @Configuration
 public class S3Config {
 
@@ -26,6 +29,12 @@ public class S3Config {
 
     @Bean
     public S3Client s3Client() {
+        if (accessKey == null || accessKey.isBlank()) {
+            log.warn("AWS Access Key is missing. Falling back to DefaultCredentialsProvider.");
+            return S3Client.builder()
+                    .region(Region.of(region))
+                    .build();
+        }
         AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
         return S3Client.builder()
                 .region(Region.of(region))
