@@ -25,3 +25,27 @@ data class PaginatedResponse<T>(
 data class StatusUpdateRequest(
     val status: String
 )
+
+/**
+ * Request model for creating/updating products.
+ * Matches backend ProductRequest.
+ */
+@JsonClass(generateAdapter = true)
+data class ProductRequest(
+    val name: String,
+    val description: String?,
+    val price: Double,
+    val category: String,
+    val imageUrl: String?,
+    val available: Boolean = true,
+    val initialStock: Int? = 0
+)
+
+/**
+ * Request model for updating inventory quantity.
+ * Matches backend InventoryUpdateRequest.
+ */
+@JsonClass(generateAdapter = true)
+data class InventoryUpdateRequest(
+    val quantity: Int
+)

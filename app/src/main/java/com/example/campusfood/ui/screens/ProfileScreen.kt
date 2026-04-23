@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.campusfood.model.User
 import com.example.campusfood.ui.theme.OrangePrimary
 import com.example.campusfood.ui.theme.OrangePrimaryDark
@@ -70,9 +71,10 @@ fun ProfileScreen(
 
     Scaffold(
         topBar = {
+            // Compact header
             Surface(
                 color = Color.Transparent,
-                shadowElevation = 4.dp
+                shadowElevation = 2.dp
             ) {
                 Box(
                     modifier = Modifier
@@ -83,11 +85,11 @@ fun ProfileScreen(
                             )
                         )
                         .statusBarsPadding()
-                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
                 ) {
                     Text(
                         "My Profile",
-                        style = MaterialTheme.typography.headlineMedium,
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Black,
                         color = Color.White
                     )
@@ -100,12 +102,12 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 24.dp),
+                .padding(horizontal = 16.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Avatar with initial
+            // Compact avatar
             Surface(
-                modifier = Modifier.size(100.dp),
+                modifier = Modifier.size(80.dp),
                 shape = CircleShape,
                 color = OrangePrimary.copy(alpha = 0.15f)
             ) {
@@ -113,23 +115,23 @@ fun ProfileScreen(
                     val initial = user?.name?.firstOrNull()?.uppercase() ?: "U"
                     Text(
                         initial,
-                        style = MaterialTheme.typography.displayLarge,
+                        style = MaterialTheme.typography.displayMedium,
                         fontWeight = FontWeight.Bold,
                         color = OrangePrimary
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Name
             Text(
                 user?.name ?: "Guest User",
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             // Role badge
             val roleLabel = when (user?.role) {
@@ -143,21 +145,21 @@ fun ProfileScreen(
                 else -> OrangePrimary
             }
             Surface(
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(6.dp),
                 color = roleColor.copy(alpha = 0.12f)
             ) {
                 Text(
                     roleLabel,
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 5.dp),
-                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 3.dp),
+                    style = MaterialTheme.typography.labelSmall,
                     color = roleColor,
                     fontWeight = FontWeight.Bold
                 )
             }
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // Info cards
+            // Compact info cards
             if (!user?.mobile.isNullOrBlank()) {
                 ProfileInfoRow(
                     icon = Icons.Default.Phone,
@@ -190,17 +192,17 @@ fun ProfileScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Settings section
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(14.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
                 )
             ) {
-                Column(modifier = Modifier.padding(4.dp)) {
+                Column(modifier = Modifier.padding(2.dp)) {
                     ProfileMenuItem(
                         icon = Icons.Default.Notifications,
                         title = "Notifications",
@@ -208,7 +210,7 @@ fun ProfileScreen(
                     )
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
                     )
                     ProfileMenuItem(
                         icon = Icons.Default.LocationOn,
@@ -217,7 +219,7 @@ fun ProfileScreen(
                     )
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
                     )
                     ProfileMenuItem(
                         icon = Icons.AutoMirrored.Filled.Help,
@@ -226,7 +228,7 @@ fun ProfileScreen(
                     )
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
                     )
                     ProfileMenuItem(
                         icon = Icons.Default.Info,
@@ -236,15 +238,15 @@ fun ProfileScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Logout Button
+            // Compact logout button
             OutlinedButton(
                 onClick = { showLogoutDialog = true },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
-                shape = RoundedCornerShape(14.dp),
+                    .height(44.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = RedError
                 )
@@ -252,17 +254,18 @@ fun ProfileScreen(
                 Icon(
                     Icons.AutoMirrored.Filled.ExitToApp,
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(18.dp)
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(6.dp))
                 Text(
                     "Logout",
                     style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 13.sp
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -276,22 +279,22 @@ private fun ProfileInfoRow(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 5.dp),
-        shape = RoundedCornerShape(14.dp),
+            .padding(vertical = 3.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.5.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+                .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(
-                modifier = Modifier.size(40.dp),
-                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.size(34.dp),
+                shape = RoundedCornerShape(8.dp),
                 color = OrangePrimary.copy(alpha = 0.1f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
@@ -299,21 +302,23 @@ private fun ProfileInfoRow(
                         icon,
                         contentDescription = null,
                         tint = OrangePrimary,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                 }
             }
-            Spacer(modifier = Modifier.width(14.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
                     label,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 10.sp
                 )
                 Text(
                     value,
                     style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 13.sp
                 )
             }
         }
@@ -329,33 +334,35 @@ private fun ProfileMenuItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 14.dp),
+            .padding(horizontal = 14.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             icon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(22.dp)
+            modifier = Modifier.size(18.dp)
         )
-        Spacer(modifier = Modifier.width(14.dp))
+        Spacer(modifier = Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 title,
                 style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                fontSize = 13.sp
             )
             Text(
                 subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 10.sp
             )
         }
         Icon(
             Icons.Default.ChevronRight,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-            modifier = Modifier.size(20.dp)
+            modifier = Modifier.size(16.dp)
         )
     }
 }

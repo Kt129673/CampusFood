@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusfood.model.OrderResponse
 import com.example.campusfood.ui.components.StatusBadge
 import com.example.campusfood.ui.theme.*
@@ -26,7 +25,8 @@ import com.example.campusfood.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminDashboardScreen(
-    adminViewModel: AdminViewModel = viewModel()
+    adminViewModel: AdminViewModel,
+    onManageProducts: () -> Unit = {}
 ) {
     val ordersState by adminViewModel.ordersState.collectAsState()
     val statusUpdateLoading by adminViewModel.statusUpdateLoading.collectAsState()
@@ -36,13 +36,17 @@ fun AdminDashboardScreen(
 
     Scaffold(
         topBar = {
-            Surface(color = Color.Transparent, shadowElevation = 4.dp) {
+            // Compact admin header
+            Surface(
+                color = Color.Transparent,
+                shadowElevation = 2.dp
+            ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(Brush.horizontalGradient(listOf(Color(0xFF7B1FA2), Color(0xFF4A148C))))
                         .statusBarsPadding()
-                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -51,22 +55,39 @@ fun AdminDashboardScreen(
                     ) {
                         Column {
                             Text(
-                                "Admin Dashboard",
-                                style = MaterialTheme.typography.headlineMedium,
+                                "Dashboard",
+                                style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Black,
                                 color = Color.White
                             )
                             Text(
-                                "Manage all orders",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.White.copy(alpha = 0.85f)
+                                "Manage orders & products",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White.copy(alpha = 0.8f)
                             )
                         }
-                        IconButton(
-                            onClick = { adminViewModel.loadAllOrders() },
-                            colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
-                        ) {
-                            Icon(Icons.Default.Refresh, "Refresh")
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            // Manage Products button
+                            FilledTonalIconButton(
+                                onClick = onManageProducts,
+                                modifier = Modifier.size(36.dp),
+                                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                                    containerColor = Color.White.copy(alpha = 0.15f),
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                Icon(Icons.Default.Inventory2, "Products", modifier = Modifier.size(18.dp))
+                            }
+                            FilledTonalIconButton(
+                                onClick = { adminViewModel.loadAllOrders() },
+                                modifier = Modifier.size(36.dp),
+                                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                                    containerColor = Color.White.copy(alpha = 0.15f),
+                                    contentColor = Color.White
+                                )
+                            ) {
+                                Icon(Icons.Default.Refresh, "Refresh", modifier = Modifier.size(18.dp))
+                            }
                         }
                     }
                 }
@@ -74,12 +95,12 @@ fun AdminDashboardScreen(
         }
     ) { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
-            // Stats bar
+            // Compact stats bar
             if (ordersState is AdminOrdersState.Success) {
                 val orders = (ordersState as AdminOrdersState.Success).orders
                 LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     val stats = mapOf(
                         "Total" to orders.size,
@@ -96,9 +117,9 @@ fun AdminDashboardScreen(
 
             // Filter chips
             LazyRow(
-                contentPadding = PaddingValues(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(bottom = 8.dp)
+                contentPadding = PaddingValues(horizontal = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier.padding(bottom = 6.dp)
             ) {
                 items(filters) { filter ->
                     val label = when (filter) {
@@ -113,8 +134,9 @@ fun AdminDashboardScreen(
                     FilterChip(
                         selected = selectedFilter == filter,
                         onClick = { selectedFilter = filter },
-                        label = { Text(label, fontSize = 12.sp) },
+                        label = { Text(label, fontSize = 11.sp) },
                         shape = RoundedCornerShape(20.dp),
+                        modifier = Modifier.height(30.dp),
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = Color(0xFF7B1FA2),
                             selectedLabelColor = Color.White
@@ -149,15 +171,19 @@ fun AdminDashboardScreen(
 
                     if (filtered.isEmpty()) {
                         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text(
-                                "No orders with this status",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("📋", fontSize = 40.sp)
+                                Spacer(Modifier.height(8.dp))
+                                Text(
+                                    "No orders with this status",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     } else {
                         LazyColumn(
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             items(filtered, key = { it.id }) { order ->
                                 AdminOrderCard(
@@ -180,24 +206,25 @@ fun AdminDashboardScreen(
 @Composable
 private fun StatCard(label: String, count: Int) {
     Card(
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp),
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 "$count",
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Black,
                 color = Color(0xFF7B1FA2)
             )
             Text(
                 label,
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 9.sp
             )
         }
     }
@@ -215,11 +242,11 @@ private fun AdminOrderCard(
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize(),
-        shape = RoundedCornerShape(18.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(14.dp)) {
             // Header row
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -229,48 +256,51 @@ private fun AdminOrderCard(
                 Column {
                     Text(
                         "Order #${order.id}",
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         order.userName ?: "User #${order.userId}",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     if (order.createdAt != null) {
                         Text(
                             text = formatAdminDateTime(order.createdAt),
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            fontSize = 9.sp
                         )
                     }
                 }
                 StatusBadge(status = order.status)
             }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(6.dp))
 
             // Items
             order.items?.forEach { item ->
                 Text(
                     "• ${item.productName ?: "Product #${item.productId}"} × ${item.quantity}",
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(vertical = 1.dp)
+                    modifier = Modifier.padding(vertical = 1.dp),
+                    fontSize = 11.sp
                 )
             }
 
             if (!order.deliveryAddress.isNullOrBlank()) {
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(4.dp))
                 Text(
                     "📍 ${order.deliveryAddress}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontSize = 10.sp
                 )
             }
 
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 10.dp),
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
+                modifier = Modifier.padding(vertical = 8.dp),
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
             )
 
             // Total + actions
@@ -281,7 +311,7 @@ private fun AdminOrderCard(
             ) {
                 Text(
                     "₹${String.format("%.2f", order.totalAmount)}",
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Black,
                     color = OrangePrimary
                 )
@@ -290,17 +320,17 @@ private fun AdminOrderCard(
                     Box {
                         Button(
                             onClick = { showStatusMenu = true },
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(10.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color(0xFF7B1FA2)
                             ),
-                            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 0.dp),
-                            modifier = Modifier.height(36.dp),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                            modifier = Modifier.height(32.dp),
                             enabled = !isUpdating
                         ) {
                             if (isUpdating) {
                                 CircularProgressIndicator(
-                                    modifier = Modifier.size(16.dp),
+                                    modifier = Modifier.size(14.dp),
                                     color = Color.White,
                                     strokeWidth = 2.dp
                                 )
@@ -308,10 +338,10 @@ private fun AdminOrderCard(
                                 Icon(
                                     Icons.Default.Update,
                                     null,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(14.dp)
                                 )
                                 Spacer(Modifier.width(4.dp))
-                                Text("Update", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                Text("Update", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                             }
                         }
 
@@ -325,7 +355,8 @@ private fun AdminOrderCard(
                                     text = {
                                         Text(
                                             getStatusLabel(status),
-                                            fontWeight = FontWeight.Medium
+                                            fontWeight = FontWeight.Medium,
+                                            fontSize = 13.sp
                                         )
                                     },
                                     leadingIcon = {
@@ -333,7 +364,7 @@ private fun AdminOrderCard(
                                             getStatusIcon(status),
                                             null,
                                             tint = getStatusColor(status),
-                                            modifier = Modifier.size(18.dp)
+                                            modifier = Modifier.size(16.dp)
                                         )
                                     },
                                     onClick = {

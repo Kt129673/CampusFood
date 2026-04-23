@@ -26,36 +26,37 @@ fun ErrorState(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("😔", fontSize = 56.sp)
-        Spacer(modifier = Modifier.height(16.dp))
+        Text("😔", fontSize = 48.sp)
+        Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = "Something went wrong",
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = message,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            lineHeight = 22.sp
+            lineHeight = 20.sp
         )
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         Button(
             onClick = onRetry,
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = OrangePrimary
             ),
-            modifier = Modifier.height(48.dp),
-            contentPadding = PaddingValues(horizontal = 32.dp)
+            modifier = Modifier.height(42.dp),
+            contentPadding = PaddingValues(horizontal = 28.dp)
         ) {
             Text(
                 "Try Again",
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = Color.White,
+                fontSize = 13.sp
             )
         }
     }

@@ -1,15 +1,18 @@
 package com.example.campusfood.network
 
 import com.example.campusfood.model.ApiResponse
+import com.example.campusfood.model.InventoryUpdateRequest
 import com.example.campusfood.model.LoginRequest
 import com.example.campusfood.model.OrderRequest
 import com.example.campusfood.model.OrderResponse
 import com.example.campusfood.model.PaginatedResponse
 import com.example.campusfood.model.Product
+import com.example.campusfood.model.ProductRequest
 import com.example.campusfood.model.RegisterRequest
 import com.example.campusfood.model.StatusUpdateRequest
 import com.example.campusfood.model.User
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -61,7 +64,7 @@ interface ApiService {
     suspend fun cancelOrder(@Path("orderId") orderId: Long): ApiResponse<OrderResponse>
 
     // ========================
-    // Admin
+    // Admin - Orders
     // ========================
     @GET("admin/orders")
     suspend fun adminGetAllOrders(
@@ -74,4 +77,28 @@ interface ApiService {
         @Path("orderId") orderId: Long,
         @Body request: StatusUpdateRequest
     ): ApiResponse<OrderResponse>
+
+    // ========================
+    // Admin - Products
+    // ========================
+    @POST("admin/products")
+    suspend fun adminCreateProduct(@Body request: ProductRequest): ApiResponse<Product>
+
+    @PUT("admin/products/{id}")
+    suspend fun adminUpdateProduct(
+        @Path("id") id: Long,
+        @Body request: ProductRequest
+    ): ApiResponse<Product>
+
+    @DELETE("admin/products/{id}")
+    suspend fun adminDeleteProduct(@Path("id") id: Long): ApiResponse<Void>
+
+    // ========================
+    // Admin - Inventory
+    // ========================
+    @PUT("admin/inventory/{productId}")
+    suspend fun adminUpdateInventory(
+        @Path("productId") productId: Long,
+        @Body request: InventoryUpdateRequest
+    ): ApiResponse<Product>
 }

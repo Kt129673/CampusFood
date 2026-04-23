@@ -22,10 +22,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.campusfood.model.OrderItemRequest
 import com.example.campusfood.model.OrderRequest
 import com.example.campusfood.ui.screens.*
@@ -38,6 +40,7 @@ fun MainScreen() {
     val authViewModel: AuthViewModel = viewModel()
     val cartViewModel: CartViewModel = viewModel()
     val orderViewModel: OrderViewModel = viewModel()
+    val adminViewModel: AdminViewModel = viewModel()
 
     val isLoggedIn by authViewModel.isLoggedIn.collectAsStateWithLifecycle()
     val currentUser by authViewModel.currentUser.collectAsStateWithLifecycle()
@@ -61,8 +64,7 @@ fun MainScreen() {
         }
     }
 
-    // FIX #1: Handle login/logout navigation reactively instead of via startDestination
-    // Navigate to login when logged out
+    // Handle login/logout navigation reactively instead of via startDestination
     LaunchedEffect(isLoggedIn) {
         if (!isLoggedIn) {
             navController.navigate(Screen.Login.route) {
@@ -71,7 +73,7 @@ fun MainScreen() {
         }
     }
 
-    // FIX #2: Navigate on auth success using authState so currentUser is guaranteed populated
+    // Navigate on auth success using authState so currentUser is guaranteed populated
     LaunchedEffect(authState) {
         if (authState is AuthUiState.Success) {
             val user = (authState as AuthUiState.Success).user
@@ -82,7 +84,7 @@ fun MainScreen() {
         }
     }
 
-    // FIX #11: Refresh orders when navigating to the Orders tab
+    // Refresh orders when navigating to the Orders tab
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     LaunchedEffect(currentRoute) {
@@ -90,6 +92,12 @@ fun MainScreen() {
             orderViewModel.getOrders()
         }
     }
+
+    // Determine if bottom bar should show (hide for admin sub-screens)
+    val showBottomBar = isLoggedIn && currentRoute != Screen.Login.route
+            && currentRoute != Screen.AdminProducts.route
+            && currentRoute != Screen.AdminAddProduct.route
+            && currentRoute != Screen.AdminEditProduct.route
 
     // Navigation items based on role
     val bottomNavItems = if (isAdmin) {
@@ -110,10 +118,11 @@ fun MainScreen() {
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            if (isLoggedIn && currentRoute != Screen.Login.route) {
+            if (showBottomBar) {
                 NavigationBar(
                     containerColor = MaterialTheme.colorScheme.surface,
-                    tonalElevation = 8.dp
+                    tonalElevation = 4.dp,
+                    modifier = Modifier
                 ) {
                     val currentDestination = navBackStackEntry?.destination
                     bottomNavItems.forEach { item ->
@@ -124,7 +133,7 @@ fun MainScreen() {
                                     badge = {
                                         if (item.badgeCount > 0) {
                                             Badge(containerColor = OrangePrimary, contentColor = Color.White) {
-                                                Text("${item.badgeCount}", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                                Text("${item.badgeCount}", fontSize = 9.sp, fontWeight = FontWeight.Bold)
                                             }
                                         }
                                     }
@@ -132,12 +141,17 @@ fun MainScreen() {
                                     Icon(
                                         if (isSelected) item.selectedIcon else item.unselectedIcon,
                                         contentDescription = item.name,
-                                        modifier = Modifier.size(24.dp)
+                                        modifier = Modifier.size(22.dp)
                                     )
                                 }
                             },
                             label = {
-                                Text(item.name, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal, fontSize = 11.sp)
+                                Text(
+                                    item.name,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    fontSize = 10.sp,
+                                    maxLines = 1
+                                )
                             },
                             selected = isSelected,
                             onClick = {
@@ -178,7 +192,48 @@ fun MainScreen() {
 
             // Admin Dashboard
             composable(Screen.AdminDashboard.route) {
-                AdminDashboardScreen()
+                AdminDashboardScreen(
+                    adminViewModel = adminViewModel,
+                    onManageProducts = {
+                        navController.navigate(Screen.AdminProducts.route)
+                    }
+                )
+            }
+
+            // Admin Products Management
+            composable(Screen.AdminProducts.route) {
+                AdminProductsScreen(
+                    adminViewModel = adminViewModel,
+                    onAddProduct = {
+                        navController.navigate(Screen.AdminAddProduct.route)
+                    },
+                    onEditProduct = { productId ->
+                        navController.navigate(Screen.AdminEditProduct.createRoute(productId))
+                    },
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            // Admin Add Product
+            composable(Screen.AdminAddProduct.route) {
+                AdminProductFormScreen(
+                    adminViewModel = adminViewModel,
+                    productId = null,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            // Admin Edit Product
+            composable(
+                route = Screen.AdminEditProduct.route,
+                arguments = listOf(navArgument("productId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val productId = backStackEntry.arguments?.getLong("productId") ?: 0L
+                AdminProductFormScreen(
+                    adminViewModel = adminViewModel,
+                    productId = productId,
+                    onBack = { navController.popBackStack() }
+                )
             }
 
             // Menu Screen

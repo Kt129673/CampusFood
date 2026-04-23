@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.BorderStroke
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campusfood.model.OrderResponse
@@ -36,9 +37,10 @@ fun OrderScreen(
 
     Scaffold(
         topBar = {
+            // Compact header
             Surface(
                 color = Color.Transparent,
-                shadowElevation = 4.dp
+                shadowElevation = 2.dp
             ) {
                 Box(
                     modifier = Modifier
@@ -49,7 +51,7 @@ fun OrderScreen(
                             )
                         )
                         .statusBarsPadding()
-                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -59,21 +61,25 @@ fun OrderScreen(
                         Column {
                             Text(
                                 "My Orders",
-                                style = MaterialTheme.typography.headlineMedium,
+                                style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Black,
                                 color = Color.White
                             )
                             Text(
                                 "Track your order status",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.White.copy(alpha = 0.85f)
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White.copy(alpha = 0.8f)
                             )
                         }
-                        IconButton(
+                        FilledTonalIconButton(
                             onClick = { viewModel.getOrders() },
-                            colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
+                            modifier = Modifier.size(34.dp),
+                            colors = IconButtonDefaults.filledTonalIconButtonColors(
+                                containerColor = Color.White.copy(alpha = 0.15f),
+                                contentColor = Color.White
+                            )
                         ) {
-                            Icon(Icons.Default.Refresh, "Refresh")
+                            Icon(Icons.Default.Refresh, "Refresh", modifier = Modifier.size(18.dp))
                         }
                     }
                 }
@@ -88,11 +94,11 @@ fun OrderScreen(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        CircularProgressIndicator(color = OrangePrimary)
-                        Spacer(modifier = Modifier.height(12.dp))
+                        CircularProgressIndicator(color = OrangePrimary, modifier = Modifier.size(36.dp))
+                        Spacer(modifier = Modifier.height(10.dp))
                         Text(
-                            "Loading your orders...",
-                            style = MaterialTheme.typography.bodyMedium,
+                            "Loading orders...",
+                            style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -105,14 +111,14 @@ fun OrderScreen(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text("😕", fontSize = 48.sp)
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("😕", fontSize = 40.sp)
+                        Spacer(modifier = Modifier.height(12.dp))
                         Text(
                             state.message,
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
                         OutlinedButton(onClick = { viewModel.getOrders() }) {
                             Text("Retry")
                         }
@@ -127,31 +133,31 @@ fun OrderScreen(
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text("📦", fontSize = 64.sp)
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Text("📦", fontSize = 48.sp)
+                            Spacer(modifier = Modifier.height(12.dp))
                             Text(
                                 "No orders yet",
-                                style = MaterialTheme.typography.titleLarge,
+                                style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(6.dp))
                             Text(
                                 "Your order history will appear here\nonce you place your first order",
-                                style = MaterialTheme.typography.bodyMedium,
+                                style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                                lineHeight = 22.sp
+                                lineHeight = 20.sp,
+                                textAlign = TextAlign.Center
                             )
                         }
                     } else {
-                        // FIX #14: Sort orders newest-first
                         val sortedOrders = remember(state.orders) {
                             state.orders.sortedByDescending { it.id }
                         }
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(14.dp)
+                            contentPadding = PaddingValues(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             items(sortedOrders, key = { it.id }) { order ->
                                 OrderCard(
@@ -163,7 +169,7 @@ fun OrderScreen(
                                     }
                                 )
                             }
-                            item { Spacer(modifier = Modifier.height(8.dp)) }
+                            item { Spacer(modifier = Modifier.height(4.dp)) }
                         }
                     }
                 }
@@ -178,11 +184,11 @@ fun OrderCard(order: OrderResponse, onCancel: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize(),
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(14.dp)) {
             // Order header
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -192,14 +198,15 @@ fun OrderCard(order: OrderResponse, onCancel: () -> Unit) {
                 Column {
                     Text(
                         "Order #${order.id}",
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold
                     )
                     if (order.createdAt != null) {
                         Text(
                             text = formatDateTime(order.createdAt),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 10.sp
                         )
                     }
                 }
@@ -207,8 +214,8 @@ fun OrderCard(order: OrderResponse, onCancel: () -> Unit) {
             }
 
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 12.dp),
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                modifier = Modifier.padding(vertical = 10.dp),
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
             )
 
             // Order items
@@ -216,41 +223,44 @@ fun OrderCard(order: OrderResponse, onCancel: () -> Unit) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 3.dp),
+                        .padding(vertical = 2.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
                         "${item.productName ?: "Product #${item.productId}"} × ${item.quantity}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.weight(1f)
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.weight(1f),
+                        fontSize = 12.sp
                     )
                     Text(
                         "₹${String.format("%.0f", item.totalPrice ?: (item.unitPrice ?: 0.0) * item.quantity)}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.SemiBold
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 12.sp
                     )
                 }
             }
 
             // Delivery address
             if (!order.deliveryAddress.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Surface(
-                    shape = RoundedCornerShape(10.dp),
+                    shape = RoundedCornerShape(8.dp),
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                 ) {
                     Text(
                         "📍 ${order.deliveryAddress}",
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 10.sp
                     )
                 }
             }
 
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 12.dp),
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                modifier = Modifier.padding(vertical = 10.dp),
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
             )
 
             // Total and cancel
@@ -262,45 +272,44 @@ fun OrderCard(order: OrderResponse, onCancel: () -> Unit) {
                 Column {
                     Text(
                         "Total",
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
                         "₹${String.format("%.2f", order.totalAmount)}",
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Black,
                         color = OrangePrimary
                     )
                 }
 
-                // FIX #3: Replaced broken `outlinedButtonBorder.copy(width=1.dp)` with proper BorderStroke
                 if (order.status == "PLACED") {
                     OutlinedButton(
                         onClick = onCancel,
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
                             contentColor = MaterialTheme.colorScheme.error
                         ),
                         border = BorderStroke(
                             width = 1.dp,
                             color = MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
-                        )
+                        ),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                        modifier = Modifier.height(32.dp)
                     ) {
                         Icon(
                             Icons.Default.Cancel,
                             contentDescription = null,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(14.dp)
                         )
                         Spacer(Modifier.width(4.dp))
-                        Text("Cancel", fontWeight = FontWeight.SemiBold)
+                        Text("Cancel", fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
                     }
                 }
             }
         }
     }
 }
-
-
 
 /**
  * Formats an ISO date string to a user-friendly format.

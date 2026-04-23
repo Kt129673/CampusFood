@@ -100,48 +100,48 @@ fun LoginScreen(
                 .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
-            // Logo
+            // Compact Logo
             Surface(
-                modifier = Modifier.size(100.dp),
+                modifier = Modifier.size(80.dp),
                 shape = CircleShape,
                 color = Color.White.copy(alpha = 0.15f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text("🍔", fontSize = 48.sp)
+                    Text("🍔", fontSize = 40.sp)
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             Text(
                 "Campus Food",
-                style = MaterialTheme.typography.displayLarge,
+                style = MaterialTheme.typography.headlineLarge,
                 color = Color.White,
                 fontWeight = FontWeight.Black
             )
             Text(
                 "Fresh food, delivered fast on campus",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = Color.White.copy(alpha = 0.8f)
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
             // Login Card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(28.dp),
+                shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp),
+                        .padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Toggle: Student / Admin
@@ -270,7 +270,7 @@ fun LoginScreen(
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(54.dp),
+                                        .height(48.dp),
                                     shape = RoundedCornerShape(14.dp),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = OrangePrimary
@@ -351,7 +351,7 @@ fun LoginScreen(
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(54.dp),
+                                        .height(48.dp),
                                     shape = RoundedCornerShape(14.dp),
                                     colors = ButtonDefaults.outlinedButtonColors(
                                         contentColor = MaterialTheme.colorScheme.onSurface
@@ -451,7 +451,7 @@ fun LoginScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Text(
                 "By continuing, you agree to our Terms of Service",
@@ -460,7 +460,7 @@ fun LoginScreen(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -19,7 +18,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -52,10 +50,10 @@ fun MenuScreen(
         topBar = {
             Surface(
                 color = MaterialTheme.colorScheme.surface,
-                shadowElevation = 4.dp
+                shadowElevation = 2.dp
             ) {
                 Column {
-                    // Header
+                    // Compact header
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -64,7 +62,7 @@ fun MenuScreen(
                                     listOf(OrangePrimary, OrangePrimaryDark)
                                 )
                             )
-                            .padding(horizontal = 20.dp, vertical = 16.dp)
+                            .padding(horizontal = 16.dp, vertical = 10.dp)
                             .statusBarsPadding(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
@@ -72,13 +70,13 @@ fun MenuScreen(
                         Column {
                             Text(
                                 "Campus Food",
-                                style = MaterialTheme.typography.headlineMedium,
+                                style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Black,
                                 color = Color.White
                             )
                             Text(
-                                "Fresh & fast campus delivery 🚀",
-                                style = MaterialTheme.typography.bodySmall,
+                                "Fresh & fast delivery 🚀",
+                                style = MaterialTheme.typography.labelSmall,
                                 color = Color.White.copy(alpha = 0.85f)
                             )
                         }
@@ -92,7 +90,8 @@ fun MenuScreen(
                                     ) {
                                         Text(
                                             "$cartItemCount",
-                                            fontWeight = FontWeight.Bold
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 10.sp
                                         )
                                     }
                                 }
@@ -100,6 +99,7 @@ fun MenuScreen(
                         ) {
                             IconButton(
                                 onClick = onCartClick,
+                                modifier = Modifier.size(36.dp),
                                 colors = IconButtonDefaults.iconButtonColors(
                                     contentColor = Color.White
                                 )
@@ -107,47 +107,50 @@ fun MenuScreen(
                                 Icon(
                                     Icons.Default.ShoppingCart,
                                     contentDescription = "Cart",
-                                    modifier = Modifier.size(28.dp)
+                                    modifier = Modifier.size(22.dp)
                                 )
                             }
                         }
                     }
 
-                    // Search Bar
+                    // Compact search bar
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                            .padding(horizontal = 12.dp, vertical = 8.dp),
                         placeholder = {
                             Text(
-                                "Search for food, snacks, drinks...",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                "Search food, snacks, drinks...",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                fontSize = 13.sp
                             )
                         },
                         leadingIcon = {
                             Icon(
                                 Icons.Default.Search,
                                 contentDescription = null,
-                                tint = OrangePrimary
+                                tint = OrangePrimary,
+                                modifier = Modifier.size(18.dp)
                             )
                         },
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(14.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = OrangePrimary,
                             unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
                             focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                             unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                         ),
-                        singleLine = true
+                        singleLine = true,
+                        textStyle = MaterialTheme.typography.bodySmall
                     )
 
-                    // Category Selector
+                    // Compact category chips
                     LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        modifier = Modifier.padding(bottom = 12.dp)
+                        contentPadding = PaddingValues(horizontal = 12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(bottom = 8.dp)
                     ) {
                         items(categories) { category ->
                             FilterChip(
@@ -157,7 +160,7 @@ fun MenuScreen(
                                     Text(
                                         category,
                                         fontWeight = if (selectedCategory == category) FontWeight.Bold else FontWeight.Medium,
-                                        fontSize = 13.sp
+                                        fontSize = 12.sp
                                     )
                                 },
                                 leadingIcon = if (selectedCategory == category) {
@@ -165,11 +168,12 @@ fun MenuScreen(
                                         Icon(
                                             imageVector = Icons.Default.Check,
                                             contentDescription = null,
-                                            modifier = Modifier.size(FilterChipDefaults.IconSize)
+                                            modifier = Modifier.size(14.dp)
                                         )
                                     }
                                 } else null,
                                 shape = RoundedCornerShape(20.dp),
+                                modifier = Modifier.height(30.dp),
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = OrangePrimary,
                                     selectedLabelColor = Color.White,
@@ -199,13 +203,13 @@ fun MenuScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator(
                             color = OrangePrimary,
-                            modifier = Modifier.size(48.dp),
-                            strokeWidth = 4.dp
+                            modifier = Modifier.size(40.dp),
+                            strokeWidth = 3.dp
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
                         Text(
                             "Loading delicious items...",
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -234,16 +238,16 @@ fun MenuScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("🔍", fontSize = 48.sp)
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Text("🔍", fontSize = 40.sp)
+                            Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 "No items found",
-                                style = MaterialTheme.typography.titleMedium,
+                                style = MaterialTheme.typography.titleSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
                                 "Try a different search or category",
-                                style = MaterialTheme.typography.bodySmall,
+                                style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                             )
                         }
@@ -253,7 +257,7 @@ fun MenuScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding),
-                        contentPadding = PaddingValues(vertical = 8.dp)
+                        contentPadding = PaddingValues(vertical = 4.dp)
                     ) {
                         items(filteredProducts, key = { it.id ?: 0 }) { product ->
                             AnimatedVisibility(
@@ -268,7 +272,7 @@ fun MenuScreen(
                             }
                         }
                         // Bottom spacing for navigation bar
-                        item { Spacer(modifier = Modifier.height(8.dp)) }
+                        item { Spacer(modifier = Modifier.height(4.dp)) }
                     }
                 }
             }
