@@ -9,5 +9,6 @@ public class CampusFoodBackendApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CampusFoodBackendApplication.class, args);
 	}
+	
 
 }
