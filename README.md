@@ -2,11 +2,14 @@
 
 A full-stack **campus food ordering application** consisting of an **Android mobile app** (Kotlin + Jetpack Compose) and a **Spring Boot REST API** backend connected to a MySQL database on AWS RDS.
 
+> **🔧 Recent Fixes (April 2026):** Image upload 500 error and Google Sign-In issues have been fixed! See [SUMMARY.md](SUMMARY.md) for details.
+
 ---
 
 ## 📋 Table of Contents
 
 - [Project Overview](#project-overview)
+- [Recent Fixes](#recent-fixes)
 - [Architecture](#architecture)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
@@ -20,6 +23,38 @@ A full-stack **campus food ordering application** consisting of an **Android mob
 - [Configuration](#configuration)
 - [Screenshots](#screenshots)
 - [Contributing](#contributing)
+
+---
+
+## 🔧 Recent Fixes
+
+### Issues Resolved ✅
+
+1. **Image Upload 500 Error** - Fixed AWS S3 configuration and error handling
+2. **Google Sign-In Not Working** - Added dedicated backend endpoint and proper OAuth flow
+
+### Documentation
+
+- **[SUMMARY.md](SUMMARY.md)** - Quick overview of fixes
+- **[QUICK_START.md](QUICK_START.md)** - Get started quickly
+- **[FIXES_APPLIED.md](FIXES_APPLIED.md)** - Detailed technical documentation
+- **[GOOGLE_SIGNIN_SETUP.md](GOOGLE_SIGNIN_SETUP.md)** - Google Sign-In configuration guide
+- **[TESTING_CHECKLIST.md](TESTING_CHECKLIST.md)** - Comprehensive testing guide
+- **[DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** - Documentation overview
+
+### Quick Setup
+
+```powershell
+# 1. Setup AWS credentials
+cd backend
+.\setup-aws-credentials.ps1
+
+# 2. Start backend
+.\mvnw.cmd spring-boot:run
+
+# 3. Setup Google Sign-In (see GOOGLE_SIGNIN_SETUP.md)
+# 4. Build and run Android app
+```
 
 ---
 
