@@ -2,28 +2,72 @@ package com.example.campusfood.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.campusfood.model.User
 import com.example.campusfood.ui.theme.OrangePrimary
 import com.example.campusfood.ui.theme.OrangePrimaryDark
+import com.example.campusfood.ui.theme.RedError
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(
+    user: User?,
+    onLogout: () -> Unit
+) {
+    var showLogoutDialog by remember { mutableStateOf(false) }
+
+    // Logout confirmation dialog
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            icon = {
+                Icon(
+                    Icons.AutoMirrored.Filled.ExitToApp,
+                    null,
+                    tint = RedError
+                )
+            },
+            title = {
+                Text("Logout", fontWeight = FontWeight.Bold)
+            },
+            text = {
+                Text("Are you sure you want to logout?")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showLogoutDialog = false
+                        onLogout()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = RedError)
+                ) {
+                    Text("Logout", fontWeight = FontWeight.SemiBold)
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { showLogoutDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             Surface(
@@ -55,54 +99,91 @@ fun ProfileScreen() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Avatar
+            // Avatar with initial
             Surface(
                 modifier = Modifier.size(100.dp),
                 shape = CircleShape,
                 color = OrangePrimary.copy(alpha = 0.15f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        modifier = Modifier.size(56.dp),
-                        tint = OrangePrimary
+                    val initial = user?.name?.firstOrNull()?.uppercase() ?: "U"
+                    Text(
+                        initial,
+                        style = MaterialTheme.typography.displayLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = OrangePrimary
                     )
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Name
             Text(
-                "Rahul Sharma",
+                user?.name ?: "Guest User",
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(4.dp))
+
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // Role badge
+            val roleLabel = when (user?.role) {
+                "ADMIN" -> "Administrator"
+                "DELIVERY" -> "Delivery Partner"
+                else -> "Student"
+            }
+            val roleColor = when (user?.role) {
+                "ADMIN" -> Color(0xFF9C27B0)
+                "DELIVERY" -> Color(0xFF2196F3)
+                else -> OrangePrimary
+            }
             Surface(
                 shape = RoundedCornerShape(8.dp),
-                color = OrangePrimary.copy(alpha = 0.12f)
+                color = roleColor.copy(alpha = 0.12f)
             ) {
                 Text(
-                    "CUSTOMER",
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                    roleLabel,
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 5.dp),
                     style = MaterialTheme.typography.labelMedium,
-                    color = OrangePrimary,
+                    color = roleColor,
                     fontWeight = FontWeight.Bold
                 )
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
             // Info cards
-            ProfileInfoRow(icon = Icons.Default.Phone, label = "Mobile", value = "9876543210")
-            ProfileInfoRow(icon = Icons.Default.Email, label = "Email", value = "rahul@campus.edu")
-            ProfileInfoRow(icon = Icons.Default.LocationOn, label = "Campus", value = "Main Campus")
+            if (!user?.mobile.isNullOrBlank()) {
+                ProfileInfoRow(
+                    icon = Icons.Default.Phone,
+                    label = "Mobile",
+                    value = user?.mobile ?: ""
+                )
+            }
+            if (!user?.email.isNullOrBlank()) {
+                ProfileInfoRow(
+                    icon = Icons.Default.Email,
+                    label = "Email",
+                    value = user?.email ?: ""
+                )
+            }
+            ProfileInfoRow(
+                icon = Icons.Default.LocationOn,
+                label = "Campus",
+                value = "Main Campus"
+            )
+            ProfileInfoRow(
+                icon = Icons.Default.Badge,
+                label = "User ID",
+                value = "#${user?.id ?: "—"}"
+            )
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(24.dp))
 
             // Settings section
             Card(
@@ -123,24 +204,42 @@ fun ProfileScreen() {
                         color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
                     )
                     ProfileMenuItem(
+                        icon = Icons.Default.LocationOn,
+                        title = "Delivery Addresses",
+                        subtitle = "Manage your addresses"
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
+                    )
+                    ProfileMenuItem(
+                        icon = Icons.AutoMirrored.Filled.Help,
+                        title = "Help & Support",
+                        subtitle = "Contact us, FAQ"
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
+                    )
+                    ProfileMenuItem(
                         icon = Icons.Default.Info,
                         title = "About CampusFood",
-                        subtitle = "Version 1.0"
+                        subtitle = "Version 1.0.0"
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // Logout
+            // Logout Button
             OutlinedButton(
-                onClick = { /* Handle logout */ },
+                onClick = { showLogoutDialog = true },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
                 shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = MaterialTheme.colorScheme.error
+                    contentColor = RedError
                 )
             ) {
                 Icon(
@@ -156,7 +255,7 @@ fun ProfileScreen() {
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }

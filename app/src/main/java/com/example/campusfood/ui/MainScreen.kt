@@ -1,19 +1,12 @@
 package com.example.campusfood.ui
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Restaurant
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Restaurant
-import androidx.compose.material.icons.outlined.ShoppingCart
+import androidx.compose.material.icons.automirrored.filled.ReceiptLong
+import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -34,142 +27,179 @@ import com.example.campusfood.model.OrderItemRequest
 import com.example.campusfood.model.OrderRequest
 import com.example.campusfood.ui.screens.*
 import com.example.campusfood.ui.theme.OrangePrimary
-import androidx.compose.material.icons.automirrored.filled.ReceiptLong
-import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
+import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
+    val authViewModel: AuthViewModel = viewModel()
     val cartViewModel: CartViewModel = viewModel()
     val orderViewModel: OrderViewModel = viewModel()
 
+    val isLoggedIn by authViewModel.isLoggedIn.collectAsStateWithLifecycle()
+    val currentUser by authViewModel.currentUser.collectAsStateWithLifecycle()
     val cartState by cartViewModel.uiState.collectAsStateWithLifecycle()
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    val isAdmin = currentUser?.role == "ADMIN"
+
     val cartItemCount = if (cartState is CartUiState.Success) {
         (cartState as CartUiState.Success).items.sumOf { it.quantity }
     } else 0
 
-    val items = listOf(
-        NavigationItem(
-            name = "Menu",
-            route = Screen.Menu.route,
-            selectedIcon = Icons.Default.Restaurant,
-            unselectedIcon = Icons.Outlined.Restaurant
-        ),
-        NavigationItem(
-            name = "Cart",
-            route = Screen.Cart.route,
-            selectedIcon = Icons.Default.ShoppingCart,
-            unselectedIcon = Icons.Outlined.ShoppingCart,
-            badgeCount = cartItemCount
-        ),
-        NavigationItem(
-            name = "Orders",
-            route = Screen.Orders.route,
-            selectedIcon = Icons.AutoMirrored.Filled.ReceiptLong,
-            unselectedIcon = Icons.AutoMirrored.Outlined.ReceiptLong
-        ),
-        NavigationItem(
-            name = "Profile",
-            route = Screen.Profile.route,
-            selectedIcon = Icons.Default.AccountCircle,
-            unselectedIcon = Icons.Outlined.AccountCircle
+    // Update OrderViewModel with real userId when user changes
+    LaunchedEffect(currentUser) {
+        currentUser?.let { user ->
+            orderViewModel.setUserId(user.id)
+        }
+    }
+
+    // Navigation items based on role
+    val bottomNavItems = if (isAdmin) {
+        listOf(
+            NavigationItem("Dashboard", Screen.AdminDashboard.route, Icons.Default.Dashboard, Icons.Outlined.Dashboard),
+            NavigationItem("Menu", Screen.Menu.route, Icons.Default.Restaurant, Icons.Outlined.Restaurant),
+            NavigationItem("Profile", Screen.Profile.route, Icons.Default.AccountCircle, Icons.Outlined.AccountCircle)
         )
-    )
+    } else {
+        listOf(
+            NavigationItem("Menu", Screen.Menu.route, Icons.Default.Restaurant, Icons.Outlined.Restaurant),
+            NavigationItem("Cart", Screen.Cart.route, Icons.Default.ShoppingCart, Icons.Outlined.ShoppingCart, cartItemCount),
+            NavigationItem("Orders", Screen.Orders.route, Icons.AutoMirrored.Filled.ReceiptLong, Icons.AutoMirrored.Outlined.ReceiptLong),
+            NavigationItem("Profile", Screen.Profile.route, Icons.Default.AccountCircle, Icons.Outlined.AccountCircle)
+        )
+    }
+
+    // Determine start destination
+    val startDestination = when {
+        !isLoggedIn -> Screen.Login.route
+        isAdmin -> Screen.AdminDashboard.route
+        else -> Screen.Menu.route
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = 8.dp
-            ) {
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentDestination = navBackStackEntry?.destination
-                items.forEach { item ->
-                    val isSelected = currentDestination?.hierarchy?.any { it.route == item.route } == true
-                    NavigationBarItem(
-                        icon = {
-                            BadgedBox(
-                                badge = {
-                                    if (item.badgeCount > 0) {
-                                        Badge(
-                                            containerColor = OrangePrimary,
-                                            contentColor = Color.White
-                                        ) {
-                                            Text(
-                                                "${item.badgeCount}",
-                                                fontSize = 10.sp,
-                                                fontWeight = FontWeight.Bold
-                                            )
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute = navBackStackEntry?.destination?.route
+
+            if (isLoggedIn && currentRoute != Screen.Login.route) {
+                NavigationBar(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    tonalElevation = 8.dp
+                ) {
+                    val currentDestination = navBackStackEntry?.destination
+                    bottomNavItems.forEach { item ->
+                        val isSelected = currentDestination?.hierarchy?.any { it.route == item.route } == true
+                        NavigationBarItem(
+                            icon = {
+                                BadgedBox(
+                                    badge = {
+                                        if (item.badgeCount > 0) {
+                                            Badge(containerColor = OrangePrimary, contentColor = Color.White) {
+                                                Text("${item.badgeCount}", fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                                            }
                                         }
                                     }
+                                ) {
+                                    Icon(
+                                        if (isSelected) item.selectedIcon else item.unselectedIcon,
+                                        contentDescription = item.name,
+                                        modifier = Modifier.size(24.dp)
+                                    )
                                 }
-                            ) {
-                                Icon(
-                                    if (isSelected) item.selectedIcon else item.unselectedIcon,
-                                    contentDescription = item.name,
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            }
-                        },
-                        label = {
-                            Text(
-                                item.name,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                fontSize = 11.sp
+                            },
+                            label = {
+                                Text(item.name, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal, fontSize = 11.sp)
+                            },
+                            selected = isSelected,
+                            onClick = {
+                                navController.navigate(item.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = if (isAdmin) Color(0xFF7B1FA2) else OrangePrimary,
+                                selectedTextColor = if (isAdmin) Color(0xFF7B1FA2) else OrangePrimary,
+                                indicatorColor = if (isAdmin) Color(0xFF7B1FA2).copy(alpha = 0.12f)
+                                                 else OrangePrimary.copy(alpha = 0.12f),
+                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                        },
-                        selected = isSelected,
-                        onClick = {
-                            navController.navigate(item.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = OrangePrimary,
-                            selectedTextColor = OrangePrimary,
-                            indicatorColor = OrangePrimary.copy(alpha = 0.12f),
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                    )
+                    }
                 }
             }
         }
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Menu.route,
+            startDestination = startDestination,
             modifier = Modifier.padding(innerPadding)
         ) {
+            // Login Screen
+            composable(Screen.Login.route) {
+                LoginScreen(
+                    authViewModel = authViewModel,
+                    onLoginSuccess = {
+                        val dest = if (currentUser?.role == "ADMIN") Screen.AdminDashboard.route
+                                   else Screen.Menu.route
+                        navController.navigate(dest) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            // Admin Dashboard
+            composable(Screen.AdminDashboard.route) {
+                AdminDashboardScreen()
+            }
+
+            // Menu Screen
             composable(Screen.Menu.route) {
                 MenuScreen(
                     onProductClick = { product ->
                         cartViewModel.addToCart(product)
+                        scope.launch {
+                            snackbarHostState.currentSnackbarData?.dismiss()
+                            snackbarHostState.showSnackbar(
+                                message = "${product.name} added to cart",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
                     },
                     onCartClick = { navController.navigate(Screen.Cart.route) },
                     cartItemCount = cartItemCount
                 )
             }
+
+            // Cart Screen
             composable(Screen.Cart.route) {
                 CartScreen(
-                    onCheckoutClick = {
+                    onCheckoutClick = { address ->
+                        val user = currentUser ?: return@CartScreen
                         if (cartState is CartUiState.Success) {
                             val cartItems = (cartState as CartUiState.Success).items
                             if (cartItems.isNotEmpty()) {
-                                val orderItems = cartItems.map {
-                                    OrderItemRequest(it.productId, it.quantity)
-                                }
+                                val orderItems = cartItems.map { OrderItemRequest(it.productId, it.quantity) }
                                 val orderRequest = OrderRequest(
-                                    userId = 2L, // Rahul Sharma from seed data
+                                    userId = user.id,
                                     items = orderItems,
-                                    deliveryAddress = "Campus Dorm A, Room 101"
+                                    deliveryAddress = address
                                 )
                                 orderViewModel.placeOrder(orderRequest) {
                                     cartViewModel.clearCart()
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar(
+                                            message = "🎉 Order placed successfully!",
+                                            duration = SnackbarDuration.Short
+                                        )
+                                    }
                                     navController.navigate(Screen.Orders.route) {
                                         popUpTo(Screen.Menu.route)
                                     }
@@ -180,11 +210,23 @@ fun MainScreen() {
                     viewModel = cartViewModel
                 )
             }
+
+            // Orders Screen
             composable(Screen.Orders.route) {
                 OrderScreen(viewModel = orderViewModel)
             }
+
+            // Profile Screen
             composable(Screen.Profile.route) {
-                ProfileScreen()
+                ProfileScreen(
+                    user = currentUser,
+                    onLogout = {
+                        authViewModel.logout()
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                )
             }
         }
     }

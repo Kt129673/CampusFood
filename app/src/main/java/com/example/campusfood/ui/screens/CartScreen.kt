@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
@@ -36,10 +37,11 @@ import com.example.campusfood.ui.theme.OrangePrimaryDark
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartScreen(
-    onCheckoutClick: () -> Unit,
+    onCheckoutClick: (String) -> Unit,
     viewModel: CartViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var deliveryAddress by remember { mutableStateOf("Campus Dorm A, Room 101") }
 
     Scaffold(
         topBar = {
@@ -119,11 +121,36 @@ fun CartScreen(
                                 )
                             }
 
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            // Delivery address field
+                            OutlinedTextField(
+                                value = deliveryAddress,
+                                onValueChange = { deliveryAddress = it },
+                                modifier = Modifier.fillMaxWidth(),
+                                label = { Text("Delivery Address") },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.LocationOn,
+                                        null,
+                                        tint = OrangePrimary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                },
+                                shape = RoundedCornerShape(14.dp),
+                                singleLine = true,
+                                textStyle = MaterialTheme.typography.bodyMedium,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = OrangePrimary,
+                                    focusedLabelColor = OrangePrimary
+                                )
+                            )
+
                             Spacer(modifier = Modifier.height(16.dp))
 
                             // Checkout button
                             Button(
-                                onClick = onCheckoutClick,
+                                onClick = { onCheckoutClick(deliveryAddress) },
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(56.dp),
@@ -133,7 +160,8 @@ fun CartScreen(
                                 ),
                                 elevation = ButtonDefaults.buttonElevation(
                                     defaultElevation = 4.dp
-                                )
+                                ),
+                                enabled = deliveryAddress.isNotBlank()
                             ) {
                                 Icon(
                                     Icons.Default.ShoppingCart,

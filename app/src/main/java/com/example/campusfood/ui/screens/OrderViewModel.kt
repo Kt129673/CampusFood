@@ -23,18 +23,28 @@ class OrderViewModel : ViewModel() {
     private val _isPlacingOrder = MutableStateFlow(false)
     val isPlacingOrder: StateFlow<Boolean> = _isPlacingOrder.asStateFlow()
 
-    // TODO: Replace with actual logged-in user ID from auth
-    private val currentUserId: Long = 2L // Rahul Sharma from seed data
+    private var userId: Long = 0L
 
-    init {
-        getOrders()
+    /**
+     * Set the current user's ID for fetching orders.
+     * Called from MainScreen when auth state changes.
+     */
+    fun setUserId(id: Long) {
+        if (userId != id) {
+            userId = id
+            getOrders()
+        }
     }
 
     fun getOrders() {
+        if (userId == 0L) {
+            _uiState.value = OrderUiState.Success(emptyList())
+            return
+        }
         viewModelScope.launch {
             _uiState.value = OrderUiState.Loading
             try {
-                val response = RetrofitInstance.api.getOrdersByUser(currentUserId)
+                val response = RetrofitInstance.api.getOrdersByUser(userId)
                 if (response.success && response.data != null) {
                     _uiState.value = OrderUiState.Success(response.data)
                 } else {
@@ -70,10 +80,10 @@ class OrderViewModel : ViewModel() {
             try {
                 val response = RetrofitInstance.api.cancelOrder(orderId)
                 if (response.success) {
-                    getOrders() // Refresh
+                    getOrders()
                 }
-            } catch (e: Exception) {
-                // Handle error
+            } catch (_: Exception) {
+                // Handle error silently for now
             }
         }
     }

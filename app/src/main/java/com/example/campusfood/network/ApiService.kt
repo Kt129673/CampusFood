@@ -1,9 +1,14 @@
 package com.example.campusfood.network
 
 import com.example.campusfood.model.ApiResponse
+import com.example.campusfood.model.LoginRequest
 import com.example.campusfood.model.OrderRequest
 import com.example.campusfood.model.OrderResponse
+import com.example.campusfood.model.PaginatedResponse
 import com.example.campusfood.model.Product
+import com.example.campusfood.model.RegisterRequest
+import com.example.campusfood.model.StatusUpdateRequest
+import com.example.campusfood.model.User
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -12,6 +17,18 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
+
+    // ========================
+    // Authentication
+    // ========================
+    @POST("auth/register")
+    suspend fun register(@Body request: RegisterRequest): ApiResponse<User>
+
+    @POST("auth/login")
+    suspend fun login(@Body request: LoginRequest): ApiResponse<User>
+
+    @GET("auth/user/{id}")
+    suspend fun getUserById(@Path("id") id: Long): ApiResponse<User>
 
     // ========================
     // Products
@@ -29,7 +46,7 @@ interface ApiService {
     suspend fun searchProducts(@Query("query") query: String): ApiResponse<List<Product>>
 
     // ========================
-    // Orders
+    // Orders (Customer)
     // ========================
     @POST("orders")
     suspend fun placeOrder(@Body order: OrderRequest): ApiResponse<OrderResponse>
@@ -42,4 +59,19 @@ interface ApiService {
 
     @PUT("orders/{orderId}/cancel")
     suspend fun cancelOrder(@Path("orderId") orderId: Long): ApiResponse<OrderResponse>
+
+    // ========================
+    // Admin
+    // ========================
+    @GET("admin/orders")
+    suspend fun adminGetAllOrders(
+        @Query("page") page: Int = 0,
+        @Query("size") size: Int = 50
+    ): ApiResponse<PaginatedResponse<OrderResponse>>
+
+    @PUT("admin/orders/{orderId}/status")
+    suspend fun adminUpdateOrderStatus(
+        @Path("orderId") orderId: Long,
+        @Body request: StatusUpdateRequest
+    ): ApiResponse<OrderResponse>
 }

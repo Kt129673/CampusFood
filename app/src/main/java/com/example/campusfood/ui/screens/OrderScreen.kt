@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campusfood.model.OrderResponse
+import com.example.campusfood.ui.components.StatusBadge
 import com.example.campusfood.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -293,41 +294,7 @@ fun OrderCard(order: OrderResponse, onCancel: () -> Unit) {
     }
 }
 
-@Composable
-fun StatusBadge(status: String) {
-    val (color, icon, label) = when (status) {
-        "PLACED" -> Triple(BlueInfo, Icons.Default.Pending, "Placed")
-        "PACKING" -> Triple(AmberWarning, Icons.Default.Inventory2, "Packing")
-        "OUT_FOR_DELIVERY" -> Triple(OrangePrimary, Icons.Default.DeliveryDining, "On the way")
-        "DELIVERED" -> Triple(GreenSuccess, Icons.Default.CheckCircle, "Delivered")
-        "CANCELLED" -> Triple(RedError, Icons.Default.Cancel, "Cancelled")
-        else -> Triple(MaterialTheme.colorScheme.onSurfaceVariant, Icons.Default.Pending, status)
-    }
 
-    Surface(
-        color = color.copy(alpha = 0.12f),
-        shape = RoundedCornerShape(10.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(14.dp),
-                tint = color
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelMedium,
-                color = color,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
-}
 
 /**
  * Formats an ISO date string to a user-friendly format.
