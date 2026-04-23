@@ -29,12 +29,12 @@ public class S3Config {
 
     @Bean
     public S3Client s3Client() {
-        if (accessKey == null || accessKey.isBlank()) {
-            log.warn("AWS Access Key is missing. Falling back to DefaultCredentialsProvider.");
-            return S3Client.builder()
-                    .region(Region.of(region))
-                    .build();
+        if (accessKey == null || accessKey.isBlank() || secretKey == null || secretKey.isBlank()) {
+            log.error("AWS credentials are not configured. Please set AWS_ACCESS_KEY and AWS_SECRET_KEY environment variables.");
+            throw new IllegalStateException("AWS credentials are required for S3 operations. Please configure AWS_ACCESS_KEY and AWS_SECRET_KEY.");
         }
+        
+        log.info("Initializing S3 client with configured credentials for region: {}", region);
         AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
         return S3Client.builder()
                 .region(Region.of(region))

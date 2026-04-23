@@ -42,6 +42,38 @@ public class UserService {
         return mapToResponse(saved);
     }
 
+    @Transactional
+    public UserResponse googleLogin(String email, String name) {
+        // Try to find user by email first
+        User user = userRepository.findByEmail(email).orElse(null);
+        
+        if (user == null) {
+            // Generate a stable mobile number from email hash
+            long hash = Math.abs((long) email.hashCode());
+            String generatedMobile = "9" + String.format("%09d", hash % 1000000000L);
+            
+            // Create new user for Google sign-in
+            user = User.builder()
+                    .name(name)
+                    .mobile(generatedMobile)
+                    .email(email)
+                    .passwordHash(hashPassword(email)) // Use email as password for Google users
+                    .role(com.campusfood.enums.UserRole.CUSTOMER)
+                    .active(true)
+                    .build();
+            
+            user = userRepository.save(user);
+            log.info("New Google user registered: {} ({})", user.getName(), user.getEmail());
+        } else {
+            if (!user.getActive()) {
+                throw new InvalidOperationException("Account is deactivated");
+            }
+            log.info("Existing Google user logged in: {} ({})", user.getName(), user.getEmail());
+        }
+        
+        return mapToResponse(user);
+    }
+
     public UserResponse login(LoginRequest request) {
         User user = userRepository.findByMobile(request.getMobile())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with mobile: " + request.getMobile()));

@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.campusfood.data.UserSessionManager
+import com.example.campusfood.model.GoogleLoginRequest
 import com.example.campusfood.model.LoginRequest
 import com.example.campusfood.model.RegisterRequest
 import com.example.campusfood.model.User
@@ -87,46 +88,20 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     /**
      * Google Sign-In: auto-register or login the user.
-     * Uses Google account email to find or create user on backend.
+     * Uses the new backend /api/auth/google endpoint.
      */
     fun loginWithGoogle(name: String, email: String) {
         viewModelScope.launch {
             _authState.value = AuthUiState.Loading
             try {
-                // Generate a stable mobile number from email hash (backend requires mobile)
-                val hash = email.hashCode().toLong()
-                val absHash = if (hash < 0) -hash else hash
-                val generatedMobile = "9" + absHash.toString().takeLast(9).padStart(9, '0')
-
-                // Try to register first (will fail if mobile already exists)
-                try {
-                    val registerResponse = RetrofitInstance.api.register(
-                        RegisterRequest(
-                            name = name,
-                            mobile = generatedMobile,
-                            email = email,
-                            password = email, // Use email as password for Google users
-                            role = "CUSTOMER"
-                        )
-                    )
-                    if (registerResponse.success && registerResponse.data != null) {
-                        sessionManager.saveSession(registerResponse.data)
-                        _authState.value = AuthUiState.Success(registerResponse.data)
-                        return@launch
-                    }
-                } catch (_: Exception) {
-                    // User likely already exists, proceed to login
-                }
-
-                // Login with existing credentials
-                val loginResponse = RetrofitInstance.api.login(
-                    LoginRequest(mobile = generatedMobile, password = email)
+                val response = RetrofitInstance.api.googleLogin(
+                    GoogleLoginRequest(email = email, name = name)
                 )
-                if (loginResponse.success && loginResponse.data != null) {
-                    sessionManager.saveSession(loginResponse.data)
-                    _authState.value = AuthUiState.Success(loginResponse.data)
+                if (response.success && response.data != null) {
+                    sessionManager.saveSession(response.data)
+                    _authState.value = AuthUiState.Success(response.data)
                 } else {
-                    _authState.value = AuthUiState.Error(loginResponse.message)
+                    _authState.value = AuthUiState.Error(response.message)
                 }
             } catch (e: Exception) {
                 _authState.value = AuthUiState.Error(e.message ?: "Google sign-in failed")

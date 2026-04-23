@@ -36,3 +36,12 @@ data class RegisterRequest(
     val password: String,
     val role: String = "CUSTOMER"
 )
+
+/**
+ * Google login request for backend GoogleLoginRequest.
+ */
+@JsonClass(generateAdapter = true)
+data class GoogleLoginRequest(
+    val email: String,
+    val name: String
+)

@@ -34,6 +34,9 @@ interface ApiService {
     @POST("auth/login")
     suspend fun login(@Body request: LoginRequest): ApiResponse<User>
 
+    @POST("auth/google")
+    suspend fun googleLogin(@Body request: GoogleLoginRequest): ApiResponse<User>
+
     @GET("auth/user/{id}")
     suspend fun getUserById(@Path("id") id: Long): ApiResponse<User>
 
