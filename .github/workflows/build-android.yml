@@ -14,10 +14,14 @@ on:
       - 'build.gradle.kts'
       - 'settings.gradle.kts'
       - 'gradle/**'
+      - '.github/workflows/build-android.yml'
   pull_request:
     branches: [main]
     paths:
       - 'app/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'gradle/**'
   workflow_dispatch: # Allow manual trigger
 
 env:
@@ -27,10 +31,13 @@ jobs:
   build:
     name: Build APK
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -39,31 +46,62 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v3
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+
       - name: Build Debug APK
-        run: ./gradlew :app:assembleDebug --no-daemon
+        run: ./gradlew :app:assembleDebug --stacktrace --no-daemon
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2048m -Dorg.gradle.daemon=false"
 
       - name: Upload Debug APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: campusfood-debug-apk
+          name: campusfood-debug-${{ github.sha }}
           path: app/build/outputs/apk/debug/*.apk
           retention-days: 30
+          if-no-files-found: error
 
       - name: Build Release APK (unsigned)
-        run: ./gradlew :app:assembleRelease --no-daemon
+        if: success()
+        run: ./gradlew :app:assembleRelease --stacktrace --no-daemon
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2048m -Dorg.gradle.daemon=false"
 
       - name: Upload Release APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: campusfood-release-apk
+          name: campusfood-release-${{ github.sha }}
           path: app/build/outputs/apk/release/*.apk
           retention-days: 30
+          if-no-files-found: error
+
+      - name: Get APK info
+        if: success()
+        run: |
+          DEBUG_APK=$(find app/build/outputs/apk/debug -name "*.apk" | head -n 1)
+          RELEASE_APK=$(find app/build/outputs/apk/release -name "*.apk" | head -n 1)
+          echo "DEBUG_SIZE=$(du -h "$DEBUG_APK" | cut -f1)" >> $GITHUB_ENV
+          echo "RELEASE_SIZE=$(du -h "$RELEASE_APK" | cut -f1)" >> $GITHUB_ENV
 
       - name: Build Summary
+        if: always()
         run: |
-          echo "✅ Android APK built successfully!"
-          echo "📱 Debug APK: app/build/outputs/apk/debug/"
-          echo "📱 Release APK: app/build/outputs/apk/release/"
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Android APK built successfully!"
+            echo "📱 Debug APK: ${{ env.DEBUG_SIZE }}"
+            echo "📱 Release APK: ${{ env.RELEASE_SIZE }}"
+            echo "🔗 Download artifacts from the Actions tab"
+          else
+            echo "❌ Build failed. Check logs above for details."
+          fi

@@ -11,21 +11,26 @@ on:
     branches: [main]
     paths:
       - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
   workflow_dispatch: # Allow manual trigger
 
 env:
   AWS_REGION: eu-north-1
   EB_APP_NAME: campusfood-backend
   EB_ENV_NAME: Campusfood-backend-env
+  MAVEN_OPTS: "-Xmx1024m"
 
 jobs:
   build-and-deploy:
     name: Build & Deploy
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -34,9 +39,48 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Verify Maven configuration
+        working-directory: backend
+        run: mvn --version
+
       - name: Build JAR
         working-directory: backend
-        run: mvn clean package -DskipTests -B
+        run: mvn clean package -DskipTests -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+
+      - name: Verify JAR exists
+        run: |
+          if [ ! -f backend/target/backend-0.0.1-SNAPSHOT.jar ]; then
+            echo "❌ JAR file not found!"
+            exit 1
+          fi
+          echo "✅ JAR file found: $(du -h backend/target/backend-0.0.1-SNAPSHOT.jar | cut -f1)"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Verify AWS connection
+        run: |
+          aws sts get-caller-identity
+          aws elasticbeanstalk describe-environments --environment-names ${{ env.EB_ENV_NAME }} --region ${{ env.AWS_REGION }}
+
+      - name: Generate version label
+        id: version
+        run: |
+          VERSION_LABEL="v-$(date +%Y%m%d-%H%M%S)-${GITHUB_SHA::7}"
+          echo "VERSION_LABEL=$VERSION_LABEL" >> $GITHUB_OUTPUT
+          echo "📦 Version: $VERSION_LABEL"
 
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v22
@@ -45,14 +89,48 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: ${{ env.EB_APP_NAME }}
           environment_name: ${{ env.EB_ENV_NAME }}
-          version_label: "v-${{ github.sha }}"
+          version_label: ${{ steps.version.outputs.VERSION_LABEL }}
           region: ${{ env.AWS_REGION }}
           deployment_package: backend/target/backend-0.0.1-SNAPSHOT.jar
           wait_for_deployment: true
-          use_existing_version_if_available: true
+          wait_for_environment_recovery: 300
+          use_existing_version_if_available: false
+
+      - name: Health check
+        if: success()
+        run: |
+          ENV_URL=$(aws elasticbeanstalk describe-environments \
+            --environment-names ${{ env.EB_ENV_NAME }} \
+            --region ${{ env.AWS_REGION }} \
+            --query 'Environments[0].CNAME' \
+            --output text)
+          echo "🌐 Environment URL: http://$ENV_URL"
+          
+          # Wait for health check
+          for i in {1..10}; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "http://$ENV_URL/actuator/health" || echo "000")
+            if [ "$STATUS" == "200" ]; then
+              echo "✅ Health check passed!"
+              break
+            fi
+            echo "⏳ Waiting for health check... ($i/10)"
+            sleep 10
+          done
 
       - name: Deployment Summary
+        if: always()
         run: |
-          echo "✅ Backend deployed successfully using Java Corretto!"
-          echo "🌍 Region: ${{ env.AWS_REGION }}"
-          echo "🚀 Environment: ${{ env.EB_ENV_NAME }}"
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "✅ Backend deployed successfully!"
+            echo "🌍 Region: ${{ env.AWS_REGION }}"
+            echo "🚀 Environment: ${{ env.EB_ENV_NAME }}"
+            echo "📦 Version: ${{ steps.version.outputs.VERSION_LABEL }}"
+          else
+            echo "❌ Deployment failed. Check logs above for details."
+          fi
+
+      - name: Rollback on failure
+        if: failure()
+        run: |
+          echo "⚠️ Deployment failed. Consider rolling back manually if needed."
+          echo "Run: aws elasticbeanstalk describe-environment-health --environment-name ${{ env.EB_ENV_NAME }} --attribute-names All"
