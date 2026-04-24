@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.devtools.ksp)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -34,6 +35,9 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+    kotlinOptions {
+        jvmTarget = "11"
     }
 }
 
@@ -73,6 +77,7 @@ dependencies {
     implementation(libs.moshi.kotlin)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.material)
+    implementation(libs.core.ktx)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.core)

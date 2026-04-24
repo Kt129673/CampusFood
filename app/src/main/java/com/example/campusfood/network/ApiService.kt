@@ -1,6 +1,7 @@
 package com.example.campusfood.network
 
 import com.example.campusfood.model.ApiResponse
+import com.example.campusfood.model.GoogleLoginRequest
 import com.example.campusfood.model.InventoryUpdateRequest
 import com.example.campusfood.model.LoginRequest
 import com.example.campusfood.model.OrderRequest
