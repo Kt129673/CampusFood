@@ -1,6 +1,9 @@
 package com.example.campusfood.ui.screens
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -23,7 +26,10 @@ import androidx.compose.ui.unit.sp
 import com.example.campusfood.model.User
 import com.example.campusfood.ui.theme.OrangePrimary
 import com.example.campusfood.ui.theme.OrangePrimaryDark
+import com.example.campusfood.ui.theme.OrangePrimaryLight
 import com.example.campusfood.ui.theme.RedError
+import com.example.campusfood.ui.theme.AdminPurple
+import com.example.campusfood.ui.theme.BlueInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,42 +62,51 @@ fun ProfileScreen(
                         showLogoutDialog = false
                         onLogout()
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = RedError)
+                    colors = ButtonDefaults.buttonColors(containerColor = RedError),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text("Logout", fontWeight = FontWeight.SemiBold)
                 }
             },
             dismissButton = {
-                OutlinedButton(onClick = { showLogoutDialog = false }) {
+                OutlinedButton(
+                    onClick = { showLogoutDialog = false },
+                    shape = RoundedCornerShape(12.dp)
+                ) {
                     Text("Cancel")
                 }
             }
         )
     }
 
+    val isAdmin = user?.role == "ADMIN"
+    val headerGradient = if (isAdmin) {
+        Brush.horizontalGradient(listOf(AdminPurple, Color(0xFF4A148C), Color(0xFF311B92)))
+    } else {
+        Brush.horizontalGradient(listOf(OrangePrimary, OrangePrimaryDark, Color(0xFFBF360C)))
+    }
+    val accentColor = if (isAdmin) AdminPurple else OrangePrimary
+
     Scaffold(
         topBar = {
-            // Compact header
+            // Premium gradient header
             Surface(
                 color = Color.Transparent,
-                shadowElevation = 2.dp
+                shadowElevation = 4.dp
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(OrangePrimary, OrangePrimaryDark)
-                            )
-                        )
+                        .background(headerGradient)
                         .statusBarsPadding()
-                        .padding(horizontal = 16.dp, vertical = 10.dp)
+                        .padding(horizontal = 20.dp, vertical = 16.dp)
                 ) {
                     Text(
                         "My Profile",
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Black,
-                        color = Color.White
+                        color = Color.White,
+                        letterSpacing = 0.5.sp
                     )
                 }
             }
@@ -102,115 +117,159 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 16.dp),
+                .padding(horizontal = 20.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Compact avatar
-            Surface(
-                modifier = Modifier.size(80.dp),
-                shape = CircleShape,
-                color = OrangePrimary.copy(alpha = 0.15f)
+            // Premium avatar with gradient ring
+            Box(
+                modifier = Modifier.size(110.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    val initial = user?.name?.firstOrNull()?.uppercase() ?: "U"
-                    Text(
-                        initial,
-                        style = MaterialTheme.typography.displayMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = OrangePrimary
-                    )
+                // Gradient border ring
+                Box(
+                    modifier = Modifier
+                        .size(110.dp)
+                        .border(
+                            width = 3.dp,
+                            brush = Brush.linearGradient(
+                                if (isAdmin)
+                                    listOf(AdminPurple, Color(0xFFCE93D8), Color(0xFF4A148C))
+                                else
+                                    listOf(OrangePrimary, OrangePrimaryLight, OrangePrimaryDark)
+                            ),
+                            shape = CircleShape
+                        )
+                )
+                Surface(
+                    modifier = Modifier.size(100.dp),
+                    shape = CircleShape,
+                    color = accentColor.copy(alpha = 0.12f)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        val initial = user?.name?.firstOrNull()?.uppercase() ?: "U"
+                        Text(
+                            initial,
+                            style = MaterialTheme.typography.displayMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = accentColor,
+                            fontSize = 44.sp
+                        )
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Name
             Text(
                 user?.name ?: "Guest User",
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
-            // Role badge
+            // Role badge – premium pill with dynamic color
             val roleLabel = when (user?.role) {
                 "ADMIN" -> "Administrator"
                 "DELIVERY" -> "Delivery Partner"
                 else -> "Student"
             }
             val roleColor = when (user?.role) {
-                "ADMIN" -> Color(0xFF9C27B0)
-                "DELIVERY" -> Color(0xFF2196F3)
+                "ADMIN" -> AdminPurple
+                "DELIVERY" -> BlueInfo
                 else -> OrangePrimary
             }
+            val roleIcon = when (user?.role) {
+                "ADMIN" -> Icons.Default.AdminPanelSettings
+                "DELIVERY" -> Icons.Default.DeliveryDining
+                else -> Icons.Default.School
+            }
             Surface(
-                shape = RoundedCornerShape(6.dp),
-                color = roleColor.copy(alpha = 0.12f)
+                shape = RoundedCornerShape(20.dp),
+                color = roleColor.copy(alpha = 0.1f)
             ) {
-                Text(
-                    roleLabel,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 3.dp),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = roleColor,
-                    fontWeight = FontWeight.Bold
-                )
+                Row(
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 5.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        roleIcon,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = roleColor
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        roleLabel,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = roleColor,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.sp
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(28.dp))
 
-            // Compact info cards
+            // Info cards – bigger, more spacious
             if (!user?.mobile.isNullOrBlank()) {
                 ProfileInfoRow(
                     icon = Icons.Default.Phone,
                     label = "Mobile",
-                    value = user?.mobile ?: ""
+                    value = user?.mobile ?: "",
+                    accentColor = accentColor
                 )
             }
             if (!user?.email.isNullOrBlank()) {
                 ProfileInfoRow(
                     icon = Icons.Default.Email,
                     label = "Email",
-                    value = user?.email ?: ""
+                    value = user?.email ?: "",
+                    accentColor = accentColor
                 )
             }
             ProfileInfoRow(
                 icon = Icons.Default.LocationOn,
                 label = "Campus",
-                value = "Main Campus"
+                value = "Main Campus",
+                accentColor = accentColor
             )
             ProfileInfoRow(
                 icon = Icons.Default.Badge,
                 label = "User ID",
-                value = "#${user?.id ?: "—"}"
+                value = "#${user?.id ?: "—"}",
+                accentColor = accentColor
             )
             if (!user?.createdAt.isNullOrBlank()) {
                 ProfileInfoRow(
                     icon = Icons.Default.CalendarMonth,
                     label = "Member Since",
-                    value = formatProfileDate(user?.createdAt ?: "")
+                    value = formatProfileDate(user?.createdAt ?: ""),
+                    accentColor = accentColor
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // Settings section
+            // Settings section – more premium card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(20.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
-                )
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
-                Column(modifier = Modifier.padding(2.dp)) {
+                Column(modifier = Modifier.padding(vertical = 4.dp)) {
                     ProfileMenuItem(
                         icon = Icons.Default.Notifications,
                         title = "Notifications",
                         subtitle = "Order updates & offers"
                     )
                     HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+                        modifier = Modifier.padding(horizontal = 20.dp),
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
                     )
                     ProfileMenuItem(
                         icon = Icons.Default.LocationOn,
@@ -218,8 +277,8 @@ fun ProfileScreen(
                         subtitle = "Manage your addresses"
                     )
                     HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+                        modifier = Modifier.padding(horizontal = 20.dp),
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
                     )
                     ProfileMenuItem(
                         icon = Icons.AutoMirrored.Filled.Help,
@@ -227,8 +286,8 @@ fun ProfileScreen(
                         subtitle = "Contact us, FAQ"
                     )
                     HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+                        modifier = Modifier.padding(horizontal = 20.dp),
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
                     )
                     ProfileMenuItem(
                         icon = Icons.Default.Info,
@@ -238,34 +297,37 @@ fun ProfileScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // Compact logout button
+            // Premium logout button
             OutlinedButton(
                 onClick = { showLogoutDialog = true },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(44.dp),
-                shape = RoundedCornerShape(12.dp),
+                    .height(52.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = RedError
+                ),
+                border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
+                    brush = Brush.linearGradient(listOf(RedError.copy(alpha = 0.5f), RedError.copy(alpha = 0.3f)))
                 )
             ) {
                 Icon(
                     Icons.AutoMirrored.Filled.ExitToApp,
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(20.dp)
                 )
-                Spacer(Modifier.width(6.dp))
+                Spacer(Modifier.width(8.dp))
                 Text(
                     "Logout",
                     style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 13.sp
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 15.sp
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
@@ -274,51 +336,53 @@ fun ProfileScreen(
 private fun ProfileInfoRow(
     icon: ImageVector,
     label: String,
-    value: String
+    value: String,
+    accentColor: Color = OrangePrimary
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 3.dp),
-        shape = RoundedCornerShape(12.dp),
+            .padding(vertical = 4.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.5.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 10.dp),
+                .padding(horizontal = 16.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(
-                modifier = Modifier.size(34.dp),
-                shape = RoundedCornerShape(8.dp),
-                color = OrangePrimary.copy(alpha = 0.1f)
+                modifier = Modifier.size(40.dp),
+                shape = RoundedCornerShape(12.dp),
+                color = accentColor.copy(alpha = 0.08f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         icon,
                         contentDescription = null,
-                        tint = OrangePrimary,
-                        modifier = Modifier.size(16.dp)
+                        tint = accentColor,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(14.dp))
             Column {
                 Text(
                     label,
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 10.sp
+                    fontSize = 12.sp
                 )
+                Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     value,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 13.sp
+                    fontSize = 15.sp
                 )
             }
         }
@@ -334,35 +398,35 @@ private fun ProfileMenuItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 14.dp, vertical = 10.dp),
+            .padding(horizontal = 18.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             icon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(18.dp)
+            modifier = Modifier.size(22.dp)
         )
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 title,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Medium,
-                fontSize = 13.sp
+                fontSize = 15.sp
             )
             Text(
                 subtitle,
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 10.sp
+                fontSize = 12.sp
             )
         }
         Icon(
             Icons.Default.ChevronRight,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-            modifier = Modifier.size(16.dp)
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+            modifier = Modifier.size(20.dp)
         )
     }
 }

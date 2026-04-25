@@ -15,9 +15,11 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -25,10 +27,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.campusfood.model.Product
+import com.example.campusfood.ui.components.EmptyState
 import com.example.campusfood.ui.components.ErrorState
 import com.example.campusfood.ui.components.ProductCard
+import com.example.campusfood.ui.components.ShimmerProductCard
 import com.example.campusfood.ui.theme.OrangePrimary
 import com.example.campusfood.ui.theme.OrangePrimaryDark
+import com.example.campusfood.ui.theme.OrangePrimaryLight
+import com.example.campusfood.ui.theme.GreenSuccess
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,6 +47,7 @@ fun MenuScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val isOnline by viewModel.isBackendOnline.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
 
     // Categories matching the seeded backend data
@@ -51,81 +58,105 @@ fun MenuScreen(
         topBar = {
             Surface(
                 color = MaterialTheme.colorScheme.surface,
-                shadowElevation = 2.dp
+                shadowElevation = 4.dp
             ) {
                 Column {
-                    // Compact header
-                    Row(
+                    // Premium compact header
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
                                 Brush.horizontalGradient(
-                                    listOf(OrangePrimary, OrangePrimaryDark)
+                                    listOf(
+                                        OrangePrimary,
+                                        OrangePrimaryDark,
+                                        Color(0xFFBF360C)
+                                    )
                                 )
                             )
-                            .padding(horizontal = 16.dp, vertical = 10.dp)
-                            .statusBarsPadding(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                            .statusBarsPadding()
+                            .padding(horizontal = 20.dp, vertical = 14.dp)
                     ) {
-                        Column {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    "Campus Food",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Black,
-                                    color = Color.White
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .size(8.dp)
-                                        .background(
-                                            if (isOnline) Color(0xFF4CAF50) else Color(0xFFF44336),
-                                            shape = RoundedCornerShape(50)
-                                        )
-                                )
-                            }
-                            Text(
-                                if (isOnline) "Fresh & fast delivery 🚀" else "Backend Offline ⚠️",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color.White.copy(alpha = 0.85f)
-                            )
-                        }
-                        // Cart button with badge
-                        BadgedBox(
-                            badge = {
-                                if (cartItemCount > 0) {
-                                    Badge(
-                                        containerColor = Color.White,
-                                        contentColor = OrangePrimary
-                                    ) {
-                                        Text(
-                                            "$cartItemCount",
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 10.sp
-                                        )
-                                    }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        "ANISHA",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.Black,
+                                        color = Color.White,
+                                        letterSpacing = 1.sp
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        "CAMPUS FOOD",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.Light,
+                                        color = Color.White.copy(alpha = 0.9f),
+                                        letterSpacing = 1.sp
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(7.dp)
+                                            .background(
+                                                if (isOnline) GreenSuccess else Color(0xFFF44336),
+                                                shape = RoundedCornerShape(50)
+                                            )
+                                    )
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text(
+                                        if (isOnline) "Fresh & fast delivery 🚀" else "Backend Offline ⚠️",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = Color.White.copy(alpha = 0.7f),
+                                        letterSpacing = 0.3.sp
+                                    )
                                 }
                             }
-                        ) {
-                            IconButton(
-                                onClick = onCartClick,
-                                modifier = Modifier.size(36.dp),
-                                colors = IconButtonDefaults.iconButtonColors(
-                                    contentColor = Color.White
-                                )
+
+                            // Cart button – premium circular
+                            BadgedBox(
+                                badge = {
+                                    if (cartItemCount > 0) {
+                                        Badge(
+                                            containerColor = Color.White,
+                                            contentColor = OrangePrimary
+                                        ) {
+                                            Text(
+                                                "$cartItemCount",
+                                                fontWeight = FontWeight.ExtraBold,
+                                                fontSize = 11.sp
+                                            )
+                                        }
+                                    }
+                                }
                             ) {
-                                Icon(
-                                    Icons.Default.ShoppingCart,
-                                    contentDescription = "Cart",
-                                    modifier = Modifier.size(22.dp)
-                                )
+                                FilledIconButton(
+                                    onClick = onCartClick,
+                                    modifier = Modifier.size(42.dp),
+                                    shape = RoundedCornerShape(14.dp),
+                                    colors = IconButtonDefaults.filledIconButtonColors(
+                                        containerColor = Color.White.copy(alpha = 0.18f),
+                                        contentColor = Color.White
+                                    )
+                                ) {
+                                    Icon(
+                                        Icons.Default.ShoppingCart,
+                                        contentDescription = "Cart",
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
                             }
                         }
                     }
 
-                    // Improved search bar with rounded corners and leading icon
+                    // Premium search bar – taller, more spacious
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
@@ -135,8 +166,8 @@ fun MenuScreen(
                         placeholder = {
                             Text(
                                 "Search food, snacks, drinks...",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                                fontSize = 14.sp
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                fontSize = 15.sp
                             )
                         },
                         leadingIcon = {
@@ -144,21 +175,21 @@ fun MenuScreen(
                                 Icons.Default.Search,
                                 contentDescription = null,
                                 tint = OrangePrimary,
-                                modifier = Modifier.size(22.dp)
+                                modifier = Modifier.size(24.dp)
                             )
                         },
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(18.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = OrangePrimary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f),
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
                         ),
                         singleLine = true,
-                        textStyle = MaterialTheme.typography.bodyMedium
+                        textStyle = MaterialTheme.typography.bodyLarge
                     )
 
-                    // Category chips with selected state animation
+                    // Category chips – slightly taller, better spacing
                     LazyRow(
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -172,7 +203,7 @@ fun MenuScreen(
                                     Text(
                                         category,
                                         fontWeight = if (selectedCategory == category) FontWeight.Bold else FontWeight.Medium,
-                                        fontSize = 13.sp
+                                        fontSize = 14.sp
                                     )
                                 },
                                 leadingIcon = if (selectedCategory == category) {
@@ -184,15 +215,15 @@ fun MenuScreen(
                                         )
                                     }
                                 } else null,
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.height(36.dp),
+                                shape = RoundedCornerShape(14.dp),
+                                modifier = Modifier.height(38.dp),
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = OrangePrimary,
                                     selectedLabelColor = Color.White,
                                     selectedLeadingIconColor = Color.White
                                 ),
                                 border = FilterChipDefaults.filterChipBorder(
-                                    borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                                    borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f),
                                     selectedBorderColor = OrangePrimary,
                                     enabled = true,
                                     selected = selectedCategory == category
@@ -206,24 +237,15 @@ fun MenuScreen(
     ) { innerPadding ->
         when (val state = uiState) {
             is MenuUiState.Loading -> {
-                Box(
+                // Shimmer skeleton loading – premium feel
+                LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
-                    contentAlignment = Alignment.Center
+                    contentPadding = PaddingValues(vertical = 10.dp)
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        CircularProgressIndicator(
-                            color = OrangePrimary,
-                            modifier = Modifier.size(40.dp),
-                            strokeWidth = 3.dp
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            "Loading delicious items...",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                    items(5) {
+                        ShimmerProductCard()
                     }
                 }
             }
@@ -246,45 +268,40 @@ fun MenuScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(innerPadding),
-                        contentAlignment = Alignment.Center
+                            .padding(innerPadding)
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("🔍", fontSize = 40.sp)
-                            Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                "No items found",
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                "Try a different search or category",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                            )
-                        }
+                        EmptyState(
+                            emoji = "🔍",
+                            title = "No items found",
+                            subtitle = "Try a different search or category"
+                        )
                     }
                 } else {
-                    LazyColumn(
+                    PullToRefreshBox(
+                        isRefreshing = isRefreshing,
+                        onRefresh = { viewModel.refresh() },
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(innerPadding),
-                        contentPadding = PaddingValues(vertical = 8.dp)
+                            .padding(innerPadding)
                     ) {
-                        items(filteredProducts, key = { it.id ?: 0 }) { product ->
-                            AnimatedVisibility(
-                                visible = true,
-                                enter = fadeIn() + slideInVertically(),
-                                exit = fadeOut()
-                            ) {
-                                ProductCard(
-                                    product = product,
-                                    onAddToCart = { onProductClick(it) }
-                                )
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(vertical = 10.dp)
+                        ) {
+                            items(filteredProducts, key = { it.id ?: 0 }) { product ->
+                                AnimatedVisibility(
+                                    visible = true,
+                                    enter = fadeIn() + slideInVertically(),
+                                    exit = fadeOut()
+                                ) {
+                                    ProductCard(
+                                        product = product,
+                                        onAddToCart = { onProductClick(it) }
+                                    )
+                                }
                             }
+                            item { Spacer(modifier = Modifier.height(12.dp)) }
                         }
-                        // Bottom spacing for navigation bar
-                        item { Spacer(modifier = Modifier.height(8.dp)) }
                     }
                 }
             }

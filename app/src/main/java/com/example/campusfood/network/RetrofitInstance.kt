@@ -7,12 +7,23 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
+import com.example.campusfood.BuildConfig
 
+/**
+ * Singleton Retrofit client for backend communication.
+ *
+ * Production configuration:
+ * - Uses BuildConfig to switch between local and cloud endpoints
+ * - Includes structured logging interceptor (BODY for debug, NONE for release)
+ * - Configures timeout policies for mobile network resilience
+ * - Lenient Moshi parsing to handle backend schema evolution gracefully
+ */
 object RetrofitInstance {
 
     /**
-     * Connecting to the live AWS Elastic Beanstalk Server.
-     * Set IS_LOCAL = true for emulator debugging (uses 10.0.2.2).
+     * Backend endpoint selection:
+     * - IS_LOCAL = true  → connects to local dev server (emulator or LAN IP)
+     * - IS_LOCAL = false → connects to AWS Elastic Beanstalk production
      */
     private const val IS_LOCAL = true
     private val BASE_URL = if (IS_LOCAL) "http://172.20.10.6:5000/api/"
@@ -23,14 +34,25 @@ object RetrofitInstance {
         .build()
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
+        level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+                else HttpLoggingInterceptor.Level.NONE
     }
 
     private val okHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
-        .connectTimeout(30, TimeUnit.SECONDS)
+        .addInterceptor { chain ->
+            // Add standard headers to all requests
+            val request = chain.request().newBuilder()
+                .addHeader("Accept", "application/json")
+                .addHeader("X-Client-Platform", "Android")
+                .addHeader("X-Client-Version", BuildConfig.VERSION_NAME)
+                .build()
+            chain.proceed(request)
+        }
+        .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
+        .retryOnConnectionFailure(true)
         .build()
 
     val api: ApiService by lazy {

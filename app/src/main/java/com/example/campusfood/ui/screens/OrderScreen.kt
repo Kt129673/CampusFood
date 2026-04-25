@@ -1,28 +1,30 @@
 package com.example.campusfood.ui.screens
 
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campusfood.model.OrderResponse
+import com.example.campusfood.ui.components.EmptyState
+import com.example.campusfood.ui.components.ErrorState
+import com.example.campusfood.ui.components.ShimmerOrderCard
 import com.example.campusfood.ui.components.StatusBadge
 import com.example.campusfood.ui.theme.*
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,24 +32,35 @@ fun OrderScreen(
     viewModel: OrderViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
+    val snackbarEvent by viewModel.snackbarEvent.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Handle one-shot snackbar events
+    LaunchedEffect(snackbarEvent) {
+        snackbarEvent?.let {
+            snackbarHostState.showSnackbar(it, duration = SnackbarDuration.Short)
+            viewModel.clearSnackbarEvent()
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            // Compact header
             Surface(
                 color = Color.Transparent,
-                shadowElevation = 2.dp
+                shadowElevation = 4.dp
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
                             Brush.horizontalGradient(
-                                listOf(OrangePrimary, OrangePrimaryDark)
+                                listOf(OrangePrimary, OrangePrimaryDark, Color(0xFFBF360C))
                             )
                         )
                         .statusBarsPadding()
-                        .padding(horizontal = 16.dp, vertical = 10.dp)
+                        .padding(horizontal = 20.dp, vertical = 16.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -57,25 +70,34 @@ fun OrderScreen(
                         Column {
                             Text(
                                 "My Orders",
-                                style = MaterialTheme.typography.titleLarge,
+                                style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Black,
-                                color = Color.White
+                                color = Color.White,
+                                letterSpacing = 0.5.sp
                             )
                             Text(
-                                "Track your order status",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color.White.copy(alpha = 0.8f)
+                                "Track your food orders",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = Color.White.copy(alpha = 0.7f)
                             )
                         }
-                        FilledTonalIconButton(
-                            onClick = { viewModel.getOrders() },
-                            modifier = Modifier.size(34.dp),
-                            colors = IconButtonDefaults.filledTonalIconButtonColors(
-                                containerColor = Color.White.copy(alpha = 0.15f),
-                                contentColor = Color.White
-                            )
-                        ) {
-                            Icon(Icons.Default.Refresh, "Refresh", modifier = Modifier.size(18.dp))
+                        // Order count badge
+                        if (uiState is OrderUiState.Success) {
+                            val count = (uiState as OrderUiState.Success).orders.size
+                            if (count > 0) {
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = Color.White.copy(alpha = 0.18f)
+                                ) {
+                                    Text(
+                                        "$count",
+                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 16.sp
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -85,87 +107,52 @@ fun OrderScreen(
         Box(modifier = Modifier.padding(innerPadding)) {
             when (val state = uiState) {
                 is OrderUiState.Loading -> {
-                    Column(
+                    LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
-                        CircularProgressIndicator(color = OrangePrimary, modifier = Modifier.size(36.dp))
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Text(
-                            "Loading orders...",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        items(4) {
+                            ShimmerOrderCard()
+                        }
                     }
                 }
                 is OrderUiState.Error -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(32.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text("😕", fontSize = 40.sp)
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            state.message,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        OutlinedButton(onClick = { viewModel.getOrders() }) {
-                            Text("Retry")
-                        }
-                    }
+                    ErrorState(
+                        message = state.message,
+                        onRetry = { viewModel.getOrders() },
+                        emoji = "📦",
+                        title = "Couldn't load orders"
+                    )
                 }
                 is OrderUiState.Success -> {
                     if (state.orders.isEmpty()) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(32.dp),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text("📦", fontSize = 48.sp)
-                            Spacer(modifier = Modifier.height(12.dp))
-                            Text(
-                                "No orders yet",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Text(
-                                "Your order history will appear here\nonce you place your first order",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                                lineHeight = 20.sp,
-                                textAlign = TextAlign.Center
-                            )
-                        }
+                        EmptyState(
+                            emoji = "🛒",
+                            title = "No orders yet",
+                            subtitle = "Your order history will appear here once you place your first order.",
+                            actionText = null
+                        )
                     } else {
-                        val sortedOrders = remember(state.orders) {
-                            state.orders.sortedByDescending { it.id }
-                        }
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(10.dp)
+                        PullToRefreshBox(
+                            isRefreshing = isRefreshing,
+                            onRefresh = { viewModel.refreshOrders() },
+                            modifier = Modifier.fillMaxSize()
                         ) {
-                            items(sortedOrders, key = { it.id }) { order ->
-                                OrderCard(
-                                    order = order,
-                                    onCancel = {
-                                        if (order.status == "PLACED") {
-                                            viewModel.cancelOrder(order.id)
-                                        }
-                                    }
-                                )
+                            LazyColumn(
+                                modifier = Modifier.fillMaxSize(),
+                                contentPadding = PaddingValues(
+                                    start = 16.dp,
+                                    end = 16.dp,
+                                    top = 14.dp,
+                                    bottom = 16.dp
+                                ),
+                                verticalArrangement = Arrangement.spacedBy(14.dp)
+                            ) {
+                                items(state.orders, key = { it.id }) { order ->
+                                    OrderCard(order = order, viewModel = viewModel)
+                                }
                             }
-                            item { Spacer(modifier = Modifier.height(4.dp)) }
                         }
                     }
                 }
@@ -175,17 +162,51 @@ fun OrderScreen(
 }
 
 @Composable
-fun OrderCard(order: OrderResponse, onCancel: () -> Unit) {
+private fun OrderCard(
+    order: OrderResponse,
+    viewModel: OrderViewModel
+) {
+    var showCancelDialog by remember { mutableStateOf(false) }
+
+    if (showCancelDialog) {
+        AlertDialog(
+            onDismissRequest = { showCancelDialog = false },
+            icon = { Icon(Icons.Default.Cancel, null, tint = RedError) },
+            title = { Text("Cancel Order", fontWeight = FontWeight.Bold) },
+            text = { Text("Are you sure you want to cancel order #${order.id}?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showCancelDialog = false
+                        viewModel.cancelOrder(order.id)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = RedError),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Cancel Order", fontWeight = FontWeight.SemiBold)
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { showCancelDialog = false },
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Keep Order")
+                }
+            }
+        )
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize(),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(modifier = Modifier.padding(14.dp)) {
-            // Order header
+        Column(modifier = Modifier.padding(18.dp)) {
+            // Header: order ID + status badge
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -194,72 +215,75 @@ fun OrderCard(order: OrderResponse, onCancel: () -> Unit) {
                 Column {
                     Text(
                         "Order #${order.id}",
-                        style = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
-                    if (order.createdAt != null) {
+                    if (!order.createdAt.isNullOrBlank()) {
                         Text(
-                            text = formatDateTime(order.createdAt),
-                            style = MaterialTheme.typography.labelSmall,
+                            formatOrderDate(order.createdAt),
+                            style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 10.sp
+                            fontSize = 11.sp
                         )
                     }
                 }
                 StatusBadge(status = order.status)
             }
 
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 10.dp),
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
-            )
+            Spacer(modifier = Modifier.height(14.dp))
 
-            // Order items
+            // Items list with quantity badges
             order.items?.forEach { item ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 2.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .padding(vertical = 3.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        "${item.productName ?: "Product #${item.productId}"} × ${item.quantity}",
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.weight(1f),
-                        fontSize = 12.sp
-                    )
-                    Text(
-                        "₹${String.format(java.util.Locale.getDefault(), "%.0f", item.totalPrice ?: ((item.unitPrice ?: 0.0) * item.quantity))}",
-                        style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 12.sp
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Surface(
+                            modifier = Modifier.size(22.dp),
+                            shape = RoundedCornerShape(6.dp),
+                            color = OrangePrimary.copy(alpha = 0.1f)
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    "${item.quantity}x",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = OrangePrimary,
+                                    fontSize = 9.sp
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            item.productName ?: "Item #${item.productId}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 13.sp
+                        )
+                    }
+                    if (item.totalPrice != null) {
+                        Text(
+                            "₹${String.format(Locale.getDefault(), "%.0f", item.totalPrice)}",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 12.sp
+                        )
+                    }
                 }
             }
 
-            // Delivery address
-            if (!order.deliveryAddress.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(6.dp))
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                ) {
-                    Text(
-                        "📍 ${order.deliveryAddress}",
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 10.sp
-                    )
-                }
-            }
+            Spacer(modifier = Modifier.height(14.dp))
 
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = 10.dp),
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.15f)
-            )
+            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
 
-            // Total and cancel
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Total + action row
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -268,39 +292,52 @@ fun OrderCard(order: OrderResponse, onCancel: () -> Unit) {
                 Column {
                     Text(
                         "Total",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontSize = 11.sp
                     )
                     Text(
-                        "₹${String.format(java.util.Locale.getDefault(), "%.2f", order.totalAmount)}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Black,
-                        color = OrangePrimary
+                        "₹${String.format(Locale.getDefault(), "%.0f", order.totalAmount)}",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = OrangePrimary,
+                        fontSize = 22.sp
                     )
                 }
-
+                // Only PLACED orders can be cancelled
                 if (order.status == "PLACED") {
                     OutlinedButton(
-                        onClick = onCancel,
-                        shape = RoundedCornerShape(10.dp),
+                        onClick = { showCancelDialog = true },
+                        shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = MaterialTheme.colorScheme.error
+                            contentColor = RedError
                         ),
-                        border = BorderStroke(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.error.copy(alpha = 0.5f)
-                        ),
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
-                        modifier = Modifier.height(32.dp)
+                        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 8.dp)
                     ) {
-                        Icon(
-                            Icons.Default.Cancel,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Spacer(Modifier.width(4.dp))
-                        Text("Cancel", fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                        Icon(Icons.Default.Close, null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("Cancel", fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
                     }
+                }
+            }
+
+            // Delivery address
+            if (!order.deliveryAddress.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.Default.LocationOn,
+                        null,
+                        modifier = Modifier.size(14.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        order.deliveryAddress,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        fontSize = 11.sp
+                    )
                 }
             }
         }
@@ -308,29 +345,26 @@ fun OrderCard(order: OrderResponse, onCancel: () -> Unit) {
 }
 
 /**
- * Formats an ISO date string to a user-friendly format.
+ * Formats an ISO datetime string to a more readable format.
  */
-private fun formatDateTime(isoString: String): String {
+private fun formatOrderDate(isoString: String): String {
     return try {
         val parts = isoString.split("T")
-        if (parts.size == 2) {
-            val dateParts = parts[0].split("-") // 2026-04-23
-            val time = parts[1].substringBefore(".").substring(0, 5) // 12:30
-            if (dateParts.size == 3) {
-                val months = listOf(
-                    "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-                )
-                val monthIndex = dateParts[1].toIntOrNull() ?: 0
-                val monthName = months.getOrElse(monthIndex) { dateParts[1] }
-                "${dateParts[2]} $monthName ${dateParts[0]} at $time"
-            } else {
-                "${parts[0]} at $time"
-            }
-        } else {
-            isoString
-        }
+        val date = parts[0]
+        val timeParts = parts.getOrNull(1)?.split(":")
+        val hour = timeParts?.getOrNull(0)?.toIntOrNull() ?: 0
+        val minute = timeParts?.getOrNull(1) ?: "00"
+        val amPm = if (hour >= 12) "PM" else "AM"
+        val displayHour = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+        val dateParts = date.split("-")
+        val months = listOf(
+            "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        )
+        val monthIndex = dateParts.getOrNull(1)?.toIntOrNull() ?: 0
+        val monthName = months.getOrElse(monthIndex) { dateParts.getOrElse(1) { "" } }
+        "${dateParts.getOrElse(2) { "" }} $monthName · $displayHour:$minute $amPm"
     } catch (_: Exception) {
-        isoString
+        isoString.split("T").getOrElse(0) { isoString }
     }
 }

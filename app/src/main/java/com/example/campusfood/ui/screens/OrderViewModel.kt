@@ -16,12 +16,29 @@ sealed interface OrderUiState {
     data class Error(val message: String) : OrderUiState
 }
 
+/**
+ * ViewModel for customer order management.
+ *
+ * Responsibilities:
+ * - Fetching user orders sorted by recency
+ * - Placing new orders with optimistic UI feedback
+ * - Cancelling orders with proper error propagation
+ * - Pull-to-refresh support via isRefreshing state
+ * - Snackbar-level event feedback via one-shot event flow
+ */
 class OrderViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<OrderUiState>(OrderUiState.Loading)
     val uiState: StateFlow<OrderUiState> = _uiState.asStateFlow()
 
     private val _isPlacingOrder = MutableStateFlow(false)
     val isPlacingOrder: StateFlow<Boolean> = _isPlacingOrder.asStateFlow()
+
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing: StateFlow<Boolean> = _isRefreshing.asStateFlow()
+
+    /** One-shot event for snackbar messages (cancel success/failure, etc.) */
+    private val _snackbarEvent = MutableStateFlow<String?>(null)
+    val snackbarEvent: StateFlow<String?> = _snackbarEvent.asStateFlow()
 
     private var userId: Long = 0L
 
@@ -46,12 +63,40 @@ class OrderViewModel : ViewModel() {
             try {
                 val response = RetrofitInstance.api.getOrdersByUser(userId)
                 if (response.success && response.data != null) {
-                    _uiState.value = OrderUiState.Success(response.data)
+                    // Sort by most recent first
+                    _uiState.value = OrderUiState.Success(
+                        response.data.sortedByDescending { it.id }
+                    )
                 } else {
                     _uiState.value = OrderUiState.Error(response.message)
                 }
             } catch (e: Exception) {
-                _uiState.value = OrderUiState.Error(e.message ?: "Failed to load orders")
+                _uiState.value = OrderUiState.Error(
+                    e.message ?: "Failed to load orders. Check your connection."
+                )
+            }
+        }
+    }
+
+    /**
+     * Silent refresh without showing loading skeleton.
+     * Used for pull-to-refresh.
+     */
+    fun refreshOrders() {
+        if (userId == 0L) return
+        viewModelScope.launch {
+            _isRefreshing.value = true
+            try {
+                val response = RetrofitInstance.api.getOrdersByUser(userId)
+                if (response.success && response.data != null) {
+                    _uiState.value = OrderUiState.Success(
+                        response.data.sortedByDescending { it.id }
+                    )
+                }
+            } catch (_: Exception) {
+                // Silent fail on refresh – keep existing data
+            } finally {
+                _isRefreshing.value = false
             }
         }
     }
@@ -65,9 +110,11 @@ class OrderViewModel : ViewModel() {
                     getOrders()
                     onSuccess()
                 } else {
+                    _snackbarEvent.value = "Order failed: ${response.message}"
                     _uiState.value = OrderUiState.Error(response.message)
                 }
             } catch (e: Exception) {
+                _snackbarEvent.value = "Order failed: ${e.message ?: "Network error"}"
                 _uiState.value = OrderUiState.Error(e.message ?: "Failed to place order")
             } finally {
                 _isPlacingOrder.value = false
@@ -75,21 +122,25 @@ class OrderViewModel : ViewModel() {
         }
     }
 
-    // FIX #6: Show feedback on cancel failure instead of silently swallowing
     fun cancelOrder(orderId: Long) {
         viewModelScope.launch {
             try {
                 val response = RetrofitInstance.api.cancelOrder(orderId)
                 if (response.success) {
+                    _snackbarEvent.value = "Order #$orderId cancelled"
                     getOrders()
                 } else {
-                    // Preserve current orders but could show a snackbar via callback
+                    _snackbarEvent.value = "Cannot cancel: ${response.message}"
                     getOrders() // Refresh to get latest state
                 }
             } catch (e: Exception) {
-                // Refresh to get current state so UI isn't stuck
+                _snackbarEvent.value = "Cancel failed: ${e.message ?: "Network error"}"
                 getOrders()
             }
         }
+    }
+
+    fun clearSnackbarEvent() {
+        _snackbarEvent.value = null
     }
 }

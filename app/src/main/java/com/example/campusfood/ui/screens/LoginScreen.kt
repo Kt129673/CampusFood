@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -96,7 +97,7 @@ fun LoginScreen(
                     colors = listOf(
                         OrangePrimary,
                         OrangePrimaryDark,
-                        Color(0xFF1A0A00)
+                        Color(0xFF1A0800)
                     )
                 )
             )
@@ -110,57 +111,93 @@ fun LoginScreen(
                 .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(48.dp))
 
-            // Compact Logo
-            Surface(
-                modifier = Modifier.size(80.dp),
-                shape = CircleShape,
-                color = Color.White.copy(alpha = 0.15f)
+            // Floating logo animation
+            val infiniteTransition = rememberInfiniteTransition(label = "logoFloat")
+            val logoOffset by infiniteTransition.animateFloat(
+                initialValue = -4f,
+                targetValue = 4f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(2000, easing = FastOutSlowInEasing),
+                    repeatMode = RepeatMode.Reverse
+                ),
+                label = "logoOffset"
+            )
+
+            // Premium Logo – with floating animation and glow ring
+            Box(
+                modifier = Modifier.size(110.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Text("🍔", fontSize = 40.sp)
+                // Outer glow ring
+                Surface(
+                    modifier = Modifier.size(110.dp),
+                    shape = CircleShape,
+                    color = Color.White.copy(alpha = 0.06f)
+                ) {}
+                Surface(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .offset(y = logoOffset.dp),
+                    shape = CircleShape,
+                    color = Color.White.copy(alpha = 0.14f)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Text("🍔", fontSize = 50.sp)
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
+            // Brand name – premium typography
             Text(
-                "Campus Food",
-                style = MaterialTheme.typography.headlineLarge,
+                "ANISHA",
+                style = MaterialTheme.typography.displayLarge,
                 color = Color.White,
-                fontWeight = FontWeight.Black
+                fontWeight = FontWeight.Black,
+                letterSpacing = 3.sp
             )
+            Text(
+                "CAMPUS FOOD",
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.White.copy(alpha = 0.85f),
+                fontWeight = FontWeight.Light,
+                letterSpacing = 4.sp
+            )
+            Spacer(modifier = Modifier.height(6.dp))
             Text(
                 "Fresh food, delivered fast on campus",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.White.copy(alpha = 0.8f)
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.65f),
+                letterSpacing = 0.5.sp
             )
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(36.dp))
 
-            // Login Card
+            // Login Card – premium with larger radius
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
+                shape = RoundedCornerShape(28.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp),
+                        .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Toggle: Student / Admin
+                    // Toggle: Student / Admin – taller
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-                            .padding(4.dp),
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f))
+                            .padding(5.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         ToggleButton(
@@ -185,12 +222,21 @@ fun LoginScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(28.dp))
 
                     AnimatedContent(
                         targetState = isAdminMode,
                         transitionSpec = {
-                            fadeIn() + slideInVertically() togetherWith fadeOut() + slideOutVertically()
+                            (fadeIn(animationSpec = tween(300)) +
+                                slideInHorizontally(
+                                    initialOffsetX = { if (targetState) it / 3 else -it / 3 },
+                                    animationSpec = tween(350, easing = FastOutSlowInEasing)
+                                )) togetherWith
+                            (fadeOut(animationSpec = tween(200)) +
+                                slideOutHorizontally(
+                                    targetOffsetX = { if (targetState) -it / 3 else it / 3 },
+                                    animationSpec = tween(350, easing = FastOutSlowInEasing)
+                                ))
                         },
                         label = "auth_content"
                     ) { isAdmin ->
@@ -202,17 +248,17 @@ fun LoginScreen(
                             ) {
                                 Text(
                                     "Admin Login",
-                                    style = MaterialTheme.typography.titleLarge,
+                                    style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.Bold
                                 )
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.height(6.dp))
                                 Text(
                                     "Enter your admin credentials",
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
 
-                                Spacer(modifier = Modifier.height(20.dp))
+                                Spacer(modifier = Modifier.height(24.dp))
 
                                 // Mobile field
                                 OutlinedTextField(
@@ -222,13 +268,13 @@ fun LoginScreen(
                                     label = { Text("Mobile Number") },
                                     placeholder = { Text("Enter 10-digit mobile") },
                                     leadingIcon = {
-                                        Icon(Icons.Default.Phone, null, tint = OrangePrimary)
+                                        Icon(Icons.Default.Phone, null, tint = OrangePrimary, modifier = Modifier.size(22.dp))
                                     },
                                     keyboardOptions = KeyboardOptions(
                                         keyboardType = KeyboardType.Phone,
                                         imeAction = ImeAction.Next
                                     ),
-                                    shape = RoundedCornerShape(14.dp),
+                                    shape = RoundedCornerShape(16.dp),
                                     singleLine = true,
                                     colors = OutlinedTextFieldDefaults.colors(
                                         focusedBorderColor = OrangePrimary,
@@ -236,7 +282,7 @@ fun LoginScreen(
                                     )
                                 )
 
-                                Spacer(modifier = Modifier.height(14.dp))
+                                Spacer(modifier = Modifier.height(16.dp))
 
                                 // Password field
                                 OutlinedTextField(
@@ -246,7 +292,7 @@ fun LoginScreen(
                                     label = { Text("Password") },
                                     placeholder = { Text("Enter your password") },
                                     leadingIcon = {
-                                        Icon(Icons.Default.Lock, null, tint = OrangePrimary)
+                                        Icon(Icons.Default.Lock, null, tint = OrangePrimary, modifier = Modifier.size(22.dp))
                                     },
                                     trailingIcon = {
                                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -263,7 +309,7 @@ fun LoginScreen(
                                         keyboardType = KeyboardType.Password,
                                         imeAction = ImeAction.Done
                                     ),
-                                    shape = RoundedCornerShape(14.dp),
+                                    shape = RoundedCornerShape(16.dp),
                                     singleLine = true,
                                     colors = OutlinedTextFieldDefaults.colors(
                                         focusedBorderColor = OrangePrimary,
@@ -271,53 +317,55 @@ fun LoginScreen(
                                     )
                                 )
 
-                                Spacer(modifier = Modifier.height(24.dp))
+                                Spacer(modifier = Modifier.height(28.dp))
 
-                                // Login Button
+                                // Login Button – taller, premium
                                 Button(
                                     onClick = {
                                         authViewModel.loginAdmin(mobile, password)
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(48.dp),
-                                    shape = RoundedCornerShape(14.dp),
+                                        .height(54.dp),
+                                    shape = RoundedCornerShape(16.dp),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = OrangePrimary
                                     ),
+                                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
                                     enabled = mobile.length == 10 && password.isNotBlank()
                                             && authState !is AuthUiState.Loading
                                 ) {
                                     if (authState is AuthUiState.Loading) {
                                         CircularProgressIndicator(
-                                            modifier = Modifier.size(22.dp),
+                                            modifier = Modifier.size(24.dp),
                                             color = Color.White,
-                                            strokeWidth = 2.dp
+                                            strokeWidth = 2.5.dp
                                         )
                                     } else {
                                         Icon(
                                             Icons.AutoMirrored.Filled.Login,
                                             null,
-                                            modifier = Modifier.size(20.dp)
+                                            modifier = Modifier.size(22.dp)
                                         )
-                                        Spacer(Modifier.width(8.dp))
+                                        Spacer(Modifier.width(10.dp))
                                         Text(
                                             "Login as Admin",
-                                            fontWeight = FontWeight.Bold
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 16.sp
                                         )
                                     }
                                 }
 
                                 // Seed data hint
-                                Spacer(modifier = Modifier.height(12.dp))
+                                Spacer(modifier = Modifier.height(16.dp))
                                 Surface(
-                                    shape = RoundedCornerShape(10.dp),
+                                    shape = RoundedCornerShape(12.dp),
                                     color = BlueInfo.copy(alpha = 0.08f)
                                 ) {
                                     Text(
                                         "Demo: 9999999999 / admin123",
-                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                                        style = MaterialTheme.typography.labelSmall,
+                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
+                                        style = MaterialTheme.typography.labelMedium,
                                         color = BlueInfo,
                                         fontWeight = FontWeight.Medium
                                     )
@@ -331,21 +379,21 @@ fun LoginScreen(
                             ) {
                                 Text(
                                     "Welcome, Student!",
-                                    style = MaterialTheme.typography.titleLarge,
+                                    style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.Bold
                                 )
-                                Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.height(6.dp))
                                 Text(
                                     "Sign in with your Google account\nto start ordering campus food",
-                                    style = MaterialTheme.typography.bodySmall,
+                                    style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     textAlign = TextAlign.Center,
-                                    lineHeight = 20.sp
+                                    lineHeight = 22.sp
                                 )
 
-                                Spacer(modifier = Modifier.height(32.dp))
+                                Spacer(modifier = Modifier.height(36.dp))
 
-                                // Google Sign-In Button
+                                // Google Sign-In Button – premium
                                 @Suppress("DEPRECATION")
                                 OutlinedButton(
                                     onClick = {
@@ -361,8 +409,8 @@ fun LoginScreen(
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(48.dp),
-                                    shape = RoundedCornerShape(14.dp),
+                                        .height(54.dp),
+                                    shape = RoundedCornerShape(16.dp),
                                     colors = ButtonDefaults.outlinedButtonColors(
                                         contentColor = MaterialTheme.colorScheme.onSurface
                                     ),
@@ -370,22 +418,23 @@ fun LoginScreen(
                                 ) {
                                     if (authState is AuthUiState.Loading) {
                                         CircularProgressIndicator(
-                                            modifier = Modifier.size(22.dp),
-                                            strokeWidth = 2.dp
+                                            modifier = Modifier.size(24.dp),
+                                            strokeWidth = 2.5.dp
                                         )
                                     } else {
                                         Text("G", fontWeight = FontWeight.Bold,
-                                            fontSize = 20.sp,
+                                            fontSize = 22.sp,
                                             color = Color(0xFF4285F4))
-                                        Spacer(Modifier.width(12.dp))
+                                        Spacer(Modifier.width(14.dp))
                                         Text(
                                             "Continue with Google",
-                                            fontWeight = FontWeight.SemiBold
+                                            fontWeight = FontWeight.SemiBold,
+                                            fontSize = 16.sp
                                         )
                                     }
                                 }
 
-                                Spacer(modifier = Modifier.height(20.dp))
+                                Spacer(modifier = Modifier.height(24.dp))
 
                                 // Divider
                                 Row(
@@ -394,22 +443,22 @@ fun LoginScreen(
                                 ) {
                                     HorizontalDivider(
                                         modifier = Modifier.weight(1f),
-                                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
                                     )
                                     Text(
                                         "  or use demo account  ",
-                                        style = MaterialTheme.typography.labelSmall,
+                                        style = MaterialTheme.typography.labelMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     HorizontalDivider(
                                         modifier = Modifier.weight(1f),
-                                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
                                     )
                                 }
 
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(18.dp))
 
-                                // Quick demo login buttons
+                                // Quick demo login
                                 TextButton(
                                     onClick = {
                                         authViewModel.loginUser("9876543210", "pass123")
@@ -420,7 +469,8 @@ fun LoginScreen(
                                     Text(
                                         "Login as Rahul (Demo Student)",
                                         color = OrangePrimary,
-                                        fontWeight = FontWeight.SemiBold
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 15.sp
                                     )
                                 }
                             }
@@ -433,21 +483,21 @@ fun LoginScreen(
                             Surface(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(top = 16.dp),
-                                shape = RoundedCornerShape(12.dp),
-                                color = RedError.copy(alpha = 0.1f)
+                                    .padding(top = 18.dp),
+                                shape = RoundedCornerShape(14.dp),
+                                color = RedError.copy(alpha = 0.08f)
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(12.dp),
+                                    modifier = Modifier.padding(14.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Icon(
                                         Icons.Default.ErrorOutline,
                                         null,
                                         tint = RedError,
-                                        modifier = Modifier.size(18.dp)
+                                        modifier = Modifier.size(20.dp)
                                     )
-                                    Spacer(Modifier.width(8.dp))
+                                    Spacer(Modifier.width(10.dp))
                                     Text(
                                         (authState as AuthUiState.Error).message,
                                         style = MaterialTheme.typography.bodySmall,
@@ -461,16 +511,17 @@ fun LoginScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Text(
                 "By continuing, you agree to our Terms of Service",
                 style = MaterialTheme.typography.labelSmall,
-                color = Color.White.copy(alpha = 0.5f),
-                textAlign = TextAlign.Center
+                color = Color.White.copy(alpha = 0.45f),
+                textAlign = TextAlign.Center,
+                fontSize = 11.sp
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }
@@ -485,29 +536,30 @@ private fun ToggleButton(
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier.height(44.dp),
-        shape = RoundedCornerShape(11.dp),
+        modifier = modifier.height(48.dp),
+        shape = RoundedCornerShape(13.dp),
         color = if (selected) OrangePrimary else Color.Transparent
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = 14.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 icon,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(20.dp),
                 tint = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Spacer(Modifier.width(6.dp))
+            Spacer(Modifier.width(8.dp))
             Text(
                 text,
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
-                color = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                color = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                fontSize = 15.sp
             )
         }
     }

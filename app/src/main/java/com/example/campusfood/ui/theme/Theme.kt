@@ -32,7 +32,8 @@ private val DarkColorScheme = darkColorScheme(
     onSurfaceVariant = TextSecondaryDark,
     error = RedError,
     onError = Color.White,
-    outline = Color(0xFF3A3A3A)
+    outline = Color(0xFF333333),
+    surfaceContainerHighest = DarkElevated
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -54,7 +55,7 @@ private val LightColorScheme = lightColorScheme(
     onSurfaceVariant = TextSecondaryLight,
     error = RedError,
     onError = Color.White,
-    outline = Color(0xFFE0E0E0)
+    outline = Color(0xFFDCDCDC)
 )
 
 @Composable
@@ -69,9 +70,10 @@ fun CampusFoodTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
+            // Edge-to-edge: transparent status bar for premium look
             @Suppress("DEPRECATION")
-            window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+            window.statusBarColor = Color.Transparent.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 

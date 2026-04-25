@@ -32,6 +32,7 @@ import com.example.campusfood.model.OrderItemRequest
 import com.example.campusfood.model.OrderRequest
 import com.example.campusfood.ui.screens.*
 import com.example.campusfood.ui.theme.OrangePrimary
+import com.example.campusfood.ui.theme.AdminPurple
 import kotlinx.coroutines.launch
 
 @Composable
@@ -118,11 +119,10 @@ fun MainScreen() {
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             if (showBottomBar) {
-                // Material 3 NavigationBar with highlight animation
+                // Premium NavigationBar with elevated feel
                 NavigationBar(
                     containerColor = MaterialTheme.colorScheme.surface,
-                    tonalElevation = 8.dp,
-                    modifier = Modifier
+                    tonalElevation = 12.dp
                 ) {
                     val currentDestination = navBackStackEntry?.destination
                     bottomNavItems.forEach { item ->
@@ -138,7 +138,7 @@ fun MainScreen() {
                                             ) {
                                                 Text(
                                                     "${item.badgeCount}",
-                                                    fontSize = 10.sp,
+                                                    fontSize = 11.sp,
                                                     fontWeight = FontWeight.Bold
                                                 )
                                             }
@@ -148,7 +148,7 @@ fun MainScreen() {
                                     Icon(
                                         if (isSelected) item.selectedIcon else item.unselectedIcon,
                                         contentDescription = item.name,
-                                        modifier = Modifier.size(24.dp)
+                                        modifier = Modifier.size(26.dp)
                                     )
                                 }
                             },
@@ -156,7 +156,7 @@ fun MainScreen() {
                                 Text(
                                     item.name,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                    fontSize = 11.sp,
+                                    fontSize = 12.sp,
                                     maxLines = 1
                                 )
                             },
@@ -169,10 +169,10 @@ fun MainScreen() {
                                 }
                             },
                             colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = if (isAdmin) Color(0xFF7B1FA2) else OrangePrimary,
-                                selectedTextColor = if (isAdmin) Color(0xFF7B1FA2) else OrangePrimary,
-                                indicatorColor = if (isAdmin) Color(0xFF7B1FA2).copy(alpha = 0.15f)
-                                                 else OrangePrimary.copy(alpha = 0.15f),
+                                selectedIconColor = if (isAdmin) AdminPurple else OrangePrimary,
+                                selectedTextColor = if (isAdmin) AdminPurple else OrangePrimary,
+                                indicatorColor = if (isAdmin) AdminPurple.copy(alpha = 0.12f)
+                                                 else OrangePrimary.copy(alpha = 0.12f),
                                 unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                 unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )

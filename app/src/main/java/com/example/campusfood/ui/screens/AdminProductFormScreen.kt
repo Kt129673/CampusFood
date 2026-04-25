@@ -63,6 +63,7 @@ fun AdminProductFormScreen(
     var stock by remember { mutableStateOf("100") }
     var available by remember { mutableStateOf(true) }
     var formInitialized by remember { mutableStateOf(false) }
+    var submitted by remember { mutableStateOf(false) }
     
     val context = LocalContext.current
     var isUploading by remember { mutableStateOf(false) }
@@ -120,14 +121,18 @@ fun AdminProductFormScreen(
         topBar = {
             Surface(
                 color = Color.Transparent,
-                shadowElevation = 2.dp
+                shadowElevation = 4.dp
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Brush.horizontalGradient(listOf(Color(0xFF7B1FA2), Color(0xFF4A148C))))
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(AdminPurple, AdminPurpleDark, Color(0xFF311B92))
+                            )
+                        )
                         .statusBarsPadding()
-                        .padding(horizontal = 8.dp, vertical = 8.dp)
+                        .padding(horizontal = 10.dp, vertical = 12.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -135,15 +140,15 @@ fun AdminProductFormScreen(
                     ) {
                         IconButton(
                             onClick = onBack,
-                            modifier = Modifier.size(36.dp),
+                            modifier = Modifier.size(40.dp),
                             colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
                         ) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", modifier = Modifier.size(20.dp))
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", modifier = Modifier.size(22.dp))
                         }
-                        Spacer(Modifier.width(4.dp))
+                        Spacer(Modifier.width(6.dp))
                         Text(
                             if (isEditing) "Edit Product" else "Add Product",
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
                         )
@@ -157,7 +162,7 @@ fun AdminProductFormScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
             // Product Name
             OutlinedTextField(
@@ -165,14 +170,16 @@ fun AdminProductFormScreen(
                 onValueChange = { name = it },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Product Name *") },
-                leadingIcon = { Icon(Icons.Default.Fastfood, null, tint = Color(0xFF7B1FA2), modifier = Modifier.size(20.dp)) },
-                shape = RoundedCornerShape(12.dp),
+                leadingIcon = { Icon(Icons.Default.Fastfood, null, tint = AdminPurple, modifier = Modifier.size(22.dp)) },
+                shape = RoundedCornerShape(16.dp),
                 singleLine = true,
                 colors = adminFieldColors(),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                isError = submitted && name.isBlank(),
+                supportingText = if (submitted && name.isBlank()) {{ Text("Product name is required", color = RedError) }} else null
             )
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(16.dp))
 
             // Description
             OutlinedTextField(
@@ -180,33 +187,35 @@ fun AdminProductFormScreen(
                 onValueChange = { description = it },
                 modifier = Modifier.fillMaxWidth(),
                 label = { Text("Description") },
-                leadingIcon = { Icon(Icons.Default.Description, null, tint = Color(0xFF7B1FA2), modifier = Modifier.size(20.dp)) },
-                shape = RoundedCornerShape(12.dp),
+                leadingIcon = { Icon(Icons.Default.Description, null, tint = AdminPurple, modifier = Modifier.size(22.dp)) },
+                shape = RoundedCornerShape(16.dp),
                 maxLines = 3,
                 colors = adminFieldColors(),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(16.dp))
 
             // Price and Stock row
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 OutlinedTextField(
                     value = price,
                     onValueChange = { if (it.isEmpty() || it.matches(Regex("^\\d*\\.?\\d*$"))) price = it },
                     modifier = Modifier.weight(1f),
                     label = { Text("Price ₹ *") },
-                    leadingIcon = { Icon(Icons.Default.CurrencyRupee, null, tint = Color(0xFF7B1FA2), modifier = Modifier.size(20.dp)) },
-                    shape = RoundedCornerShape(12.dp),
+                    leadingIcon = { Icon(Icons.Default.CurrencyRupee, null, tint = AdminPurple, modifier = Modifier.size(22.dp)) },
+                    shape = RoundedCornerShape(16.dp),
                     singleLine = true,
                     colors = adminFieldColors(),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Decimal,
                         imeAction = ImeAction.Next
-                    )
+                    ),
+                    isError = submitted && (price.isBlank() || (price.toDoubleOrNull() ?: 0.0) <= 0),
+                    supportingText = if (submitted && (price.isBlank() || (price.toDoubleOrNull() ?: 0.0) <= 0)) {{ Text("Required", color = RedError) }} else null
                 )
 
                 OutlinedTextField(
@@ -214,8 +223,8 @@ fun AdminProductFormScreen(
                     onValueChange = { if (it.all { c -> c.isDigit() }) stock = it },
                     modifier = Modifier.weight(1f),
                     label = { Text("Initial Stock") },
-                    leadingIcon = { Icon(Icons.Default.Inventory, null, tint = Color(0xFF7B1FA2), modifier = Modifier.size(20.dp)) },
-                    shape = RoundedCornerShape(12.dp),
+                    leadingIcon = { Icon(Icons.Default.Inventory, null, tint = AdminPurple, modifier = Modifier.size(22.dp)) },
+                    shape = RoundedCornerShape(16.dp),
                     singleLine = true,
                     colors = adminFieldColors(),
                     keyboardOptions = KeyboardOptions(
@@ -225,7 +234,7 @@ fun AdminProductFormScreen(
                 )
             }
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(16.dp))
 
             // Category dropdown
             ExposedDropdownMenuBox(
@@ -239,9 +248,9 @@ fun AdminProductFormScreen(
                         .fillMaxWidth()
                         .menuAnchor(MenuAnchorType.PrimaryEditable),
                     label = { Text("Category *") },
-                    leadingIcon = { Icon(Icons.Default.Category, null, tint = Color(0xFF7B1FA2), modifier = Modifier.size(20.dp)) },
+                    leadingIcon = { Icon(Icons.Default.Category, null, tint = AdminPurple, modifier = Modifier.size(22.dp)) },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategory) },
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(16.dp),
                     singleLine = true,
                     colors = adminFieldColors()
                 )
@@ -251,7 +260,7 @@ fun AdminProductFormScreen(
                 ) {
                     categories.forEach { cat ->
                         DropdownMenuItem(
-                            text = { Text(cat) },
+                            text = { Text(cat, fontSize = 14.sp) },
                             onClick = {
                                 category = cat
                                 expandedCategory = false
@@ -261,21 +270,21 @@ fun AdminProductFormScreen(
                 }
             }
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(16.dp))
 
             // Image URL
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 OutlinedTextField(
                     value = imageUrl,
                     onValueChange = { imageUrl = it },
                     modifier = Modifier.weight(1f),
                     label = { Text("Image URL") },
-                    leadingIcon = { Icon(Icons.Default.Image, null, tint = Color(0xFF7B1FA2), modifier = Modifier.size(20.dp)) },
-                    shape = RoundedCornerShape(12.dp),
+                    leadingIcon = { Icon(Icons.Default.Image, null, tint = AdminPurple, modifier = Modifier.size(22.dp)) },
+                    shape = RoundedCornerShape(16.dp),
                     singleLine = true,
                     colors = adminFieldColors(),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
@@ -284,30 +293,30 @@ fun AdminProductFormScreen(
                 FilledTonalButton(
                     onClick = { imagePickerLauncher.launch("image/*") },
                     modifier = Modifier.height(56.dp).padding(top = 8.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.filledTonalButtonColors(containerColor = Color(0xFF7B1FA2).copy(alpha = 0.1f))
+                    shape = RoundedCornerShape(14.dp),
+                    colors = ButtonDefaults.filledTonalButtonColors(containerColor = AdminPurple.copy(alpha = 0.08f))
                 ) {
                     if (isUploading || actionState is AdminProductActionState.Loading && name.isEmpty()) {
-                        CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color(0xFF7B1FA2), strokeWidth = 2.dp)
+                        CircularProgressIndicator(modifier = Modifier.size(22.dp), color = AdminPurple, strokeWidth = 2.5.dp)
                     } else {
-                        Icon(Icons.Default.Upload, contentDescription = "Upload", tint = Color(0xFF7B1FA2))
+                        Icon(Icons.Default.Upload, contentDescription = "Upload", tint = AdminPurple, modifier = Modifier.size(22.dp))
                     }
                 }
             }
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(16.dp))
 
-            // Available toggle
+            // Available toggle – premium
             Card(
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
                 )
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 18.dp, vertical = 14.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -315,30 +324,34 @@ fun AdminProductFormScreen(
                         Text(
                             "Available for sale",
                             style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 15.sp
                         )
                         Text(
                             "Visible to customers",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 12.sp
                         )
                     }
                     Switch(
                         checked = available,
                         onCheckedChange = { available = it },
                         colors = SwitchDefaults.colors(
-                            checkedTrackColor = Color(0xFF7B1FA2),
+                            checkedTrackColor = AdminPurple,
                             checkedThumbColor = Color.White
                         )
                     )
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(28.dp))
 
-            // Submit button
+            // Submit button – premium
             Button(
                 onClick = {
+                    submitted = true
+                    if (!isFormValid) return@Button
                     val request = ProductRequest(
                         name = name.trim(),
                         description = description.trim().ifBlank { null },
@@ -356,50 +369,52 @@ fun AdminProductFormScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(14.dp),
-                enabled = isFormValid && actionState !is AdminProductActionState.Loading,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7B1FA2))
+                    .height(56.dp),
+                shape = RoundedCornerShape(18.dp),
+                enabled = actionState !is AdminProductActionState.Loading,
+                colors = ButtonDefaults.buttonColors(containerColor = AdminPurple),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
             ) {
                 if (actionState is AdminProductActionState.Loading) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier.size(22.dp),
                         color = Color.White,
-                        strokeWidth = 2.dp
+                        strokeWidth = 2.5.dp
                     )
-                    Spacer(Modifier.width(8.dp))
-                    Text("Saving...", fontWeight = FontWeight.Bold, color = Color.White)
+                    Spacer(Modifier.width(10.dp))
+                    Text("Saving...", fontWeight = FontWeight.Bold, color = Color.White, fontSize = 16.sp)
                 } else {
                     Icon(
                         if (isEditing) Icons.Default.Save else Icons.Default.Add,
                         null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(20.dp)
                     )
-                    Spacer(Modifier.width(8.dp))
+                    Spacer(Modifier.width(10.dp))
                     Text(
                         if (isEditing) "Update Product" else "Create Product",
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = Color.White,
+                        fontSize = 16.sp
                     )
                 }
             }
 
             // Error message
             if (actionState is AdminProductActionState.Error) {
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(16.dp))
                 Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = RedError.copy(alpha = 0.08f)
+                    shape = RoundedCornerShape(14.dp),
+                    color = RedError.copy(alpha = 0.06f)
                 ) {
                     Row(
-                        modifier = Modifier.padding(12.dp),
+                        modifier = Modifier.padding(14.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.ErrorOutline, null, tint = RedError, modifier = Modifier.size(16.dp))
-                        Spacer(Modifier.width(8.dp))
+                        Icon(Icons.Default.ErrorOutline, null, tint = RedError, modifier = Modifier.size(20.dp))
+                        Spacer(Modifier.width(10.dp))
                         Text(
                             (actionState as AdminProductActionState.Error).message,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyMedium,
                             color = RedError,
                             fontWeight = FontWeight.Medium
                         )
@@ -407,14 +422,14 @@ fun AdminProductFormScreen(
                 }
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(28.dp))
         }
     }
 }
 
 @Composable
 private fun adminFieldColors() = OutlinedTextFieldDefaults.colors(
-    focusedBorderColor = Color(0xFF7B1FA2),
-    focusedLabelColor = Color(0xFF7B1FA2),
-    cursorColor = Color(0xFF7B1FA2)
+    focusedBorderColor = AdminPurple,
+    focusedLabelColor = AdminPurple,
+    cursorColor = AdminPurple
 )

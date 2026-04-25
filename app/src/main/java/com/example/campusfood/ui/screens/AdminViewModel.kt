@@ -33,6 +33,17 @@ sealed interface AdminProductActionState {
     data class Error(val message: String) : AdminProductActionState
 }
 
+/**
+ * ViewModel for admin dashboard and product management.
+ *
+ * Responsibilities:
+ * - Loading and filtering all orders with pagination
+ * - Updating order statuses through the order lifecycle
+ * - CRUD operations for products (create, update, delete)
+ * - Inventory management
+ * - Image upload for product photos
+ * - Pull-to-refresh support for both orders and products
+ */
 class AdminViewModel : ViewModel() {
     private val _ordersState = MutableStateFlow<AdminOrdersState>(AdminOrdersState.Loading)
     val ordersState: StateFlow<AdminOrdersState> = _ordersState.asStateFlow()
@@ -49,9 +60,17 @@ class AdminViewModel : ViewModel() {
     private val _selectedProduct = MutableStateFlow<Product?>(null)
     val selectedProduct: StateFlow<Product?> = _selectedProduct.asStateFlow()
 
+    /** One-shot event for admin snackbar messages */
+    private val _snackbarEvent = MutableStateFlow<String?>(null)
+    val snackbarEvent: StateFlow<String?> = _snackbarEvent.asStateFlow()
+
     init {
         loadAllOrders()
         loadAllProducts()
+    }
+
+    fun clearSnackbarEvent() {
+        _snackbarEvent.value = null
     }
 
     // ========================
@@ -85,16 +104,35 @@ class AdminViewModel : ViewModel() {
                     request = StatusUpdateRequest(status = newStatus)
                 )
                 if (response.success) {
+                    _snackbarEvent.value = "Order #$orderId → $newStatus"
                     loadAllOrders()
                 } else {
-                    // Refresh to show current state even on failure
+                    _snackbarEvent.value = "Failed: ${response.message}"
                     loadAllOrders()
                 }
-            } catch (_: Exception) {
-                // Refresh to get current state so UI isn't stuck
+            } catch (e: Exception) {
+                _snackbarEvent.value = "Update failed: ${e.message ?: "Network error"}"
                 loadAllOrders()
             } finally {
                 _statusUpdateLoading.value = null
+            }
+        }
+    }
+
+    /**
+     * Silent refresh without loading skeleton. For pull-to-refresh.
+     */
+    fun refreshOrders() {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.adminGetAllOrders(page = 0, size = 100)
+                if (response.success && response.data != null) {
+                    _ordersState.value = AdminOrdersState.Success(
+                        response.data.content.sortedByDescending { it.id }
+                    )
+                }
+            } catch (_: Exception) {
+                // Silent fail – keep existing data
             }
         }
     }
@@ -139,6 +177,7 @@ class AdminViewModel : ViewModel() {
                 val response = RetrofitInstance.api.adminCreateProduct(request)
                 if (response.success) {
                     _productActionState.value = AdminProductActionState.Success("Product created successfully")
+                    _snackbarEvent.value = "✅ ${request.name} created"
                     loadAllProducts()
                     onSuccess()
                 } else {
@@ -157,6 +196,7 @@ class AdminViewModel : ViewModel() {
                 val response = RetrofitInstance.api.adminUpdateProduct(productId, request)
                 if (response.success) {
                     _productActionState.value = AdminProductActionState.Success("Product updated successfully")
+                    _snackbarEvent.value = "✅ ${request.name} updated"
                     loadAllProducts()
                     onSuccess()
                 } else {
@@ -175,6 +215,7 @@ class AdminViewModel : ViewModel() {
                 val response = RetrofitInstance.api.adminDeleteProduct(productId)
                 if (response.success) {
                     _productActionState.value = AdminProductActionState.Success("Product deleted")
+                    _snackbarEvent.value = "🗑️ Product deleted"
                     loadAllProducts()
                 } else {
                     _productActionState.value = AdminProductActionState.Error(response.message)
