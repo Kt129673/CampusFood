@@ -19,8 +19,26 @@ class MenuViewModel : ViewModel() {
     private val _uiState = MutableStateFlow<MenuUiState>(MenuUiState.Loading)
     val uiState: StateFlow<MenuUiState> = _uiState.asStateFlow()
 
+    private val _isBackendOnline = MutableStateFlow(true)
+    val isBackendOnline: StateFlow<Boolean> = _isBackendOnline.asStateFlow()
+
     init {
         getProducts()
+        startHealthCheck()
+    }
+
+    private fun startHealthCheck() {
+        viewModelScope.launch {
+            while (true) {
+                try {
+                    RetrofitInstance.api.getBackendHealth()
+                    _isBackendOnline.value = true
+                } catch (e: Exception) {
+                    _isBackendOnline.value = false
+                }
+                kotlinx.coroutines.delay(30000) // Check every 30 seconds
+            }
+        }
     }
 
     fun getProducts() {

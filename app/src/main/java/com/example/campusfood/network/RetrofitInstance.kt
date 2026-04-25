@@ -14,8 +14,8 @@ object RetrofitInstance {
      * Connecting to the live AWS Elastic Beanstalk Server.
      * Set IS_LOCAL = true for emulator debugging (uses 10.0.2.2).
      */
-    private const val IS_LOCAL = false
-    private val BASE_URL = if (IS_LOCAL) "http://10.0.2.2:5000/api/"
+    private const val IS_LOCAL = true
+    private val BASE_URL = if (IS_LOCAL) "http://172.20.10.6:5000/api/"
                            else "http://Campusfood-backend-env.eba-nwhwij87.eu-north-1.elasticbeanstalk.com/api/"
 
     private val moshi = Moshi.Builder()

@@ -309,14 +309,14 @@ fun CartItemCard(
             ) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(item.imageUrl)
+                        .data(item.imageUrl?.ifBlank { null })
                         .crossfade(true)
                         .build(),
                     contentDescription = item.productName,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
-                    placeholder = painterResource(id = android.R.drawable.ic_menu_gallery),
-                    error = painterResource(id = android.R.drawable.ic_menu_gallery)
+                    placeholder = painterResource(id = android.R.drawable.ic_menu_report_image),
+                    error = painterResource(id = android.R.drawable.ic_menu_close_clear_cancel)
                 )
             }
 

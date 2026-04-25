@@ -108,6 +108,12 @@ interface ApiService {
     ): ApiResponse<ImageUploadResponse>
 
     // ========================
+    // Monitoring / Actuator
+    // ========================
+    @GET("../actuator/health")
+    suspend fun getBackendHealth(): Any
+
+    // ========================
     // Admin - Inventory
     // ========================
     @PUT("admin/inventory/{productId}")

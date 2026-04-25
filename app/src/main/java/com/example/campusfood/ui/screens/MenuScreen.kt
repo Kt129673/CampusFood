@@ -40,6 +40,7 @@ fun MenuScreen(
     viewModel: MenuViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val isOnline by viewModel.isBackendOnline.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
 
     // Categories matching the seeded backend data
@@ -68,14 +69,25 @@ fun MenuScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    "Campus Food",
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.Black,
+                                    color = Color.White
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .background(
+                                            if (isOnline) Color(0xFF4CAF50) else Color(0xFFF44336),
+                                            shape = RoundedCornerShape(50)
+                                        )
+                                )
+                            }
                             Text(
-                                "Campus Food",
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Black,
-                                color = Color.White
-                            )
-                            Text(
-                                "Fresh & fast delivery 🚀",
+                                if (isOnline) "Fresh & fast delivery 🚀" else "Backend Offline ⚠️",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = Color.White.copy(alpha = 0.85f)
                             )
