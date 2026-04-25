@@ -95,7 +95,7 @@ fun MenuScreen(
                                 )
                             )
                             .statusBarsPadding()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .padding(horizontal = 16.dp, vertical = 4.dp)
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -181,13 +181,14 @@ fun MenuScreen(
                         onValueChange = { searchQuery = it },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 6.dp)
+                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                            .height(48.dp)
                             .focusRequester(focusRequester),
                         placeholder = {
                             Text(
                                 "Search food, snacks, drinks...",
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                                fontSize = 15.sp
+                                fontSize = 13.sp
                             )
                         },
                         leadingIcon = {
@@ -195,7 +196,7 @@ fun MenuScreen(
                                 Icons.Default.Search,
                                 contentDescription = null,
                                 tint = OrangePrimary,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(18.dp)
                             )
                         },
                         shape = RoundedCornerShape(14.dp),
@@ -206,7 +207,7 @@ fun MenuScreen(
                             unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
                         ),
                         singleLine = true,
-                        textStyle = MaterialTheme.typography.bodyLarge,
+                        textStyle = MaterialTheme.typography.bodyMedium,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                         keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() })
                     )
@@ -215,7 +216,7 @@ fun MenuScreen(
                     LazyRow(
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(bottom = 6.dp)
+                        modifier = Modifier.padding(bottom = 4.dp)
                     ) {
                         items(categories) { category ->
                             FilterChip(
@@ -238,7 +239,7 @@ fun MenuScreen(
                                     }
                                 } else null,
                                 shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.height(34.dp),
+                                modifier = Modifier.height(30.dp),
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = OrangePrimary,
                                     selectedLabelColor = Color.White,
