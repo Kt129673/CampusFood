@@ -2,8 +2,8 @@ package com.example.campusfood.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Primary Orange Palette
-val OrangePrimary = Color(0xFFFF6D00)
+// Primary Orange Palette - Updated to match requirements
+val OrangePrimary = Color(0xFFFF6B00)
 val OrangePrimaryLight = Color(0xFFFF9E40)
 val OrangePrimaryDark = Color(0xFFE65100)
 val OrangeSecondary = Color(0xFFFFAB40)
@@ -21,8 +21,8 @@ val DarkSurface = Color(0xFF1A1A1A)
 val DarkSurfaceVariant = Color(0xFF252525)
 val DarkCard = Color(0xFF1E1E1E)
 
-// Light Mode
-val LightBackground = Color(0xFFFAFAFA)
+// Light Mode - Updated to match requirements
+val LightBackground = Color(0xFFF8F8F8)
 val LightSurface = Color(0xFFFFFFFF)
 val LightSurfaceVariant = Color(0xFFF5F5F5)
 

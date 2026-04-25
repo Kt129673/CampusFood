@@ -99,18 +99,19 @@ fun CartScreen(
                 val items = (uiState as CartUiState.Success).items
                 if (items.isNotEmpty()) {
                     val total = items.sumOf { it.price * it.quantity }
+                    // Sticky total section at bottom with elevation
                     Surface(
-                        shadowElevation = 8.dp,
-                        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+                        shadowElevation = 12.dp,
+                        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
                         color = MaterialTheme.colorScheme.surface
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
+                                .padding(20.dp)
                                 .navigationBarsPadding()
                         ) {
-                            // Compact order summary
+                            // Order summary with large + bold total
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -118,91 +119,98 @@ fun CartScreen(
                             ) {
                                 Column {
                                     Text(
-                                        "Total",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        "Total Amount",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        fontSize = 13.sp
                                     )
+                                    // Highlighted total price - large + bold
                                     Text(
                                         "₹${String.format(java.util.Locale.getDefault(), "%.2f", total)}",
-                                        style = MaterialTheme.typography.titleLarge,
+                                        style = MaterialTheme.typography.headlineMedium,
                                         color = OrangePrimary,
-                                        fontWeight = FontWeight.Black
+                                        fontWeight = FontWeight.ExtraBold,
+                                        fontSize = 28.sp
                                     )
                                 }
                                 Text(
                                     "${items.sumOf { it.quantity }} items",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontWeight = FontWeight.Medium
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                            // Compact delivery address
+                            // Delivery address
                             OutlinedTextField(
                                 value = deliveryAddress,
                                 onValueChange = { deliveryAddress = it },
                                 modifier = Modifier.fillMaxWidth(),
-                                label = { Text("Delivery Address", fontSize = 12.sp) },
+                                label = { Text("Delivery Address", fontSize = 13.sp) },
                                 leadingIcon = {
                                     Icon(
                                         Icons.Default.LocationOn,
                                         null,
                                         tint = OrangePrimary,
-                                        modifier = Modifier.size(18.dp)
+                                        modifier = Modifier.size(20.dp)
                                     )
                                 },
-                                shape = RoundedCornerShape(12.dp),
+                                shape = RoundedCornerShape(14.dp),
                                 singleLine = true,
-                                textStyle = MaterialTheme.typography.bodySmall,
+                                textStyle = MaterialTheme.typography.bodyMedium,
                                 colors = OutlinedTextFieldDefaults.colors(
                                     focusedBorderColor = OrangePrimary,
                                     focusedLabelColor = OrangePrimary
                                 )
                             )
 
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                            // Compact checkout button
+                            // Full-width "Place Order" button with elevation
                             Button(
                                 onClick = { onCheckoutClick(deliveryAddress) },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(48.dp),
-                                shape = RoundedCornerShape(14.dp),
+                                    .height(56.dp),
+                                shape = RoundedCornerShape(16.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = OrangePrimary
                                 ),
                                 elevation = ButtonDefaults.buttonElevation(
-                                    defaultElevation = 2.dp
+                                    defaultElevation = 4.dp,
+                                    pressedElevation = 8.dp
                                 ),
                                 enabled = deliveryAddress.isNotBlank() && !isPlacingOrder
                             ) {
                                 if (isPlacingOrder) {
                                     CircularProgressIndicator(
-                                        modifier = Modifier.size(18.dp),
+                                        modifier = Modifier.size(20.dp),
                                         color = Color.White,
                                         strokeWidth = 2.dp
                                     )
-                                    Spacer(Modifier.width(8.dp))
+                                    Spacer(Modifier.width(12.dp))
                                     Text(
                                         "Placing Order...",
-                                        style = MaterialTheme.typography.titleSmall,
+                                        style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color.White
+                                        color = Color.White,
+                                        fontSize = 16.sp
                                     )
                                 } else {
                                     Icon(
                                         Icons.Default.ShoppingCart,
                                         contentDescription = null,
-                                        modifier = Modifier.size(18.dp)
+                                        modifier = Modifier.size(20.dp)
                                     )
-                                    Spacer(Modifier.width(8.dp))
+                                    Spacer(Modifier.width(12.dp))
                                     Text(
                                         "Place Order",
-                                        style = MaterialTheme.typography.titleSmall,
+                                        style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color.White
+                                        color = Color.White,
+                                        fontSize = 16.sp
                                     )
                                 }
                             }
@@ -258,8 +266,8 @@ fun CartScreen(
                     } else {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            contentPadding = PaddingValues(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(state.items, key = { it.productId }) { item ->
                                 CartItemCard(
@@ -270,7 +278,7 @@ fun CartScreen(
                                 )
                             }
                             // Bottom spacing for checkout bar
-                            item { Spacer(modifier = Modifier.height(80.dp)) }
+                            item { Spacer(modifier = Modifier.height(100.dp)) }
                         }
                     }
                 }
@@ -290,21 +298,21 @@ fun CartItemCard(
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize(),
-        shape = RoundedCornerShape(14.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier
-                .padding(10.dp)
+                .padding(12.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Product image
+            // Product image with rounded corners (12-16dp)
             Box(
                 modifier = Modifier
-                    .size(64.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .size(72.dp)
+                    .clip(RoundedCornerShape(14.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 AsyncImage(
@@ -320,7 +328,7 @@ fun CartItemCard(
                 )
             }
 
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Row(
@@ -329,34 +337,37 @@ fun CartItemCard(
                     verticalAlignment = Alignment.Top
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
+                        // Title - bold, 16sp+
                         Text(
                             item.productName,
-                            style = MaterialTheme.typography.titleSmall,
+                            style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            fontSize = 13.sp
+                            fontSize = 16.sp
                         )
+                        // Price per item - 12-14sp, gray
                         Text(
                             "₹${String.format(java.util.Locale.getDefault(), "%.0f", item.price)} each",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 13.sp
                         )
                     }
                     IconButton(
                         onClick = onRemove,
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
                             Icons.Default.Delete,
                             contentDescription = "Remove",
                             tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f),
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 // Quantity controls and total
                 Row(
@@ -364,53 +375,55 @@ fun CartItemCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Compact quantity stepper
+                    // Modern quantity stepper with + / - buttons
                     Surface(
-                        shape = RoundedCornerShape(10.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shadowElevation = 1.dp
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(2.dp)
+                            modifier = Modifier.padding(4.dp)
                         ) {
                             IconButton(
                                 onClick = onDecrement,
-                                modifier = Modifier.size(28.dp)
+                                modifier = Modifier.size(32.dp)
                             ) {
                                 Icon(
                                     Icons.Default.Remove,
                                     contentDescription = "Decrease",
-                                    modifier = Modifier.size(14.dp),
+                                    modifier = Modifier.size(18.dp),
                                     tint = OrangePrimary
                                 )
                             }
                             Text(
                                 "${item.quantity}",
-                                modifier = Modifier.padding(horizontal = 6.dp),
-                                style = MaterialTheme.typography.titleSmall,
+                                modifier = Modifier.padding(horizontal = 12.dp),
+                                style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 13.sp
+                                fontSize = 16.sp
                             )
                             IconButton(
                                 onClick = onIncrement,
-                                modifier = Modifier.size(28.dp)
+                                modifier = Modifier.size(32.dp)
                             ) {
                                 Icon(
                                     Icons.Default.Add,
                                     contentDescription = "Increase",
-                                    modifier = Modifier.size(14.dp),
+                                    modifier = Modifier.size(18.dp),
                                     tint = OrangePrimary
                                 )
                             }
                         }
                     }
 
-                    // Item total
+                    // Item total - highlighted, semi-bold
                     Text(
                         "₹${String.format(java.util.Locale.getDefault(), "%.0f", item.price * item.quantity)}",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Black,
-                        color = OrangePrimary
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = OrangePrimary,
+                        fontSize = 18.sp
                     )
                 }
             }

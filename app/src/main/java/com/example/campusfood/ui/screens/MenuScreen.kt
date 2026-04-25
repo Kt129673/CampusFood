@@ -125,18 +125,18 @@ fun MenuScreen(
                         }
                     }
 
-                    // Compact search bar
+                    // Improved search bar with rounded corners and leading icon
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 12.dp, vertical = 8.dp),
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
                         placeholder = {
                             Text(
                                 "Search food, snacks, drinks...",
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                                fontSize = 13.sp
+                                fontSize = 14.sp
                             )
                         },
                         leadingIcon = {
@@ -144,25 +144,25 @@ fun MenuScreen(
                                 Icons.Default.Search,
                                 contentDescription = null,
                                 tint = OrangePrimary,
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(22.dp)
                             )
                         },
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = OrangePrimary,
                             unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
                         ),
                         singleLine = true,
-                        textStyle = MaterialTheme.typography.bodySmall
+                        textStyle = MaterialTheme.typography.bodyMedium
                     )
 
-                    // Compact category chips
+                    // Category chips with selected state animation
                     LazyRow(
-                        contentPadding = PaddingValues(horizontal = 12.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        modifier = Modifier.padding(bottom = 12.dp)
                     ) {
                         items(categories) { category ->
                             FilterChip(
@@ -172,7 +172,7 @@ fun MenuScreen(
                                     Text(
                                         category,
                                         fontWeight = if (selectedCategory == category) FontWeight.Bold else FontWeight.Medium,
-                                        fontSize = 12.sp
+                                        fontSize = 13.sp
                                     )
                                 },
                                 leadingIcon = if (selectedCategory == category) {
@@ -180,12 +180,12 @@ fun MenuScreen(
                                         Icon(
                                             imageVector = Icons.Default.Check,
                                             contentDescription = null,
-                                            modifier = Modifier.size(14.dp)
+                                            modifier = Modifier.size(16.dp)
                                         )
                                     }
                                 } else null,
-                                shape = RoundedCornerShape(20.dp),
-                                modifier = Modifier.height(30.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.height(36.dp),
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = OrangePrimary,
                                     selectedLabelColor = Color.White,
@@ -269,7 +269,7 @@ fun MenuScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding),
-                        contentPadding = PaddingValues(vertical = 4.dp)
+                        contentPadding = PaddingValues(vertical = 8.dp)
                     ) {
                         items(filteredProducts, key = { it.id ?: 0 }) { product ->
                             AnimatedVisibility(
@@ -284,7 +284,7 @@ fun MenuScreen(
                             }
                         }
                         // Bottom spacing for navigation bar
-                        item { Spacer(modifier = Modifier.height(4.dp)) }
+                        item { Spacer(modifier = Modifier.height(8.dp)) }
                     }
                 }
             }

@@ -1,17 +1,23 @@
 package com.example.campusfood.ui.components
 
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -34,16 +40,25 @@ fun ProductCard(
     modifier: Modifier = Modifier
 ) {
     var isAdded by remember { mutableStateOf(false) }
+    val scale by animateFloatAsState(
+        targetValue = if (isAdded) 0.95f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "cardScale"
+    )
 
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp, horizontal = 12.dp)
+            .padding(vertical = 6.dp, horizontal = 16.dp)
+            .scale(scale)
             .animateContentSize(),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 1.dp,
-            pressedElevation = 4.dp
+            defaultElevation = 2.dp,
+            pressedElevation = 6.dp
         ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -52,14 +67,14 @@ fun ProductCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(10.dp),
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Product Image - slightly smaller
+            // Product Image with rounded corners
             Box(
                 modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .size(88.dp)
+                    .clip(RoundedCornerShape(14.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 AsyncImage(
@@ -78,53 +93,56 @@ fun ProductCard(
                 Surface(
                     modifier = Modifier
                         .align(Alignment.TopStart)
-                        .padding(4.dp),
-                    shape = RoundedCornerShape(6.dp),
-                    color = OrangePrimary.copy(alpha = 0.9f)
+                        .padding(6.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    color = OrangePrimary.copy(alpha = 0.95f),
+                    shadowElevation = 2.dp
                 ) {
                     Text(
                         text = product.category,
-                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 1.dp),
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.White,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 8.sp
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 9.sp
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(end = 2.dp)
+                    .padding(end = 4.dp)
             ) {
-                // Product name
+                // Product name - Bold, 16sp+
                 Text(
                     text = product.name,
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
+                    fontSize = 17.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
-                Spacer(modifier = Modifier.height(1.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
-                // Description
+                // Description - 12-14sp, gray
                 if (!product.description.isNullOrBlank()) {
                     Text(
                         text = product.description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                         maxLines = 2,
-                        lineHeight = 14.sp,
+                        lineHeight = 16.sp,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = 11.sp
+                        fontSize = 13.sp
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 // Price and Add button row
                 Row(
@@ -132,53 +150,56 @@ fun ProductCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Price
+                    // Price - Highlighted, semi-bold
                     Text(
                         text = "₹${String.format(Locale.getDefault(), "%.0f", product.price)}",
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleLarge,
                         color = OrangePrimary,
-                        fontWeight = FontWeight.Black
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 20.sp
                     )
 
-                    // Compact add to cart button
-                    Button(
+                    // Floating "+" button style with animation
+                    FloatingActionButton(
                         onClick = {
                             isAdded = true
                             onAddToCart(product)
                         },
-                        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 0.dp),
-                        modifier = Modifier.height(32.dp),
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isAdded) GreenSuccess else OrangePrimary
+                        modifier = Modifier.size(40.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        containerColor = if (isAdded) GreenSuccess else OrangePrimary,
+                        elevation = FloatingActionButtonDefaults.elevation(
+                            defaultElevation = 4.dp,
+                            pressedElevation = 8.dp
                         )
                     ) {
-                        Icon(
-                            imageVector = if (isAdded) Icons.Default.Check else Icons.Default.Add,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = Color.White
-                        )
-                        Spacer(Modifier.width(3.dp))
-                        Text(
-                            if (isAdded) "Added" else "Add",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp
-                        )
+                        AnimatedContent(
+                            targetState = isAdded,
+                            transitionSpec = {
+                                fadeIn(animationSpec = tween(300)) togetherWith
+                                        fadeOut(animationSpec = tween(300))
+                            },
+                            label = "addButtonIcon"
+                        ) { added ->
+                            Icon(
+                                imageVector = if (added) Icons.Default.Check else Icons.Default.Add,
+                                contentDescription = if (added) "Added" else "Add to cart",
+                                modifier = Modifier.size(20.dp),
+                                tint = Color.White
+                            )
+                        }
                     }
                 }
 
                 // Stock indicator
                 if (product.stock != null && product.stock <= 10) {
-                    Spacer(modifier = Modifier.height(2.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Only ${product.stock} left!",
+                        text = "⚠️ Only ${product.stock} left!",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.error,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 9.sp
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 10.sp
                     )
                 }
             }
@@ -188,7 +209,7 @@ fun ProductCard(
     // Reset "Added" state after brief delay
     LaunchedEffect(isAdded) {
         if (isAdded) {
-            kotlinx.coroutines.delay(1500)
+            kotlinx.coroutines.delay(1800)
             isAdded = false
         }
     }

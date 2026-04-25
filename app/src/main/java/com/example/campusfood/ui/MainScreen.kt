@@ -47,15 +47,14 @@ fun MainScreen() {
     val authState by authViewModel.authState.collectAsStateWithLifecycle()
     val cartState by cartViewModel.uiState.collectAsStateWithLifecycle()
     val isPlacingOrder by orderViewModel.isPlacingOrder.collectAsStateWithLifecycle()
+    
+    // Automatically updates when cart changes
+    val cartItemCount by cartViewModel.cartItemCount.collectAsStateWithLifecycle()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
     val isAdmin = currentUser?.role == "ADMIN"
-
-    val cartItemCount = if (cartState is CartUiState.Success) {
-        (cartState as CartUiState.Success).items.sumOf { it.quantity }
-    } else 0
 
     // Update OrderViewModel with real userId when user changes
     LaunchedEffect(currentUser) {
@@ -119,9 +118,10 @@ fun MainScreen() {
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             if (showBottomBar) {
+                // Material 3 NavigationBar with highlight animation
                 NavigationBar(
                     containerColor = MaterialTheme.colorScheme.surface,
-                    tonalElevation = 4.dp,
+                    tonalElevation = 8.dp,
                     modifier = Modifier
                 ) {
                     val currentDestination = navBackStackEntry?.destination
@@ -132,8 +132,15 @@ fun MainScreen() {
                                 BadgedBox(
                                     badge = {
                                         if (item.badgeCount > 0) {
-                                            Badge(containerColor = OrangePrimary, contentColor = Color.White) {
-                                                Text("${item.badgeCount}", fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                                            Badge(
+                                                containerColor = OrangePrimary,
+                                                contentColor = Color.White
+                                            ) {
+                                                Text(
+                                                    "${item.badgeCount}",
+                                                    fontSize = 10.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
                                             }
                                         }
                                     }
@@ -141,7 +148,7 @@ fun MainScreen() {
                                     Icon(
                                         if (isSelected) item.selectedIcon else item.unselectedIcon,
                                         contentDescription = item.name,
-                                        modifier = Modifier.size(22.dp)
+                                        modifier = Modifier.size(24.dp)
                                     )
                                 }
                             },
@@ -149,7 +156,7 @@ fun MainScreen() {
                                 Text(
                                     item.name,
                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                    fontSize = 10.sp,
+                                    fontSize = 11.sp,
                                     maxLines = 1
                                 )
                             },
@@ -164,8 +171,8 @@ fun MainScreen() {
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = if (isAdmin) Color(0xFF7B1FA2) else OrangePrimary,
                                 selectedTextColor = if (isAdmin) Color(0xFF7B1FA2) else OrangePrimary,
-                                indicatorColor = if (isAdmin) Color(0xFF7B1FA2).copy(alpha = 0.12f)
-                                                 else OrangePrimary.copy(alpha = 0.12f),
+                                indicatorColor = if (isAdmin) Color(0xFF7B1FA2).copy(alpha = 0.15f)
+                                                 else OrangePrimary.copy(alpha = 0.15f),
                                 unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                                 unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
