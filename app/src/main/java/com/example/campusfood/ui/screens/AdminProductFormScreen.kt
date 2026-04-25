@@ -119,40 +119,35 @@ fun AdminProductFormScreen(
 
     Scaffold(
         topBar = {
-            Surface(
-                color = Color.Transparent,
-                shadowElevation = 4.dp
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(AdminPurple, AdminPurpleDark, Color(0xFF311B92))
+                        )
+                    )
+                    .statusBarsPadding()
+                    .padding(horizontal = 10.dp, vertical = 10.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(AdminPurple, AdminPurpleDark, Color(0xFF311B92))
-                            )
-                        )
-                        .statusBarsPadding()
-                        .padding(horizontal = 10.dp, vertical = 8.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+                    IconButton(
+                        onClick = onBack,
+                        modifier = Modifier.size(36.dp),
+                        colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
                     ) {
-                        IconButton(
-                            onClick = onBack,
-                            modifier = Modifier.size(36.dp),
-                            colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
-                        ) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", modifier = Modifier.size(22.dp))
-                        }
-                        Spacer(Modifier.width(6.dp))
-                        Text(
-                            if (isEditing) "Edit Product" else "Add Product",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", modifier = Modifier.size(20.dp))
                     }
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        if (isEditing) "Edit Product" else "Add Product",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
                 }
             }
         }

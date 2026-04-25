@@ -21,7 +21,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -63,35 +62,34 @@ fun StatusBadge(status: String) {
 
     Surface(
         shape = RoundedCornerShape(20.dp),
-        color = color.copy(alpha = 0.1f)
+        color = color.copy(alpha = 0.08f)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (isActive) {
-                // Pulsing dot for active statuses
                 Box(
                     modifier = Modifier
-                        .size(8.dp)
+                        .size(6.dp)
                         .scale(pulseScale)
                         .background(color, shape = CircleShape)
                 )
-                Spacer(Modifier.width(6.dp))
+                Spacer(Modifier.width(5.dp))
             }
             Icon(
                 icon,
                 contentDescription = null,
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(14.dp),
                 tint = color
             )
-            Spacer(Modifier.width(5.dp))
+            Spacer(Modifier.width(4.dp))
             Text(
                 label,
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.Bold,
                 color = color,
-                fontSize = 12.sp
+                fontSize = 11.sp
             )
         }
     }

@@ -1,6 +1,7 @@
 package com.example.campusfood.ui
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
@@ -116,15 +117,16 @@ fun MainScreen() {
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             if (showBottomBar) {
-                Column {
-                    HorizontalDivider(
-                        thickness = 0.5.dp,
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
-                    )
+                Surface(
+                    shadowElevation = 8.dp,
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+                    modifier = Modifier.navigationBarsPadding()
+                ) {
                     NavigationBar(
-                        containerColor = MaterialTheme.colorScheme.surface,
+                        containerColor = Color.Transparent,
                         tonalElevation = 0.dp,
-                        modifier = Modifier.height(64.dp)
+                        modifier = Modifier.height(68.dp)
                     ) {
                         val currentDestination = navBackStackEntry?.destination
                         bottomNavItems.forEach { item ->
@@ -140,7 +142,7 @@ fun MainScreen() {
                                                 ) {
                                                     Text(
                                                         "${item.badgeCount}",
-                                                        fontSize = 11.sp,
+                                                        fontSize = 10.sp,
                                                         fontWeight = FontWeight.Bold
                                                     )
                                                 }
@@ -157,7 +159,7 @@ fun MainScreen() {
                                 label = {
                                     Text(
                                         item.name,
-                                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                                         fontSize = 11.sp,
                                         maxLines = 1
                                     )
@@ -173,10 +175,10 @@ fun MainScreen() {
                                 colors = NavigationBarItemDefaults.colors(
                                     selectedIconColor = if (isAdmin) AdminPurple else OrangePrimary,
                                     selectedTextColor = if (isAdmin) AdminPurple else OrangePrimary,
-                                    indicatorColor = if (isAdmin) AdminPurple.copy(alpha = 0.12f)
-                                                     else OrangePrimary.copy(alpha = 0.12f),
-                                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                    indicatorColor = if (isAdmin) AdminPurple.copy(alpha = 0.1f)
+                                                     else OrangePrimary.copy(alpha = 0.1f),
+                                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                                 )
                             )
                         }

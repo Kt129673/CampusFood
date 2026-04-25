@@ -4,12 +4,12 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Fastfood
-import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,6 +33,7 @@ import com.example.campusfood.ui.theme.GreenSuccess
 import com.example.campusfood.ui.theme.OrangePrimary
 import com.example.campusfood.ui.theme.OrangePrimaryDark
 import com.example.campusfood.ui.theme.OrangePrimaryLight
+import com.example.campusfood.ui.theme.OrangeAccentSoft
 import com.example.campusfood.ui.theme.RedError
 
 @Composable
@@ -54,13 +55,13 @@ fun ProductCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp, horizontal = 16.dp)
+            .padding(vertical = 5.dp, horizontal = 16.dp)
             .scale(scale)
             .animateContentSize(),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(18.dp),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 3.dp,
-            pressedElevation = 8.dp
+            defaultElevation = 1.dp,
+            pressedElevation = 6.dp
         ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -72,12 +73,12 @@ fun ProductCard(
                 .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Product Image – with proper fallback
+            // Product Image
             Box(
                 modifier = Modifier
-                    .size(88.dp)
+                    .size(84.dp)
                     .clip(RoundedCornerShape(14.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .background(OrangeAccentSoft)
             ) {
                 SubcomposeAsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
@@ -88,32 +89,29 @@ fun ProductCard(
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
                     loading = {
-                        // Shimmer placeholder while loading
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(
-                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
-                                ),
+                                .background(OrangeAccentSoft),
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
-                                color = OrangePrimary.copy(alpha = 0.5f),
+                                modifier = Modifier.size(22.dp),
+                                color = OrangePrimary.copy(alpha = 0.4f),
                                 strokeWidth = 2.dp
                             )
                         }
                     },
                     error = {
-                        // Premium food icon fallback instead of ugly X
+                        // Premium food icon fallback
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .background(
-                                    Brush.linearGradient(
+                                    Brush.radialGradient(
                                         listOf(
-                                            OrangePrimary.copy(alpha = 0.08f),
-                                            OrangePrimaryLight.copy(alpha = 0.15f)
+                                            OrangePrimary.copy(alpha = 0.06f),
+                                            OrangePrimaryLight.copy(alpha = 0.12f)
                                         )
                                     )
                                 ),
@@ -122,33 +120,21 @@ fun ProductCard(
                             Icon(
                                 Icons.Default.Fastfood,
                                 contentDescription = null,
-                                modifier = Modifier.size(36.dp),
-                                tint = OrangePrimary.copy(alpha = 0.4f)
+                                modifier = Modifier.size(32.dp),
+                                tint = OrangePrimary.copy(alpha = 0.35f)
                             )
                         }
                     }
                 )
 
-                // Gradient overlay at bottom for category badge
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
-                        .height(28.dp)
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.65f))
-                            )
-                        )
-                )
-
-                // Category badge on image – with proper readable background
+                // Category badge – bottom left
                 Surface(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .padding(6.dp),
+                        .padding(5.dp),
                     shape = RoundedCornerShape(6.dp),
-                    color = OrangePrimary.copy(alpha = 0.85f)
+                    color = OrangePrimary,
+                    shadowElevation = 2.dp
                 ) {
                     Text(
                         text = product.category,
@@ -156,70 +142,69 @@ fun ProductCard(
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 10.sp
+                        fontSize = 9.sp
                     )
                 }
 
-                // Low stock indicator dot
+                // Low stock dot – top right
                 if (product.stock != null && product.stock <= 10) {
-                    Surface(
+                    Box(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .padding(6.dp)
-                            .size(10.dp),
-                        shape = RoundedCornerShape(50),
-                        color = RedError,
-                        shadowElevation = 2.dp
-                    ) {}
+                            .size(8.dp)
+                            .shadow(2.dp, CircleShape)
+                            .background(RedError, CircleShape)
+                    )
                 }
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(14.dp))
 
+            // Product details
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(end = 4.dp)
+                    .padding(end = 2.dp)
             ) {
-                // Product name
+                // Name
                 Text(
                     text = product.name,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 17.sp,
+                    fontSize = 15.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
                 // Description
                 if (!product.description.isNullOrBlank()) {
                     Text(
                         text = product.description,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
-                        maxLines = 2,
-                        lineHeight = 18.sp,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        fontSize = 13.sp
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp
                     )
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                // Price and Add button row
+                // Price + Stock + Add button
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Price – larger, premium
                     Column {
                         Text(
                             text = "₹${String.format(Locale.getDefault(), "%.0f", product.price)}",
-                            style = MaterialTheme.typography.titleLarge,
+                            style = MaterialTheme.typography.titleMedium,
                             color = OrangePrimary,
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 18.sp
@@ -230,12 +215,12 @@ fun ProductCard(
                                 style = MaterialTheme.typography.labelSmall,
                                 color = RedError,
                                 fontWeight = FontWeight.SemiBold,
-                                fontSize = 10.sp
+                                fontSize = 9.sp
                             )
                         }
                     }
 
-                    // Premium "Add" button with animated icon
+                    // Add button
                     FilledIconButton(
                         onClick = {
                             if (product.stock == null || product.stock > 0) {
@@ -243,8 +228,8 @@ fun ProductCard(
                                 onAddToCart(product)
                             }
                         },
-                        modifier = Modifier.size(40.dp),
-                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.size(36.dp),
+                        shape = RoundedCornerShape(11.dp),
                         enabled = product.stock == null || product.stock > 0,
                         colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = if (isAdded) GreenSuccess else OrangePrimary,
@@ -264,7 +249,7 @@ fun ProductCard(
                             Icon(
                                 imageVector = if (added) Icons.Default.Check else Icons.Default.Add,
                                 contentDescription = if (added) "Added" else "Add to cart",
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(18.dp)
                             )
                         }
                     }

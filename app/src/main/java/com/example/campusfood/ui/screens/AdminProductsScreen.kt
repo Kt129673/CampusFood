@@ -161,58 +161,53 @@ fun AdminProductsScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            Surface(
-                color = Color.Transparent,
-                shadowElevation = 4.dp
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(AdminPurple, AdminPurpleDark, Color(0xFF311B92))
-                            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(AdminPurple, AdminPurpleDark, Color(0xFF311B92))
                         )
-                        .statusBarsPadding()
-                        .padding(horizontal = 10.dp, vertical = 8.dp)
+                    )
+                    .statusBarsPadding()
+                    .padding(horizontal = 10.dp, vertical = 10.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+                    IconButton(
+                        onClick = onBack,
+                        modifier = Modifier.size(36.dp),
+                        colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
                     ) {
-                        IconButton(
-                            onClick = onBack,
-                            modifier = Modifier.size(36.dp),
-                            colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
-                        ) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", modifier = Modifier.size(22.dp))
-                        }
-                        Spacer(Modifier.width(6.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                "Manage Products",
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                            Text(
-                                "Add, edit, stock management",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.White.copy(alpha = 0.75f),
-                                fontSize = 12.sp
-                            )
-                        }
-                        FilledIconButton(
-                            onClick = { adminViewModel.loadAllProducts() },
-                            modifier = Modifier.size(40.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = IconButtonDefaults.filledIconButtonColors(
-                                containerColor = Color.White.copy(alpha = 0.18f),
-                                contentColor = Color.White
-                            )
-                        ) {
-                            Icon(Icons.Default.Refresh, "Refresh", modifier = Modifier.size(20.dp))
-                        }
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", modifier = Modifier.size(20.dp))
+                    }
+                    Spacer(Modifier.width(4.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            "Manage Products",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            "Add, edit, stock management",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White.copy(alpha = 0.65f),
+                            fontSize = 10.sp
+                        )
+                    }
+                    FilledIconButton(
+                        onClick = { adminViewModel.loadAllProducts() },
+                        modifier = Modifier.size(36.dp),
+                        shape = RoundedCornerShape(11.dp),
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = Color.White.copy(alpha = 0.15f),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Icon(Icons.Default.Refresh, "Refresh", modifier = Modifier.size(18.dp))
                     }
                 }
             }
@@ -222,10 +217,10 @@ fun AdminProductsScreen(
                 onClick = onAddProduct,
                 containerColor = AdminPurple,
                 contentColor = Color.White,
-                shape = RoundedCornerShape(18.dp),
-                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 6.dp)
+                shape = RoundedCornerShape(16.dp),
+                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp)
             ) {
-                Icon(Icons.Default.Add, "Add Product", modifier = Modifier.size(26.dp))
+                Icon(Icons.Default.Add, "Add Product", modifier = Modifier.size(24.dp))
             }
         }
     ) { innerPadding ->
@@ -315,22 +310,22 @@ private fun AdminProductCard(
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize(),
-        shape = RoundedCornerShape(18.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp),
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Product image – larger
             Box(
                 modifier = Modifier
-                    .size(72.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .size(68.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(OrangeAccentSoft)
             ) {
                 SubcomposeAsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)

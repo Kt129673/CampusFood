@@ -53,65 +53,58 @@ fun AdminDashboardScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             // Premium admin header
-            Surface(
-                color = Color.Transparent,
-                shadowElevation = 4.dp
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(AdminPurple, AdminPurpleDark, Color(0xFF311B92))
-                            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(AdminPurple, AdminPurpleDark, Color(0xFF311B92))
                         )
-                        .statusBarsPadding()
-                        .padding(horizontal = 16.dp, vertical = 10.dp)
+                    )
+                    .statusBarsPadding()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(
-                                "Dashboard",
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Black,
-                                color = Color.White,
-                                letterSpacing = 0.5.sp
+                    Column {
+                        Text(
+                            "Dashboard",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            "Manage orders & products",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White.copy(alpha = 0.65f),
+                            fontSize = 10.sp
+                        )
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        FilledIconButton(
+                            onClick = onManageProducts,
+                            modifier = Modifier.size(36.dp),
+                            shape = RoundedCornerShape(11.dp),
+                            colors = IconButtonDefaults.filledIconButtonColors(
+                                containerColor = Color.White.copy(alpha = 0.15f),
+                                contentColor = Color.White
                             )
-                            Spacer(modifier = Modifier.height(1.dp))
-                            Text(
-                                "Manage orders & products",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color.White.copy(alpha = 0.7f)
-                            )
+                        ) {
+                            Icon(Icons.Default.Inventory2, "Products", modifier = Modifier.size(18.dp))
                         }
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            // Manage Products button
-                            FilledIconButton(
-                                onClick = onManageProducts,
-                                modifier = Modifier.size(36.dp),
-                                shape = RoundedCornerShape(12.dp),
-                                colors = IconButtonDefaults.filledIconButtonColors(
-                                    containerColor = Color.White.copy(alpha = 0.18f),
-                                    contentColor = Color.White
-                                )
-                            ) {
-                                Icon(Icons.Default.Inventory2, "Products", modifier = Modifier.size(20.dp))
-                            }
-                            FilledIconButton(
-                                onClick = { adminViewModel.loadAllOrders() },
-                                modifier = Modifier.size(36.dp),
-                                shape = RoundedCornerShape(12.dp),
-                                colors = IconButtonDefaults.filledIconButtonColors(
-                                    containerColor = Color.White.copy(alpha = 0.18f),
-                                    contentColor = Color.White
-                                )
-                            ) {
-                                Icon(Icons.Default.Refresh, "Refresh", modifier = Modifier.size(20.dp))
-                            }
+                        FilledIconButton(
+                            onClick = { adminViewModel.loadAllOrders() },
+                            modifier = Modifier.size(36.dp),
+                            shape = RoundedCornerShape(11.dp),
+                            colors = IconButtonDefaults.filledIconButtonColors(
+                                containerColor = Color.White.copy(alpha = 0.15f),
+                                contentColor = Color.White
+                            )
+                        ) {
+                            Icon(Icons.Default.Refresh, "Refresh", modifier = Modifier.size(18.dp))
                         }
                     }
                 }
@@ -159,12 +152,19 @@ fun AdminDashboardScreen(
                     FilterChip(
                         selected = selectedFilter == filter,
                         onClick = { selectedFilter = filter },
-                        label = { Text(label, fontSize = 13.sp, fontWeight = if (selectedFilter == filter) FontWeight.Bold else FontWeight.Medium) },
+                        label = { Text(label, fontSize = 12.sp, fontWeight = if (selectedFilter == filter) FontWeight.Bold else FontWeight.Medium) },
                         shape = RoundedCornerShape(20.dp),
                         modifier = Modifier.height(32.dp),
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = AdminPurple,
-                            selectedLabelColor = Color.White
+                            selectedLabelColor = Color.White,
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        ),
+                        border = FilterChipDefaults.filterChipBorder(
+                            borderColor = Color.Transparent,
+                            selectedBorderColor = Color.Transparent,
+                            enabled = true,
+                            selected = selectedFilter == filter
                         )
                     )
                 }
@@ -227,9 +227,9 @@ fun AdminDashboardScreen(
 @Composable
 private fun StatCard(label: String, count: Int, icon: ImageVector, accentColor: Color) {
     Card(
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
@@ -279,8 +279,8 @@ private fun AdminOrderCard(
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize(),
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
@@ -344,7 +344,7 @@ private fun AdminOrderCard(
 
             HorizontalDivider(
                 modifier = Modifier.padding(vertical = 8.dp),
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
+                color = MaterialTheme.colorScheme.outlineVariant
             )
 
             // Total + actions

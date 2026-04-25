@@ -47,56 +47,51 @@ fun OrderScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            Surface(
-                color = Color.Transparent,
-                shadowElevation = 4.dp
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(OrangePrimary, OrangePrimaryDark, Color(0xFFBF360C))
-                            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(OrangePrimary, OrangePrimaryDark, Color(0xFFBF360C))
                         )
-                        .statusBarsPadding()
-                        .padding(horizontal = 16.dp, vertical = 10.dp)
+                    )
+                    .statusBarsPadding()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(
-                                "My Orders",
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Black,
-                                color = Color.White,
-                                letterSpacing = 0.5.sp
-                            )
-                            Text(
-                                "Track your food orders",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = Color.White.copy(alpha = 0.7f)
-                            )
-                        }
-                        // Order count badge
-                        if (uiState is OrderUiState.Success) {
-                            val count = (uiState as OrderUiState.Success).orders.size
-                            if (count > 0) {
-                                Surface(
-                                    shape = RoundedCornerShape(12.dp),
-                                    color = Color.White.copy(alpha = 0.18f)
-                                ) {
-                                    Text(
-                                        "$count",
-                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                                        color = Color.White,
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 14.sp
-                                    )
-                                }
+                    Column {
+                        Text(
+                            "My Orders",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
+                        Text(
+                            "Track your food orders",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White.copy(alpha = 0.65f),
+                            fontSize = 10.sp
+                        )
+                    }
+                    // Order count badge
+                    if (uiState is OrderUiState.Success) {
+                        val count = (uiState as OrderUiState.Success).orders.size
+                        if (count > 0) {
+                            Surface(
+                                shape = RoundedCornerShape(10.dp),
+                                color = Color.White.copy(alpha = 0.15f)
+                            ) {
+                                Text(
+                                    "$count",
+                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                                    color = Color.White,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 13.sp
+                                )
                             }
                         }
                     }
@@ -110,7 +105,7 @@ fun OrderScreen(
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(4) {
                             ShimmerOrderCard()
@@ -202,7 +197,7 @@ private fun OrderCard(
             .fillMaxWidth()
             .animateContentSize(),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
@@ -215,15 +210,16 @@ private fun OrderCard(
                 Column {
                     Text(
                         "Order #${order.id}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp
                     )
                     if (!order.createdAt.isNullOrBlank()) {
                         Text(
                             formatOrderDate(order.createdAt),
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 11.sp
+                            fontSize = 10.sp
                         )
                     }
                 }
@@ -232,7 +228,7 @@ private fun OrderCard(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Items list with quantity badges
+            // Items
             order.items?.forEach { item ->
                 Row(
                     modifier = Modifier
@@ -243,8 +239,8 @@ private fun OrderCard(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Surface(
-                            modifier = Modifier.size(22.dp),
-                            shape = RoundedCornerShape(6.dp),
+                            modifier = Modifier.size(20.dp),
+                            shape = RoundedCornerShape(5.dp),
                             color = OrangePrimary.copy(alpha = 0.1f)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
@@ -260,18 +256,18 @@ private fun OrderCard(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             item.productName ?: "Item #${item.productId}",
-                            style = MaterialTheme.typography.bodyMedium,
+                            style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 13.sp
+                            fontSize = 12.sp
                         )
                     }
                     if (item.totalPrice != null) {
                         Text(
                             "₹${String.format(Locale.getDefault(), "%.0f", item.totalPrice)}",
-                            style = MaterialTheme.typography.labelMedium,
+                            style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 12.sp
+                            fontSize = 11.sp
                         )
                     }
                 }
@@ -279,11 +275,11 @@ private fun OrderCard(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Total + action row
+            // Total + action
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -292,31 +288,31 @@ private fun OrderCard(
                 Column {
                     Text(
                         "Total",
-                        style = MaterialTheme.typography.labelMedium,
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 11.sp
+                        fontSize = 10.sp
                     )
                     Text(
                         "₹${String.format(Locale.getDefault(), "%.0f", order.totalAmount)}",
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.ExtraBold,
                         color = OrangePrimary,
-                        fontSize = 18.sp
+                        fontSize = 16.sp
                     )
                 }
                 // Only PLACED orders can be cancelled
                 if (order.status == "PLACED") {
                     OutlinedButton(
                         onClick = { showCancelDialog = true },
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(10.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
                             contentColor = RedError
                         ),
-                        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 8.dp)
+                        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
                     ) {
-                        Icon(Icons.Default.Close, null, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Close, null, modifier = Modifier.size(14.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("Cancel", fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                        Text("Cancel", fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
                     }
                 }
             }
@@ -328,7 +324,7 @@ private fun OrderCard(
                     Icon(
                         Icons.Default.LocationOn,
                         null,
-                        modifier = Modifier.size(14.dp),
+                        modifier = Modifier.size(12.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -336,7 +332,7 @@ private fun OrderCard(
                         order.deliveryAddress,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                        fontSize = 11.sp
+                        fontSize = 10.sp
                     )
                 }
             }

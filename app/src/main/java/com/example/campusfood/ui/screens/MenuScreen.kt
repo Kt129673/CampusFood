@@ -19,7 +19,6 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -76,182 +75,189 @@ fun MenuScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            Surface(
-                color = MaterialTheme.colorScheme.surface,
-                shadowElevation = 4.dp
-            ) {
-                Column {
-                    // Premium compact header
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                Brush.horizontalGradient(
-                                    listOf(
-                                        OrangePrimary,
-                                        OrangePrimaryDark,
-                                        Color(0xFFBF360C)
-                                    )
+            Column {
+                // Gradient header - compact & premium
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(
+                                    OrangePrimary,
+                                    OrangePrimaryDark,
+                                    Color(0xFFBF360C)
                                 )
                             )
-                            .statusBarsPadding()
-                            .padding(horizontal = 16.dp, vertical = 4.dp)
+                        )
+                        .statusBarsPadding()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(
-                                        "ANISHA",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Black,
-                                        color = Color.White,
-                                        letterSpacing = 0.8.sp
-                                    )
-                                    Spacer(modifier = Modifier.width(5.dp))
-                                    Text(
-                                        "CAMPUS FOOD",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Light,
-                                        color = Color.White.copy(alpha = 0.9f),
-                                        letterSpacing = 0.8.sp
-                                    )
-                                }
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(6.dp)
-                                            .background(
-                                                if (isOnline) GreenSuccess else Color(0xFFF44336),
-                                                shape = RoundedCornerShape(50)
-                                            )
-                                    )
-                                    Spacer(modifier = Modifier.width(5.dp))
-                                    Text(
-                                        if (isOnline) "Fresh & fast delivery 🚀" else "Backend Offline ⚠️",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = Color.White.copy(alpha = 0.7f),
-                                        letterSpacing = 0.2.sp
-                                    )
-                                }
+                        Column(modifier = Modifier.weight(1f)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    "ANISHA",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Black,
+                                    color = Color.White,
+                                    letterSpacing = 0.8.sp,
+                                    fontSize = 15.sp
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    "CAMPUS FOOD",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Light,
+                                    color = Color.White.copy(alpha = 0.9f),
+                                    letterSpacing = 0.8.sp,
+                                    fontSize = 15.sp
+                                )
                             }
+                            Spacer(modifier = Modifier.height(1.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(4.dp)
+                                        .background(
+                                            if (isOnline) GreenSuccess else Color(0xFFF44336),
+                                            shape = RoundedCornerShape(50)
+                                        )
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    if (isOnline) "Fresh & fast delivery 🚀" else "Backend Offline ⚠️",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color.White.copy(alpha = 0.7f),
+                                    fontSize = 9.sp
+                                )
+                            }
+                        }
 
-                            // Cart button – premium circular
-                            BadgedBox(
-                                badge = {
-                                    if (cartItemCount > 0) {
-                                        Badge(
-                                            containerColor = Color.White,
-                                            contentColor = OrangePrimary
-                                        ) {
-                                            Text(
-                                                "$cartItemCount",
-                                                fontWeight = FontWeight.ExtraBold,
-                                                fontSize = 10.sp
-                                            )
-                                        }
+                        // Cart button
+                        BadgedBox(
+                            badge = {
+                                if (cartItemCount > 0) {
+                                    Badge(
+                                        containerColor = Color.White,
+                                        contentColor = OrangePrimary
+                                    ) {
+                                        Text(
+                                            "$cartItemCount",
+                                            fontWeight = FontWeight.ExtraBold,
+                                            fontSize = 9.sp
+                                        )
                                     }
                                 }
+                            }
+                        ) {
+                            FilledIconButton(
+                                onClick = onCartClick,
+                                modifier = Modifier.size(34.dp),
+                                shape = RoundedCornerShape(10.dp),
+                                colors = IconButtonDefaults.filledIconButtonColors(
+                                    containerColor = Color.White.copy(alpha = 0.15f),
+                                    contentColor = Color.White
+                                )
                             ) {
-                                FilledIconButton(
-                                    onClick = onCartClick,
-                                    modifier = Modifier.size(38.dp),
-                                    shape = RoundedCornerShape(12.dp),
-                                    colors = IconButtonDefaults.filledIconButtonColors(
-                                        containerColor = Color.White.copy(alpha = 0.18f),
-                                        contentColor = Color.White
-                                    )
-                                ) {
-                                    Icon(
-                                        Icons.Default.ShoppingCart,
-                                        contentDescription = "Cart",
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                }
+                                Icon(
+                                    Icons.Default.ShoppingCart,
+                                    contentDescription = "Cart",
+                                    modifier = Modifier.size(17.dp)
+                                )
                             }
                         }
                     }
+                }
 
-                    // Premium search bar – compact
-                    OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp)
-                            .height(48.dp)
-                            .focusRequester(focusRequester),
-                        placeholder = {
-                            Text(
-                                "Search food, snacks, drinks...",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                                fontSize = 13.sp
-                            )
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Search,
-                                contentDescription = null,
-                                tint = OrangePrimary,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        },
-                        shape = RoundedCornerShape(14.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = OrangePrimary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
-                        ),
-                        singleLine = true,
-                        textStyle = MaterialTheme.typography.bodyMedium,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                        keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() })
-                    )
-
-                    // Category chips – compact
-                    LazyRow(
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    ) {
-                        items(categories) { category ->
-                            FilterChip(
-                                selected = selectedCategory == category,
-                                onClick = { selectedCategory = category },
-                                label = {
-                                    Text(
-                                        category,
-                                        fontWeight = if (selectedCategory == category) FontWeight.Bold else FontWeight.Medium,
-                                        fontSize = 13.sp
-                                    )
-                                },
-                                leadingIcon = if (selectedCategory == category) {
-                                    {
-                                        Icon(
-                                            imageVector = Icons.Default.Check,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(14.dp)
-                                        )
-                                    }
-                                } else null,
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.height(30.dp),
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = OrangePrimary,
-                                    selectedLabelColor = Color.White,
-                                    selectedLeadingIconColor = Color.White
-                                ),
-                                border = FilterChipDefaults.filterChipBorder(
-                                    borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f),
-                                    selectedBorderColor = OrangePrimary,
-                                    enabled = true,
-                                    selected = selectedCategory == category
+                // Search + Chips section - compact & premium
+                Surface(
+                    color = MaterialTheme.colorScheme.surface,
+                    shadowElevation = 1.dp
+                ) {
+                    Column {
+                        // Search bar
+                        OutlinedTextField(
+                            value = searchQuery,
+                            onValueChange = { searchQuery = it },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 6.dp)
+                                .height(44.dp)
+                                .focusRequester(focusRequester),
+                            placeholder = {
+                                Text(
+                                    "Search food, snacks, drinks...",
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                    fontSize = 12.sp
                                 )
-                            )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Search,
+                                    contentDescription = null,
+                                    tint = OrangePrimary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            },
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = OrangePrimary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                            ),
+                            singleLine = true,
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
+                            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                            keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() })
+                        )
+
+                        // Category chips
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            modifier = Modifier.padding(bottom = 6.dp)
+                        ) {
+                            items(categories) { category ->
+                                FilterChip(
+                                    selected = selectedCategory == category,
+                                    onClick = { selectedCategory = category },
+                                    label = {
+                                        Text(
+                                            category,
+                                            fontWeight = if (selectedCategory == category) FontWeight.Bold else FontWeight.Medium,
+                                            fontSize = 11.sp
+                                        )
+                                    },
+                                    leadingIcon = if (selectedCategory == category) {
+                                        {
+                                            Icon(
+                                                imageVector = Icons.Default.Check,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(13.dp)
+                                            )
+                                        }
+                                    } else null,
+                                    shape = RoundedCornerShape(18.dp),
+                                    modifier = Modifier.height(30.dp),
+                                    colors = FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = OrangePrimary,
+                                        selectedLabelColor = Color.White,
+                                        selectedLeadingIconColor = Color.White,
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                                    ),
+                                    border = FilterChipDefaults.filterChipBorder(
+                                        borderColor = Color.Transparent,
+                                        selectedBorderColor = Color.Transparent,
+                                        enabled = true,
+                                        selected = selectedCategory == category
+                                    )
+                                )
+                            }
                         }
                     }
                 }
@@ -265,7 +271,7 @@ fun MenuScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(innerPadding),
-                    contentPadding = PaddingValues(vertical = 10.dp)
+                    contentPadding = PaddingValues(vertical = 8.dp)
                 ) {
                     items(5) {
                         ShimmerProductCard()
@@ -310,7 +316,7 @@ fun MenuScreen(
                         LazyColumn(
                             state = listState,
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(vertical = 10.dp)
+                            contentPadding = PaddingValues(vertical = 8.dp)
                         ) {
                             items(filteredProducts, key = { it.id ?: 0 }) { product ->
                                 AnimatedVisibility(
@@ -324,7 +330,7 @@ fun MenuScreen(
                                     )
                                 }
                             }
-                            item { Spacer(modifier = Modifier.height(12.dp)) }
+                            item { Spacer(modifier = Modifier.height(8.dp)) }
                         }
                     }
                 }

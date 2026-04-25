@@ -2,19 +2,17 @@ package com.example.campusfood.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.campusfood.ui.theme.OrangePrimary
+import com.example.campusfood.ui.theme.OrangeAccentSoft
 
 /**
  * Premium empty/error state component with consistent styling across screens.
@@ -32,51 +30,50 @@ fun ErrorState(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(28.dp),
+            .padding(32.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Emoji in a premium circular surface
         Surface(
             modifier = Modifier.size(80.dp),
             shape = RoundedCornerShape(40.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            color = OrangeAccentSoft
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Text(emoji, fontSize = 40.sp)
+                Text(emoji, fontSize = 36.sp)
             }
         }
-        Spacer(modifier = Modifier.height(18.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = title,
-            style = MaterialTheme.typography.headlineSmall,
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground
         )
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = message,
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            lineHeight = 22.sp
+            lineHeight = 20.sp
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = onRetry,
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape(14.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = OrangePrimary
             ),
-            modifier = Modifier.height(50.dp),
-            contentPadding = PaddingValues(horizontal = 36.dp),
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
+            modifier = Modifier.height(46.dp),
+            contentPadding = PaddingValues(horizontal = 32.dp),
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
         ) {
             Text(
                 retryText,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                fontSize = 15.sp
+                fontSize = 14.sp
             )
         }
     }
@@ -97,17 +94,17 @@ fun EmptyState(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(28.dp),
+            .padding(32.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Surface(
             modifier = Modifier.size(80.dp),
             shape = RoundedCornerShape(40.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+            color = OrangeAccentSoft
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Text(emoji, fontSize = 36.sp)
+                Text(emoji, fontSize = 34.sp)
             }
         }
         Spacer(modifier = Modifier.height(14.dp))
@@ -117,23 +114,23 @@ fun EmptyState(
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = subtitle,
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-            lineHeight = 22.sp
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            lineHeight = 20.sp
         )
 
         if (actionText != null && onAction != null) {
             Spacer(modifier = Modifier.height(20.dp))
             OutlinedButton(
                 onClick = onAction,
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = OrangePrimary)
             ) {
-                Text(actionText, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text(actionText, fontWeight = FontWeight.Bold, fontSize = 13.sp)
             }
         }
     }

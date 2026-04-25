@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.campusfood.ui.theme.OrangeAccentSoft
 
 /**
  * Shimmer placeholder for product cards while loading.
@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ShimmerProductCard(modifier: Modifier = Modifier) {
     val shimmerColors = listOf(
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
         MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f),
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
     )
 
     val transition = rememberInfiniteTransition(label = "shimmer")
@@ -32,7 +32,7 @@ fun ShimmerProductCard(modifier: Modifier = Modifier) {
         targetValue = 1200f,
         animationSpec = infiniteRepeatable(
             animation = tween(
-                durationMillis = 1200,
+                durationMillis = 1100,
                 easing = FastOutSlowInEasing
             ),
             repeatMode = RepeatMode.Restart
@@ -49,8 +49,8 @@ fun ShimmerProductCard(modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp, horizontal = 16.dp)
-            .clip(RoundedCornerShape(20.dp))
+            .padding(vertical = 5.dp, horizontal = 16.dp)
+            .clip(RoundedCornerShape(18.dp))
             .background(MaterialTheme.colorScheme.surface)
             .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -58,41 +58,32 @@ fun ShimmerProductCard(modifier: Modifier = Modifier) {
         // Image placeholder
         Box(
             modifier = Modifier
-                .size(88.dp)
+                .size(84.dp)
                 .clip(RoundedCornerShape(14.dp))
                 .background(brush)
         )
 
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(14.dp))
 
         Column(modifier = Modifier.weight(1f)) {
             // Title
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .height(18.dp)
+                    .fillMaxWidth(0.65f)
+                    .height(16.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(brush)
             )
-            Spacer(modifier = Modifier.height(10.dp))
-            // Description line 1
+            Spacer(modifier = Modifier.height(8.dp))
+            // Description
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .height(12.dp)
-                    .clip(RoundedCornerShape(6.dp))
+                    .fillMaxWidth(0.85f)
+                    .height(10.dp)
+                    .clip(RoundedCornerShape(5.dp))
                     .background(brush)
             )
-            Spacer(modifier = Modifier.height(6.dp))
-            // Description line 2
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .height(12.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(brush)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -101,16 +92,16 @@ fun ShimmerProductCard(modifier: Modifier = Modifier) {
                 // Price
                 Box(
                     modifier = Modifier
-                        .width(60.dp)
-                        .height(22.dp)
+                        .width(55.dp)
+                        .height(20.dp)
                         .clip(RoundedCornerShape(8.dp))
                         .background(brush)
                 )
                 // Button
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
-                        .clip(RoundedCornerShape(12.dp))
+                        .size(36.dp)
+                        .clip(RoundedCornerShape(11.dp))
                         .background(brush)
                 )
             }
@@ -124,9 +115,9 @@ fun ShimmerProductCard(modifier: Modifier = Modifier) {
 @Composable
 fun ShimmerOrderCard(modifier: Modifier = Modifier) {
     val shimmerColors = listOf(
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
         MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.15f),
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
     )
 
     val transition = rememberInfiniteTransition(label = "shimmerOrder")
@@ -135,7 +126,7 @@ fun ShimmerOrderCard(modifier: Modifier = Modifier) {
         targetValue = 1200f,
         animationSpec = infiniteRepeatable(
             animation = tween(
-                durationMillis = 1200,
+                durationMillis = 1100,
                 easing = FastOutSlowInEasing
             ),
             repeatMode = RepeatMode.Restart
@@ -152,10 +143,9 @@ fun ShimmerOrderCard(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surface)
-            .padding(18.dp)
+            .padding(14.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -164,41 +154,41 @@ fun ShimmerOrderCard(modifier: Modifier = Modifier) {
             Column {
                 Box(
                     modifier = Modifier
-                        .width(100.dp)
-                        .height(16.dp)
+                        .width(90.dp)
+                        .height(14.dp)
                         .clip(RoundedCornerShape(6.dp))
                         .background(brush)
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Box(
                     modifier = Modifier
-                        .width(70.dp)
-                        .height(12.dp)
-                        .clip(RoundedCornerShape(6.dp))
+                        .width(65.dp)
+                        .height(10.dp)
+                        .clip(RoundedCornerShape(5.dp))
                         .background(brush)
                 )
             }
             Box(
                 modifier = Modifier
-                    .width(80.dp)
-                    .height(28.dp)
-                    .clip(RoundedCornerShape(14.dp))
+                    .width(70.dp)
+                    .height(26.dp)
+                    .clip(RoundedCornerShape(13.dp))
                     .background(brush)
             )
         }
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         // Items
         repeat(2) {
             Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.6f)
-                    .height(12.dp)
-                    .clip(RoundedCornerShape(6.dp))
+                    .fillMaxWidth(0.55f)
+                    .height(10.dp)
+                    .clip(RoundedCornerShape(5.dp))
                     .background(brush)
             )
             Spacer(modifier = Modifier.height(6.dp))
         }
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -206,16 +196,16 @@ fun ShimmerOrderCard(modifier: Modifier = Modifier) {
         ) {
             Box(
                 modifier = Modifier
-                    .width(70.dp)
-                    .height(24.dp)
+                    .width(60.dp)
+                    .height(20.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(brush)
             )
             Box(
                 modifier = Modifier
-                    .width(90.dp)
-                    .height(36.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .width(80.dp)
+                    .height(32.dp)
+                    .clip(RoundedCornerShape(10.dp))
                     .background(brush)
             )
         }

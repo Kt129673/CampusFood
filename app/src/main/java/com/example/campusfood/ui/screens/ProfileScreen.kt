@@ -27,6 +27,7 @@ import com.example.campusfood.model.User
 import com.example.campusfood.ui.theme.OrangePrimary
 import com.example.campusfood.ui.theme.OrangePrimaryDark
 import com.example.campusfood.ui.theme.OrangePrimaryLight
+import com.example.campusfood.ui.theme.OrangeAccentSoft
 import com.example.campusfood.ui.theme.RedError
 import com.example.campusfood.ui.theme.AdminPurple
 import com.example.campusfood.ui.theme.BlueInfo
@@ -89,26 +90,19 @@ fun ProfileScreen(
 
     Scaffold(
         topBar = {
-            // Premium gradient header
-            Surface(
-                color = Color.Transparent,
-                shadowElevation = 4.dp
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(headerGradient)
+                    .statusBarsPadding()
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(headerGradient)
-                        .statusBarsPadding()
-                        .padding(horizontal = 16.dp, vertical = 10.dp)
-                ) {
-                    Text(
-                        "My Profile",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Black,
-                        color = Color.White,
-                        letterSpacing = 0.5.sp
-                    )
-                }
+                Text(
+                    "My Profile",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
             }
         }
     ) { innerPadding ->
@@ -120,17 +114,16 @@ fun ProfileScreen(
                 .padding(horizontal = 20.dp, vertical = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Premium avatar with gradient ring
+            // Avatar with gradient ring
             Box(
-                modifier = Modifier.size(96.dp),
+                modifier = Modifier.size(88.dp),
                 contentAlignment = Alignment.Center
             ) {
-                // Gradient border ring
                 Box(
                     modifier = Modifier
-                        .size(96.dp)
+                        .size(88.dp)
                         .border(
-                            width = 3.dp,
+                            width = 2.5.dp,
                             brush = Brush.linearGradient(
                                 if (isAdmin)
                                     listOf(AdminPurple, Color(0xFFCE93D8), Color(0xFF4A148C))
@@ -141,9 +134,9 @@ fun ProfileScreen(
                         )
                 )
                 Surface(
-                    modifier = Modifier.size(86.dp),
+                    modifier = Modifier.size(78.dp),
                     shape = CircleShape,
-                    color = accentColor.copy(alpha = 0.12f)
+                    color = if (isAdmin) AdminPurple.copy(alpha = 0.08f) else OrangeAccentSoft
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         val initial = user?.name?.firstOrNull()?.uppercase() ?: "U"
@@ -152,7 +145,7 @@ fun ProfileScreen(
                             style = MaterialTheme.typography.displayMedium,
                             fontWeight = FontWeight.Bold,
                             color = accentColor,
-                            fontSize = 38.sp
+                            fontSize = 34.sp
                         )
                     }
                 }
@@ -169,7 +162,7 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(6.dp))
 
-            // Role badge – premium pill with dynamic color
+            // Role badge
             val roleLabel = when (user?.role) {
                 "ADMIN" -> "Administrator"
                 "DELIVERY" -> "Delivery Partner"
@@ -187,7 +180,7 @@ fun ProfileScreen(
             }
             Surface(
                 shape = RoundedCornerShape(20.dp),
-                color = roleColor.copy(alpha = 0.1f)
+                color = roleColor.copy(alpha = 0.08f)
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 14.dp, vertical = 5.dp),
@@ -205,7 +198,7 @@ fun ProfileScreen(
                         style = MaterialTheme.typography.labelMedium,
                         color = roleColor,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp
+                        fontSize = 11.sp
                     )
                 }
             }
@@ -255,9 +248,9 @@ fun ProfileScreen(
             // Settings section
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(18.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                 ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
@@ -269,7 +262,7 @@ fun ProfileScreen(
                     )
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 20.dp),
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
+                        color = MaterialTheme.colorScheme.outlineVariant
                     )
                     ProfileMenuItem(
                         icon = Icons.Default.LocationOn,
@@ -278,7 +271,7 @@ fun ProfileScreen(
                     )
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 20.dp),
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
+                        color = MaterialTheme.colorScheme.outlineVariant
                     )
                     ProfileMenuItem(
                         icon = Icons.AutoMirrored.Filled.Help,
@@ -287,7 +280,7 @@ fun ProfileScreen(
                     )
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 20.dp),
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
+                        color = MaterialTheme.colorScheme.outlineVariant
                     )
                     ProfileMenuItem(
                         icon = Icons.Default.Info,
@@ -305,25 +298,25 @@ fun ProfileScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(46.dp),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(14.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = RedError
                 ),
                 border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
-                    brush = Brush.linearGradient(listOf(RedError.copy(alpha = 0.5f), RedError.copy(alpha = 0.3f)))
+                    brush = Brush.linearGradient(listOf(RedError.copy(alpha = 0.4f), RedError.copy(alpha = 0.2f)))
                 )
             ) {
                 Icon(
                     Icons.AutoMirrored.Filled.ExitToApp,
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(18.dp)
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
                     "Logout",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp
+                    fontSize = 14.sp
                 )
             }
 
@@ -342,12 +335,12 @@ private fun ProfileInfoRow(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        shape = RoundedCornerShape(16.dp),
+            .padding(vertical = 3.dp),
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
             modifier = Modifier
@@ -356,8 +349,8 @@ private fun ProfileInfoRow(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(
-                modifier = Modifier.size(32.dp),
-                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.size(30.dp),
+                shape = RoundedCornerShape(9.dp),
                 color = accentColor.copy(alpha = 0.08f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
@@ -365,7 +358,7 @@ private fun ProfileInfoRow(
                         icon,
                         contentDescription = null,
                         tint = accentColor,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                 }
             }
@@ -373,16 +366,16 @@ private fun ProfileInfoRow(
             Column {
                 Text(
                     label,
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontSize = 12.sp
+                    fontSize = 10.sp
                 )
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(1.dp))
                 Text(
                     value,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 15.sp
+                    fontSize = 14.sp
                 )
             }
         }
@@ -405,7 +398,7 @@ private fun ProfileMenuItem(
             icon,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.size(22.dp)
+            modifier = Modifier.size(20.dp)
         )
         Spacer(modifier = Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
@@ -413,20 +406,20 @@ private fun ProfileMenuItem(
                 title,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Medium,
-                fontSize = 15.sp
+                fontSize = 14.sp
             )
             Text(
                 subtitle,
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 12.sp
+                fontSize = 11.sp
             )
         }
         Icon(
             Icons.Default.ChevronRight,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-            modifier = Modifier.size(20.dp)
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+            modifier = Modifier.size(18.dp)
         )
     }
 }
