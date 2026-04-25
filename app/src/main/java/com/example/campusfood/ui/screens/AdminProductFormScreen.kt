@@ -132,7 +132,7 @@ fun AdminProductFormScreen(
                             )
                         )
                         .statusBarsPadding()
-                        .padding(horizontal = 10.dp, vertical = 12.dp)
+                        .padding(horizontal = 10.dp, vertical = 8.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -140,7 +140,7 @@ fun AdminProductFormScreen(
                     ) {
                         IconButton(
                             onClick = onBack,
-                            modifier = Modifier.size(40.dp),
+                            modifier = Modifier.size(36.dp),
                             colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
                         ) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", modifier = Modifier.size(22.dp))
@@ -179,7 +179,7 @@ fun AdminProductFormScreen(
                 supportingText = if (submitted && name.isBlank()) {{ Text("Product name is required", color = RedError) }} else null
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(12.dp))
 
             // Description
             OutlinedTextField(
@@ -345,7 +345,7 @@ fun AdminProductFormScreen(
                 }
             }
 
-            Spacer(Modifier.height(28.dp))
+            Spacer(Modifier.height(20.dp))
 
             // Submit button – premium
             Button(
@@ -369,7 +369,7 @@ fun AdminProductFormScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .height(48.dp),
                 shape = RoundedCornerShape(18.dp),
                 enabled = actionState !is AdminProductActionState.Loading,
                 colors = ButtonDefaults.buttonColors(containerColor = AdminPurple),

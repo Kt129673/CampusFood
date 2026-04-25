@@ -60,7 +60,7 @@ fun OrderScreen(
                             )
                         )
                         .statusBarsPadding()
-                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -70,14 +70,14 @@ fun OrderScreen(
                         Column {
                             Text(
                                 "My Orders",
-                                style = MaterialTheme.typography.headlineMedium,
+                                style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Black,
                                 color = Color.White,
                                 letterSpacing = 0.5.sp
                             )
                             Text(
                                 "Track your food orders",
-                                style = MaterialTheme.typography.labelMedium,
+                                style = MaterialTheme.typography.labelSmall,
                                 color = Color.White.copy(alpha = 0.7f)
                             )
                         }
@@ -91,10 +91,10 @@ fun OrderScreen(
                                 ) {
                                     Text(
                                         "$count",
-                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                                         color = Color.White,
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 16.sp
+                                        fontSize = 14.sp
                                     )
                                 }
                             }
@@ -144,10 +144,10 @@ fun OrderScreen(
                                 contentPadding = PaddingValues(
                                     start = 16.dp,
                                     end = 16.dp,
-                                    top = 14.dp,
-                                    bottom = 16.dp
+                                    top = 10.dp,
+                                    bottom = 12.dp
                                 ),
-                                verticalArrangement = Arrangement.spacedBy(14.dp)
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
                             ) {
                                 items(state.orders, key = { it.id }) { order ->
                                     OrderCard(order = order, viewModel = viewModel)
@@ -201,11 +201,11 @@ private fun OrderCard(
         modifier = Modifier
             .fillMaxWidth()
             .animateContentSize(),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(modifier = Modifier.padding(18.dp)) {
+        Column(modifier = Modifier.padding(14.dp)) {
             // Header: order ID + status badge
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -230,7 +230,7 @@ private fun OrderCard(
                 StatusBadge(status = order.status)
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Items list with quantity badges
             order.items?.forEach { item ->
@@ -277,11 +277,11 @@ private fun OrderCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f))
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Total + action row
             Row(
@@ -298,10 +298,10 @@ private fun OrderCard(
                     )
                     Text(
                         "₹${String.format(Locale.getDefault(), "%.0f", order.totalAmount)}",
-                        style = MaterialTheme.typography.titleLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.ExtraBold,
                         color = OrangePrimary,
-                        fontSize = 22.sp
+                        fontSize = 18.sp
                     )
                 }
                 // Only PLACED orders can be cancelled
@@ -323,7 +323,7 @@ private fun OrderCard(
 
             // Delivery address
             if (!order.deliveryAddress.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         Icons.Default.LocationOn,

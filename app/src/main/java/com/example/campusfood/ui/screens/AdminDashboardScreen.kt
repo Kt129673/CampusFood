@@ -66,7 +66,7 @@ fun AdminDashboardScreen(
                             )
                         )
                         .statusBarsPadding()
-                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -76,23 +76,23 @@ fun AdminDashboardScreen(
                         Column {
                             Text(
                                 "Dashboard",
-                                style = MaterialTheme.typography.headlineMedium,
+                                style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Black,
                                 color = Color.White,
                                 letterSpacing = 0.5.sp
                             )
-                            Spacer(modifier = Modifier.height(2.dp))
+                            Spacer(modifier = Modifier.height(1.dp))
                             Text(
                                 "Manage orders & products",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color.White.copy(alpha = 0.75f)
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White.copy(alpha = 0.7f)
                             )
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             // Manage Products button
                             FilledIconButton(
                                 onClick = onManageProducts,
-                                modifier = Modifier.size(40.dp),
+                                modifier = Modifier.size(36.dp),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = IconButtonDefaults.filledIconButtonColors(
                                     containerColor = Color.White.copy(alpha = 0.18f),
@@ -103,7 +103,7 @@ fun AdminDashboardScreen(
                             }
                             FilledIconButton(
                                 onClick = { adminViewModel.loadAllOrders() },
-                                modifier = Modifier.size(40.dp),
+                                modifier = Modifier.size(36.dp),
                                 shape = RoundedCornerShape(12.dp),
                                 colors = IconButtonDefaults.filledIconButtonColors(
                                     containerColor = Color.White.copy(alpha = 0.18f),
@@ -123,7 +123,7 @@ fun AdminDashboardScreen(
             if (ordersState is AdminOrdersState.Success) {
                 val orders = (ordersState as AdminOrdersState.Success).orders
                 LazyRow(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     data class StatInfo(val label: String, val count: Int, val icon: ImageVector, val color: Color)
@@ -144,7 +144,7 @@ fun AdminDashboardScreen(
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.padding(bottom = 10.dp)
+                modifier = Modifier.padding(bottom = 6.dp)
             ) {
                 items(filters) { filter ->
                     val label = when (filter) {
@@ -161,7 +161,7 @@ fun AdminDashboardScreen(
                         onClick = { selectedFilter = filter },
                         label = { Text(label, fontSize = 13.sp, fontWeight = if (selectedFilter == filter) FontWeight.Bold else FontWeight.Medium) },
                         shape = RoundedCornerShape(20.dp),
-                        modifier = Modifier.height(36.dp),
+                        modifier = Modifier.height(32.dp),
                         colors = FilterChipDefaults.filterChipColors(
                             selectedContainerColor = AdminPurple,
                             selectedLabelColor = Color.White
@@ -232,12 +232,12 @@ private fun StatCard(label: String, count: Int, icon: ImageVector, accentColor: 
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp),
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Surface(
-                modifier = Modifier.size(28.dp),
-                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.size(24.dp),
+                shape = RoundedCornerShape(6.dp),
                 color = accentColor.copy(alpha = 0.1f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
@@ -252,7 +252,7 @@ private fun StatCard(label: String, count: Int, icon: ImageVector, accentColor: 
             Spacer(Modifier.height(6.dp))
             Text(
                 "$count",
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Black,
                 color = accentColor
             )
@@ -283,7 +283,7 @@ private fun AdminOrderCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(modifier = Modifier.padding(18.dp)) {
+        Column(modifier = Modifier.padding(14.dp)) {
             // Header row
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -314,7 +314,7 @@ private fun AdminOrderCard(
                 StatusBadge(status = order.status)
             }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(6.dp))
 
             // Items
             order.items?.forEach { item ->
@@ -343,7 +343,7 @@ private fun AdminOrderCard(
             }
 
             HorizontalDivider(
-                modifier = Modifier.padding(vertical = 12.dp),
+                modifier = Modifier.padding(vertical = 8.dp),
                 color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f)
             )
 

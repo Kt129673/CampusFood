@@ -69,14 +69,14 @@ fun ProductCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp),
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Product Image – with proper fallback
             Box(
                 modifier = Modifier
-                    .size(100.dp)
-                    .clip(RoundedCornerShape(16.dp))
+                    .size(88.dp)
+                    .clip(RoundedCornerShape(14.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 SubcomposeAsyncImage(
@@ -134,7 +134,7 @@ fun ProductCard(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
-                        .height(36.dp)
+                        .height(28.dp)
                         .background(
                             Brush.verticalGradient(
                                 colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.65f))
@@ -207,7 +207,7 @@ fun ProductCard(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 // Price and Add button row
                 Row(
@@ -222,7 +222,7 @@ fun ProductCard(
                             style = MaterialTheme.typography.titleLarge,
                             color = OrangePrimary,
                             fontWeight = FontWeight.ExtraBold,
-                            fontSize = 22.sp
+                            fontSize = 18.sp
                         )
                         if (product.stock != null && product.stock <= 10) {
                             Text(
@@ -243,8 +243,8 @@ fun ProductCard(
                                 onAddToCart(product)
                             }
                         },
-                        modifier = Modifier.size(44.dp),
-                        shape = RoundedCornerShape(14.dp),
+                        modifier = Modifier.size(40.dp),
+                        shape = RoundedCornerShape(12.dp),
                         enabled = product.stock == null || product.stock > 0,
                         colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = if (isAdded) GreenSuccess else OrangePrimary,
@@ -264,7 +264,7 @@ fun ProductCard(
                             Icon(
                                 imageVector = if (added) Icons.Default.Check else Icons.Default.Add,
                                 contentDescription = if (added) "Added" else "Add to cart",
-                                modifier = Modifier.size(22.dp)
+                                modifier = Modifier.size(20.dp)
                             )
                         }
                     }

@@ -174,7 +174,7 @@ fun AdminProductsScreen(
                             )
                         )
                         .statusBarsPadding()
-                        .padding(horizontal = 10.dp, vertical = 12.dp)
+                        .padding(horizontal = 10.dp, vertical = 8.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -182,7 +182,7 @@ fun AdminProductsScreen(
                     ) {
                         IconButton(
                             onClick = onBack,
-                            modifier = Modifier.size(40.dp),
+                            modifier = Modifier.size(36.dp),
                             colors = IconButtonDefaults.iconButtonColors(contentColor = Color.White)
                         ) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", modifier = Modifier.size(22.dp))
@@ -236,7 +236,7 @@ fun AdminProductsScreen(
                 onValueChange = { searchQuery = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
                 placeholder = { Text("Search products...", fontSize = 15.sp) },
                 leadingIcon = {
                     Icon(Icons.Default.Search, null, tint = AdminPurple, modifier = Modifier.size(22.dp))

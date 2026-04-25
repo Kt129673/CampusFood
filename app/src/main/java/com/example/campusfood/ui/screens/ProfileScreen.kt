@@ -99,11 +99,11 @@ fun ProfileScreen(
                         .fillMaxWidth()
                         .background(headerGradient)
                         .statusBarsPadding()
-                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
                 ) {
                     Text(
                         "My Profile",
-                        style = MaterialTheme.typography.headlineMedium,
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Black,
                         color = Color.White,
                         letterSpacing = 0.5.sp
@@ -117,18 +117,18 @@ fun ProfileScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 24.dp),
+                .padding(horizontal = 20.dp, vertical = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Premium avatar with gradient ring
             Box(
-                modifier = Modifier.size(110.dp),
+                modifier = Modifier.size(96.dp),
                 contentAlignment = Alignment.Center
             ) {
                 // Gradient border ring
                 Box(
                     modifier = Modifier
-                        .size(110.dp)
+                        .size(96.dp)
                         .border(
                             width = 3.dp,
                             brush = Brush.linearGradient(
@@ -141,7 +141,7 @@ fun ProfileScreen(
                         )
                 )
                 Surface(
-                    modifier = Modifier.size(100.dp),
+                    modifier = Modifier.size(86.dp),
                     shape = CircleShape,
                     color = accentColor.copy(alpha = 0.12f)
                 ) {
@@ -152,13 +152,13 @@ fun ProfileScreen(
                             style = MaterialTheme.typography.displayMedium,
                             fontWeight = FontWeight.Bold,
                             color = accentColor,
-                            fontSize = 44.sp
+                            fontSize = 38.sp
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Name
             Text(
@@ -210,9 +210,9 @@ fun ProfileScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(18.dp))
 
-            // Info cards – bigger, more spacious
+            // Info cards
             if (!user?.mobile.isNullOrBlank()) {
                 ProfileInfoRow(
                     icon = Icons.Default.Phone,
@@ -250,9 +250,9 @@ fun ProfileScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Settings section – more premium card
+            // Settings section
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
@@ -297,14 +297,14 @@ fun ProfileScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Premium logout button
+            // Logout button
             OutlinedButton(
                 onClick = { showLogoutDialog = true },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp),
+                    .height(46.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = RedError
@@ -327,7 +327,7 @@ fun ProfileScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -352,12 +352,12 @@ private fun ProfileInfoRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 14.dp),
+                .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Surface(
-                modifier = Modifier.size(40.dp),
-                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.size(32.dp),
+                shape = RoundedCornerShape(10.dp),
                 color = accentColor.copy(alpha = 0.08f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
@@ -365,11 +365,11 @@ private fun ProfileInfoRow(
                         icon,
                         contentDescription = null,
                         tint = accentColor,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }
-            Spacer(modifier = Modifier.width(14.dp))
+            Spacer(modifier = Modifier.width(10.dp))
             Column {
                 Text(
                     label,
@@ -398,7 +398,7 @@ private fun ProfileMenuItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 18.dp, vertical = 14.dp),
+            .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(

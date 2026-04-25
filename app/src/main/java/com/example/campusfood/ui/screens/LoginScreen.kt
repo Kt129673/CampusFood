@@ -110,7 +110,7 @@ fun LoginScreen(
                 .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             // Floating logo animation
             val infiniteTransition = rememberInfiniteTransition(label = "logoFloat")
@@ -131,24 +131,24 @@ fun LoginScreen(
             ) {
                 // Outer glow ring
                 Surface(
-                    modifier = Modifier.size(90.dp),
+                    modifier = Modifier.size(76.dp),
                     shape = CircleShape,
                     color = Color.White.copy(alpha = 0.06f)
                 ) {}
                 Surface(
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(66.dp)
                         .offset(y = logoOffset.dp),
                     shape = CircleShape,
                     color = Color.White.copy(alpha = 0.14f)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Text("🍔", fontSize = 40.sp)
+                        Text("🍔", fontSize = 34.sp)
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Brand name – premium typography
             Text(
@@ -187,7 +187,7 @@ fun LoginScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp),
+                        .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Toggle: Student / Admin – taller
@@ -543,7 +543,7 @@ private fun ToggleButton(
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier.height(42.dp),
+        modifier = modifier.height(38.dp),
         shape = RoundedCornerShape(11.dp),
         color = if (selected) OrangePrimary else Color.Transparent
     ) {

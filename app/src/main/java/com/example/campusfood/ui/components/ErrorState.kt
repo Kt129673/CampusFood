@@ -32,21 +32,21 @@ fun ErrorState(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(40.dp),
+            .padding(28.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Emoji in a premium circular surface
         Surface(
-            modifier = Modifier.size(100.dp),
-            shape = RoundedCornerShape(50.dp),
+            modifier = Modifier.size(80.dp),
+            shape = RoundedCornerShape(40.dp),
             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Text(emoji, fontSize = 48.sp)
+                Text(emoji, fontSize = 40.sp)
             }
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(18.dp))
         Text(
             text = title,
             style = MaterialTheme.typography.headlineSmall,
@@ -61,7 +61,7 @@ fun ErrorState(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             lineHeight = 22.sp
         )
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = onRetry,
             shape = RoundedCornerShape(16.dp),
@@ -97,20 +97,20 @@ fun EmptyState(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(40.dp),
+            .padding(28.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Surface(
-            modifier = Modifier.size(100.dp),
-            shape = RoundedCornerShape(50.dp),
+            modifier = Modifier.size(80.dp),
+            shape = RoundedCornerShape(40.dp),
             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Text(emoji, fontSize = 44.sp)
+                Text(emoji, fontSize = 36.sp)
             }
         }
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(14.dp))
         Text(
             text = title,
             style = MaterialTheme.typography.titleLarge,
@@ -127,7 +127,7 @@ fun EmptyState(
         )
 
         if (actionText != null && onAction != null) {
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             OutlinedButton(
                 onClick = onAction,
                 shape = RoundedCornerShape(14.dp),

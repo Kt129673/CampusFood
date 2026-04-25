@@ -65,9 +65,7 @@ fun MenuScreen(
     val focusManager = LocalFocusManager.current
     val listState = rememberLazyListState()
 
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
+    // Removed: auto-focus on entry was forcing keyboard open every time
 
     LaunchedEffect(listState.isScrollInProgress) {
         if (listState.isScrollInProgress) {
@@ -76,6 +74,7 @@ fun MenuScreen(
     }
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             Surface(
                 color = MaterialTheme.colorScheme.surface,
@@ -96,7 +95,7 @@ fun MenuScreen(
                                 )
                             )
                             .statusBarsPadding()
-                            .padding(horizontal = 16.dp, vertical = 10.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -182,7 +181,7 @@ fun MenuScreen(
                         onValueChange = { searchQuery = it },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .padding(horizontal = 16.dp, vertical = 6.dp)
                             .focusRequester(focusRequester),
                         placeholder = {
                             Text(
@@ -202,7 +201,7 @@ fun MenuScreen(
                         shape = RoundedCornerShape(14.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = OrangePrimary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f),
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                             focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
                             unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
                         ),
@@ -216,7 +215,7 @@ fun MenuScreen(
                     LazyRow(
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 6.dp)
                     ) {
                         items(categories) { category ->
                             FilterChip(

@@ -70,7 +70,7 @@ fun CartScreen(
                             )
                         )
                         .statusBarsPadding()
-                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -80,7 +80,7 @@ fun CartScreen(
                         Column {
                             Text(
                                 "My Cart",
-                                style = MaterialTheme.typography.headlineMedium,
+                                style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Black,
                                 color = Color.White,
                                 letterSpacing = 0.5.sp
@@ -133,7 +133,7 @@ fun CartScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 22.dp, vertical = 20.dp)
+                                .padding(horizontal = 18.dp, vertical = 14.dp)
                                 .navigationBarsPadding()
                         ) {
                             // Price Summary
@@ -144,7 +144,7 @@ fun CartScreen(
                                 Text("Subtotal", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 Text("₹${String.format("%.2f", subtotal)}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
                             }
-                            Spacer(modifier = Modifier.height(6.dp))
+                            Spacer(modifier = Modifier.height(4.dp))
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween
@@ -153,23 +153,23 @@ fun CartScreen(
                                 Text("₹${String.format("%.2f", deliveryFee)}", style = MaterialTheme.typography.bodyLarge, color = GreenSuccess, fontWeight = FontWeight.Medium)
                             }
                             
-                            HorizontalDivider(modifier = Modifier.padding(vertical = 14.dp), thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp), thickness = 0.5.dp, color = MaterialTheme.colorScheme.outlineVariant)
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text("Total", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                                Text("Total", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                                 Text(
                                     "₹${String.format("%.2f", total)}",
-                                    style = MaterialTheme.typography.headlineSmall,
+                                    style = MaterialTheme.typography.titleMedium,
                                     color = OrangePrimary,
                                     fontWeight = FontWeight.ExtraBold
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(18.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
 
                             // Delivery address
                             OutlinedTextField(
@@ -197,13 +197,13 @@ fun CartScreen(
                                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
                             )
 
-                            Spacer(modifier = Modifier.height(18.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
 
                             Button(
                                 onClick = { onCheckoutClick(deliveryAddress) },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(58.dp),
+                                    .height(50.dp),
                                 shape = RoundedCornerShape(18.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = OrangePrimary
@@ -248,7 +248,7 @@ fun CartScreen(
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(14.dp)
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
                             items(state.items, key = { it.productId }) { item ->
                                 CartItemCard(
@@ -290,35 +290,35 @@ fun EmptyCartState(onBackToMenu: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Surface(
-            modifier = Modifier.size(140.dp),
-            shape = RoundedCornerShape(70.dp),
+            modifier = Modifier.size(100.dp),
+            shape = RoundedCornerShape(50.dp),
             color = OrangePrimary.copy(alpha = 0.08f)
         ) {
             Box(contentAlignment = Alignment.Center) {
-                Text("🛒", fontSize = 56.sp)
+                Text("🛒", fontSize = 44.sp)
             }
         }
-        Spacer(modifier = Modifier.height(28.dp))
+        Spacer(modifier = Modifier.height(20.dp))
         Text(
             "Your cart is empty",
-            style = MaterialTheme.typography.headlineSmall,
+            style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.ExtraBold,
             color = MaterialTheme.colorScheme.onSurface
         )
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
-            "Looks like you haven't added anything to your cart yet.\nGo ahead and explore our menu!",
+            "Looks like you haven't added anything yet.\nExplore our menu!",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
-            lineHeight = 24.sp
+            lineHeight = 20.sp
         )
-        Spacer(modifier = Modifier.height(36.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         Button(
             onClick = onBackToMenu,
             shape = RoundedCornerShape(18.dp),
             colors = ButtonDefaults.buttonColors(containerColor = OrangePrimary),
-            modifier = Modifier.height(52.dp).fillMaxWidth(0.7f),
+            modifier = Modifier.height(46.dp).fillMaxWidth(0.7f),
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 3.dp)
         ) {
             Text("Browse Menu", fontWeight = FontWeight.Bold, fontSize = 16.sp)
@@ -348,11 +348,11 @@ fun CartItemCard(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Product image – larger with rounded corners
+            // Product image
             Box(
                 modifier = Modifier
-                    .size(90.dp)
-                    .clip(RoundedCornerShape(16.dp))
+                    .size(76.dp)
+                    .clip(RoundedCornerShape(12.dp))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 SubcomposeAsyncImage(
@@ -402,7 +402,7 @@ fun CartItemCard(
                 )
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Row(
@@ -441,7 +441,7 @@ fun CartItemCard(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -485,7 +485,7 @@ fun CartItemCard(
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.ExtraBold,
                             color = OrangePrimary,
-                            fontSize = 18.sp
+                            fontSize = 16.sp
                         )
                         if (item.quantity > 1) {
                             Text(

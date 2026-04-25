@@ -45,8 +45,9 @@ fun StatusBadge(status: String) {
 
     // Active orders get a subtle pulse on the dot indicator
     val isActive = status in listOf("PLACED", "PACKING", "OUT_FOR_DELIVERY")
-    val pulseScale by if (isActive) {
-        rememberInfiniteTransition(label = "statusPulse").animateFloat(
+    val pulseScale = if (isActive) {
+        val transition = rememberInfiniteTransition(label = "statusPulse")
+        val scale by transition.animateFloat(
             initialValue = 0.85f,
             targetValue = 1.15f,
             animationSpec = infiniteRepeatable(
@@ -55,16 +56,9 @@ fun StatusBadge(status: String) {
             ),
             label = "statusPulseScale"
         )
+        scale
     } else {
-        rememberInfiniteTransition(label = "statusStatic").animateFloat(
-            initialValue = 1f,
-            targetValue = 1f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(1000),
-                repeatMode = RepeatMode.Restart
-            ),
-            label = "statusStaticScale"
-        )
+        1f
     }
 
     Surface(

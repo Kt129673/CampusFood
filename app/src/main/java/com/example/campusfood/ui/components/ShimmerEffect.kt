@@ -52,14 +52,14 @@ fun ShimmerProductCard(modifier: Modifier = Modifier) {
             .padding(vertical = 6.dp, horizontal = 16.dp)
             .clip(RoundedCornerShape(20.dp))
             .background(MaterialTheme.colorScheme.surface)
-            .padding(14.dp),
+            .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Image placeholder
         Box(
             modifier = Modifier
-                .size(100.dp)
-                .clip(RoundedCornerShape(16.dp))
+                .size(88.dp)
+                .clip(RoundedCornerShape(14.dp))
                 .background(brush)
         )
 
@@ -109,8 +109,8 @@ fun ShimmerProductCard(modifier: Modifier = Modifier) {
                 // Button
                 Box(
                     modifier = Modifier
-                        .size(44.dp)
-                        .clip(RoundedCornerShape(14.dp))
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(12.dp))
                         .background(brush)
                 )
             }

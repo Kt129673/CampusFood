@@ -1,10 +1,6 @@
 package com.example.campusfood.ui
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
@@ -120,65 +116,70 @@ fun MainScreen() {
         snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             if (showBottomBar) {
-                // Premium NavigationBar with elevated feel
-                NavigationBar(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    tonalElevation = 8.dp,
-                    modifier = Modifier.height(64.dp)
-                ) {
-                    val currentDestination = navBackStackEntry?.destination
-                    bottomNavItems.forEach { item ->
-                        val isSelected = currentDestination?.hierarchy?.any { it.route == item.route } == true
-                        NavigationBarItem(
-                            icon = {
-                                BadgedBox(
-                                    badge = {
-                                        if (item.badgeCount > 0) {
-                                            Badge(
-                                                containerColor = OrangePrimary,
-                                                contentColor = Color.White
-                                            ) {
-                                                Text(
-                                                    "${item.badgeCount}",
-                                                    fontSize = 11.sp,
-                                                    fontWeight = FontWeight.Bold
-                                                )
+                Column {
+                    HorizontalDivider(
+                        thickness = 0.5.dp,
+                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                    )
+                    NavigationBar(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        tonalElevation = 0.dp,
+                        modifier = Modifier.height(64.dp)
+                    ) {
+                        val currentDestination = navBackStackEntry?.destination
+                        bottomNavItems.forEach { item ->
+                            val isSelected = currentDestination?.hierarchy?.any { it.route == item.route } == true
+                            NavigationBarItem(
+                                icon = {
+                                    BadgedBox(
+                                        badge = {
+                                            if (item.badgeCount > 0) {
+                                                Badge(
+                                                    containerColor = OrangePrimary,
+                                                    contentColor = Color.White
+                                                ) {
+                                                    Text(
+                                                        "${item.badgeCount}",
+                                                        fontSize = 11.sp,
+                                                        fontWeight = FontWeight.Bold
+                                                    )
+                                                }
                                             }
                                         }
+                                    ) {
+                                        Icon(
+                                            if (isSelected) item.selectedIcon else item.unselectedIcon,
+                                            contentDescription = item.name,
+                                            modifier = Modifier.size(22.dp)
+                                        )
                                     }
-                                ) {
-                                    Icon(
-                                        if (isSelected) item.selectedIcon else item.unselectedIcon,
-                                        contentDescription = item.name,
-                                        modifier = Modifier.size(22.dp)
+                                },
+                                label = {
+                                    Text(
+                                        item.name,
+                                        fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                                        fontSize = 11.sp,
+                                        maxLines = 1
                                     )
-                                }
-                            },
-                            label = {
-                                Text(
-                                    item.name,
-                                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                                    fontSize = 11.sp,
-                                    maxLines = 1
+                                },
+                                selected = isSelected,
+                                onClick = {
+                                    navController.navigate(item.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = if (isAdmin) AdminPurple else OrangePrimary,
+                                    selectedTextColor = if (isAdmin) AdminPurple else OrangePrimary,
+                                    indicatorColor = if (isAdmin) AdminPurple.copy(alpha = 0.12f)
+                                                     else OrangePrimary.copy(alpha = 0.12f),
+                                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
-                            },
-                            selected = isSelected,
-                            onClick = {
-                                navController.navigate(item.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = if (isAdmin) AdminPurple else OrangePrimary,
-                                selectedTextColor = if (isAdmin) AdminPurple else OrangePrimary,
-                                indicatorColor = if (isAdmin) AdminPurple.copy(alpha = 0.12f)
-                                                 else OrangePrimary.copy(alpha = 0.12f),
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                        )
+                        }
                     }
                 }
             }
@@ -248,6 +249,7 @@ fun MainScreen() {
             // Menu Screen
             composable(Screen.Menu.route) {
                 MenuScreen(
+                    modifier = Modifier.fillMaxSize(),
                     onProductClick = { product ->
                         cartViewModel.addToCart(product)
                         scope.launch {
