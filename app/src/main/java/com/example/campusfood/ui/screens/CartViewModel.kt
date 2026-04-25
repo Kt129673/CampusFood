@@ -99,6 +99,18 @@ class CartViewModel : ViewModel() {
     }
 
     /**
+     * Restore a removed item back to cart.
+     */
+    fun restoreCartItem(item: CartItem) {
+        synchronized(cartItems) {
+            if (!cartItems.any { it.productId == item.productId }) {
+                cartItems.add(item)
+                emitCartState()
+            }
+        }
+    }
+
+    /**
      * Increment quantity of a product in cart.
      */
     fun incrementQuantity(productId: Long) {

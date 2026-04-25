@@ -26,6 +26,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.foundation.lazy.rememberLazyListState
 import com.example.campusfood.model.Product
 import com.example.campusfood.ui.components.EmptyState
 import com.example.campusfood.ui.components.ErrorState
@@ -53,6 +60,20 @@ fun MenuScreen(
     // Categories matching the seeded backend data
     val categories = listOf("All", "Snacks", "Beverages", "Hot Beverages", "Quick Bites", "Essentials", "Chocolates")
     var selectedCategory by remember { mutableStateOf("All") }
+
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
+    LaunchedEffect(listState.isScrollInProgress) {
+        if (listState.isScrollInProgress) {
+            focusManager.clearFocus()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -162,7 +183,8 @@ fun MenuScreen(
                         onValueChange = { searchQuery = it },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                            .focusRequester(focusRequester),
                         placeholder = {
                             Text(
                                 "Search food, snacks, drinks...",
@@ -186,7 +208,9 @@ fun MenuScreen(
                             unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
                         ),
                         singleLine = true,
-                        textStyle = MaterialTheme.typography.bodyLarge
+                        textStyle = MaterialTheme.typography.bodyLarge,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                        keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() })
                     )
 
                     // Category chips – slightly taller, better spacing
@@ -285,6 +309,7 @@ fun MenuScreen(
                             .padding(innerPadding)
                     ) {
                         LazyColumn(
+                            state = listState,
                             modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(vertical = 10.dp)
                         ) {

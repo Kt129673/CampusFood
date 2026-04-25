@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Login
@@ -71,11 +73,7 @@ fun LoginScreen(
                 }
             } catch (e: ApiException) {
                 Log.e("LoginScreen", "Google sign-in failed: ${e.statusCode}", e)
-                if (e.statusCode == 10) {
-                    authViewModel.setError("Google Sign-In Error (Code 10): App SHA-1 is not registered in Google Cloud Console.")
-                } else {
-                    authViewModel.setError("Google sign-in failed (Code: ${e.statusCode}).")
-                }
+                authViewModel.setError("Unable to sign in. Please try again or contact support.")
             }
         } else {
             // User canceled or Google Play Services had an issue
@@ -88,6 +86,7 @@ fun LoginScreen(
     var mobile by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
 
     Box(
         modifier = Modifier
@@ -183,7 +182,7 @@ fun LoginScreen(
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -314,6 +313,14 @@ fun LoginScreen(
                                     colors = OutlinedTextFieldDefaults.colors(
                                         focusedBorderColor = OrangePrimary,
                                         focusedLabelColor = OrangePrimary
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            focusManager.clearFocus()
+                                            if (mobile.length == 10 && password.isNotBlank()) {
+                                                authViewModel.loginAdmin(mobile, password)
+                                            }
+                                        }
                                     )
                                 )
 

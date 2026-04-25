@@ -101,14 +101,14 @@ class OrderViewModel : ViewModel() {
         }
     }
 
-    fun placeOrder(orderRequest: OrderRequest, onSuccess: () -> Unit) {
+    fun placeOrder(orderRequest: OrderRequest, onSuccess: (Long?) -> Unit) {
         viewModelScope.launch {
             _isPlacingOrder.value = true
             try {
                 val response = RetrofitInstance.api.placeOrder(orderRequest)
                 if (response.success) {
                     getOrders()
-                    onSuccess()
+                    onSuccess(response.data?.id)
                 } else {
                     _snackbarEvent.value = "Order failed: ${response.message}"
                     _uiState.value = OrderUiState.Error(response.message)

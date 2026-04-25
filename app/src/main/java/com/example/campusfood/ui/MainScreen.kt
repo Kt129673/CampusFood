@@ -250,10 +250,14 @@ fun MainScreen() {
                         cartViewModel.addToCart(product)
                         scope.launch {
                             snackbarHostState.currentSnackbarData?.dismiss()
-                            snackbarHostState.showSnackbar(
+                            val result = snackbarHostState.showSnackbar(
                                 message = "${product.name} added to cart",
+                                actionLabel = "View Cart",
                                 duration = SnackbarDuration.Short
                             )
+                            if (result == SnackbarResult.ActionPerformed) {
+                                navController.navigate(Screen.Cart.route)
+                            }
                         }
                     },
                     onCartClick = { navController.navigate(Screen.Cart.route) },
@@ -275,11 +279,12 @@ fun MainScreen() {
                                     items = orderItems,
                                     deliveryAddress = address
                                 )
-                                orderViewModel.placeOrder(orderRequest) {
+                                orderViewModel.placeOrder(orderRequest) { orderId ->
                                     cartViewModel.clearCart()
                                     scope.launch {
+                                        val message = if (orderId != null) "🎉 Order #$orderId placed successfully!" else "🎉 Order placed successfully!"
                                         snackbarHostState.showSnackbar(
-                                            message = "🎉 Order placed successfully!",
+                                            message = message,
                                             duration = SnackbarDuration.Short
                                         )
                                     }

@@ -23,6 +23,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+import kotlinx.coroutines.launch
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,8 +49,12 @@ fun CartScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var deliveryAddress by remember { mutableStateOf("Campus Dorm A, Room 101") }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             // Premium gradient header
             Surface(
@@ -183,7 +192,9 @@ fun CartScreen(
                                     focusedLabelColor = OrangePrimary,
                                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                                     focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                                )
+                                ),
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() })
                             )
 
                             Spacer(modifier = Modifier.height(18.dp))
@@ -244,7 +255,20 @@ fun CartScreen(
                                     item = item,
                                     onIncrement = { viewModel.incrementQuantity(item.productId) },
                                     onDecrement = { viewModel.decrementQuantity(item.productId) },
-                                    onRemove = { viewModel.removeFromCart(item.productId) }
+                                    onRemove = {
+                                        viewModel.removeFromCart(item.productId)
+                                        scope.launch {
+                                            snackbarHostState.currentSnackbarData?.dismiss()
+                                            val result = snackbarHostState.showSnackbar(
+                                                message = "${item.productName} removed",
+                                                actionLabel = "Undo",
+                                                duration = SnackbarDuration.Short
+                                            )
+                                            if (result == SnackbarResult.ActionPerformed) {
+                                                viewModel.restoreCartItem(item)
+                                            }
+                                        }
+                                    }
                                 )
                             }
                             item { Spacer(modifier = Modifier.height(20.dp)) }
@@ -316,7 +340,7 @@ fun CartItemCard(
             .animateContentSize(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier
