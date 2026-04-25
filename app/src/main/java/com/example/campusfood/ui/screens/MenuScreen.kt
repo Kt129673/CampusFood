@@ -96,7 +96,7 @@ fun MenuScreen(
                                 )
                             )
                             .statusBarsPadding()
-                            .padding(horizontal = 20.dp, vertical = 14.dp)
+                            .padding(horizontal = 16.dp, vertical = 10.dp)
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -107,36 +107,35 @@ fun MenuScreen(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
                                         "ANISHA",
-                                        style = MaterialTheme.typography.titleLarge,
+                                        style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Black,
                                         color = Color.White,
-                                        letterSpacing = 1.sp
+                                        letterSpacing = 0.8.sp
                                     )
-                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Spacer(modifier = Modifier.width(5.dp))
                                     Text(
                                         "CAMPUS FOOD",
-                                        style = MaterialTheme.typography.titleLarge,
+                                        style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Light,
                                         color = Color.White.copy(alpha = 0.9f),
-                                        letterSpacing = 1.sp
+                                        letterSpacing = 0.8.sp
                                     )
                                 }
-                                Spacer(modifier = Modifier.height(2.dp))
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Box(
                                         modifier = Modifier
-                                            .size(7.dp)
+                                            .size(6.dp)
                                             .background(
                                                 if (isOnline) GreenSuccess else Color(0xFFF44336),
                                                 shape = RoundedCornerShape(50)
                                             )
                                     )
-                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Spacer(modifier = Modifier.width(5.dp))
                                     Text(
                                         if (isOnline) "Fresh & fast delivery 🚀" else "Backend Offline ⚠️",
-                                        style = MaterialTheme.typography.labelMedium,
+                                        style = MaterialTheme.typography.labelSmall,
                                         color = Color.White.copy(alpha = 0.7f),
-                                        letterSpacing = 0.3.sp
+                                        letterSpacing = 0.2.sp
                                     )
                                 }
                             }
@@ -152,7 +151,7 @@ fun MenuScreen(
                                             Text(
                                                 "$cartItemCount",
                                                 fontWeight = FontWeight.ExtraBold,
-                                                fontSize = 11.sp
+                                                fontSize = 10.sp
                                             )
                                         }
                                     }
@@ -160,8 +159,8 @@ fun MenuScreen(
                             ) {
                                 FilledIconButton(
                                     onClick = onCartClick,
-                                    modifier = Modifier.size(42.dp),
-                                    shape = RoundedCornerShape(14.dp),
+                                    modifier = Modifier.size(38.dp),
+                                    shape = RoundedCornerShape(12.dp),
                                     colors = IconButtonDefaults.filledIconButtonColors(
                                         containerColor = Color.White.copy(alpha = 0.18f),
                                         contentColor = Color.White
@@ -170,20 +169,20 @@ fun MenuScreen(
                                     Icon(
                                         Icons.Default.ShoppingCart,
                                         contentDescription = "Cart",
-                                        modifier = Modifier.size(20.dp)
+                                        modifier = Modifier.size(18.dp)
                                     )
                                 }
                             }
                         }
                     }
 
-                    // Premium search bar – taller, more spacious
+                    // Premium search bar – compact
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
                             .focusRequester(focusRequester),
                         placeholder = {
                             Text(
@@ -197,10 +196,10 @@ fun MenuScreen(
                                 Icons.Default.Search,
                                 contentDescription = null,
                                 tint = OrangePrimary,
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(20.dp)
                             )
                         },
-                        shape = RoundedCornerShape(18.dp),
+                        shape = RoundedCornerShape(14.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = OrangePrimary,
                             unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f),
@@ -213,11 +212,11 @@ fun MenuScreen(
                         keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() })
                     )
 
-                    // Category chips – slightly taller, better spacing
+                    // Category chips – compact
                     LazyRow(
                         contentPadding = PaddingValues(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        modifier = Modifier.padding(bottom = 12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(bottom = 8.dp)
                     ) {
                         items(categories) { category ->
                             FilterChip(
@@ -227,7 +226,7 @@ fun MenuScreen(
                                     Text(
                                         category,
                                         fontWeight = if (selectedCategory == category) FontWeight.Bold else FontWeight.Medium,
-                                        fontSize = 14.sp
+                                        fontSize = 13.sp
                                     )
                                 },
                                 leadingIcon = if (selectedCategory == category) {
@@ -235,12 +234,12 @@ fun MenuScreen(
                                         Icon(
                                             imageVector = Icons.Default.Check,
                                             contentDescription = null,
-                                            modifier = Modifier.size(16.dp)
+                                            modifier = Modifier.size(14.dp)
                                         )
                                     }
                                 } else null,
-                                shape = RoundedCornerShape(14.dp),
-                                modifier = Modifier.height(38.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.height(34.dp),
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = OrangePrimary,
                                     selectedLabelColor = Color.White,

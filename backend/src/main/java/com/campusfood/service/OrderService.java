@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -94,7 +95,7 @@ public class OrderService {
     }
 
     public OrderResponse getOrderById(Long orderId) {
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findByIdWithDetails(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
         return mapToResponse(order);
     }

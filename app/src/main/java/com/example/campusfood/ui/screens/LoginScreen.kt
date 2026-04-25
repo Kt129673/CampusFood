@@ -105,18 +105,18 @@ fun LoginScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 28.dp)
+                .padding(horizontal = 24.dp)
                 .statusBarsPadding()
                 .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             // Floating logo animation
             val infiniteTransition = rememberInfiniteTransition(label = "logoFloat")
             val logoOffset by infiniteTransition.animateFloat(
-                initialValue = -4f,
-                targetValue = 4f,
+                initialValue = -3f,
+                targetValue = 3f,
                 animationSpec = infiniteRepeatable(
                     animation = tween(2000, easing = FastOutSlowInEasing),
                     repeatMode = RepeatMode.Reverse
@@ -126,59 +126,59 @@ fun LoginScreen(
 
             // Premium Logo – with floating animation and glow ring
             Box(
-                modifier = Modifier.size(110.dp),
+                modifier = Modifier.size(90.dp),
                 contentAlignment = Alignment.Center
             ) {
                 // Outer glow ring
                 Surface(
-                    modifier = Modifier.size(110.dp),
+                    modifier = Modifier.size(90.dp),
                     shape = CircleShape,
                     color = Color.White.copy(alpha = 0.06f)
                 ) {}
                 Surface(
                     modifier = Modifier
-                        .size(100.dp)
+                        .size(80.dp)
                         .offset(y = logoOffset.dp),
                     shape = CircleShape,
                     color = Color.White.copy(alpha = 0.14f)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
-                        Text("🍔", fontSize = 50.sp)
+                        Text("🍔", fontSize = 40.sp)
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Brand name – premium typography
             Text(
                 "ANISHA",
-                style = MaterialTheme.typography.displayLarge,
+                style = MaterialTheme.typography.displayMedium,
                 color = Color.White,
                 fontWeight = FontWeight.Black,
-                letterSpacing = 3.sp
+                letterSpacing = 2.sp
             )
             Text(
                 "CAMPUS FOOD",
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 color = Color.White.copy(alpha = 0.85f),
                 fontWeight = FontWeight.Light,
-                letterSpacing = 4.sp
+                letterSpacing = 3.sp
             )
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 "Fresh food, delivered fast on campus",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = Color.White.copy(alpha = 0.65f),
-                letterSpacing = 0.5.sp
+                letterSpacing = 0.3.sp
             )
 
-            Spacer(modifier = Modifier.height(36.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             // Login Card – premium with larger radius
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(28.dp),
+                shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
                 ),
@@ -187,16 +187,16 @@ fun LoginScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp),
+                        .padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Toggle: Student / Admin – taller
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(16.dp))
+                            .clip(RoundedCornerShape(14.dp))
                             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f))
-                            .padding(5.dp),
+                            .padding(4.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         ToggleButton(
@@ -221,7 +221,7 @@ fun LoginScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(28.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
                     AnimatedContent(
                         targetState = isAdminMode,
@@ -250,14 +250,14 @@ fun LoginScreen(
                                     style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.Bold
                                 )
-                                Spacer(modifier = Modifier.height(6.dp))
+                                Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     "Enter your admin credentials",
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
 
-                                Spacer(modifier = Modifier.height(24.dp))
+                                Spacer(modifier = Modifier.height(16.dp))
 
                                 // Mobile field
                                 OutlinedTextField(
@@ -281,7 +281,7 @@ fun LoginScreen(
                                     )
                                 )
 
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(12.dp))
 
                                 // Password field
                                 OutlinedTextField(
@@ -324,7 +324,7 @@ fun LoginScreen(
                                     )
                                 )
 
-                                Spacer(modifier = Modifier.height(28.dp))
+                                Spacer(modifier = Modifier.height(20.dp))
 
                                 // Login Button – taller, premium
                                 Button(
@@ -333,7 +333,7 @@ fun LoginScreen(
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(54.dp),
+                                        .height(48.dp),
                                     shape = RoundedCornerShape(16.dp),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = OrangePrimary
@@ -364,15 +364,15 @@ fun LoginScreen(
                                 }
 
                                 // Seed data hint
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(12.dp))
                                 Surface(
-                                    shape = RoundedCornerShape(12.dp),
+                                    shape = RoundedCornerShape(10.dp),
                                     color = BlueInfo.copy(alpha = 0.08f)
                                 ) {
                                     Text(
                                         "Demo: 9999999999 / admin123",
-                                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp),
-                                        style = MaterialTheme.typography.labelMedium,
+                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                        style = MaterialTheme.typography.labelSmall,
                                         color = BlueInfo,
                                         fontWeight = FontWeight.Medium
                                     )
@@ -389,16 +389,16 @@ fun LoginScreen(
                                     style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.Bold
                                 )
-                                Spacer(modifier = Modifier.height(6.dp))
+                                Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     "Sign in with your Google account\nto start ordering campus food",
-                                    style = MaterialTheme.typography.bodyMedium,
+                                    style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     textAlign = TextAlign.Center,
-                                    lineHeight = 22.sp
+                                    lineHeight = 18.sp
                                 )
 
-                                Spacer(modifier = Modifier.height(36.dp))
+                                Spacer(modifier = Modifier.height(24.dp))
 
                                 // Google Sign-In Button – premium
                                 @Suppress("DEPRECATION")
@@ -416,7 +416,7 @@ fun LoginScreen(
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(54.dp),
+                                        .height(48.dp),
                                     shape = RoundedCornerShape(16.dp),
                                     colors = ButtonDefaults.outlinedButtonColors(
                                         contentColor = MaterialTheme.colorScheme.onSurface
@@ -441,7 +441,7 @@ fun LoginScreen(
                                     }
                                 }
 
-                                Spacer(modifier = Modifier.height(24.dp))
+                                Spacer(modifier = Modifier.height(18.dp))
 
                                 // Divider
                                 Row(
@@ -463,7 +463,7 @@ fun LoginScreen(
                                     )
                                 }
 
-                                Spacer(modifier = Modifier.height(18.dp))
+                                Spacer(modifier = Modifier.height(14.dp))
 
                                 // Quick demo login
                                 TextButton(
@@ -471,13 +471,13 @@ fun LoginScreen(
                                         authViewModel.loginUser("9876543210", "pass123")
                                     },
                                     modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(14.dp)
+                                    shape = RoundedCornerShape(12.dp)
                                 ) {
                                     Text(
                                         "Login as Rahul (Demo Student)",
                                         color = OrangePrimary,
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 15.sp
+                                        fontSize = 14.sp
                                     )
                                 }
                             }
@@ -490,21 +490,21 @@ fun LoginScreen(
                             Surface(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(top = 18.dp),
-                                shape = RoundedCornerShape(14.dp),
+                                    .padding(top = 12.dp),
+                                shape = RoundedCornerShape(12.dp),
                                 color = RedError.copy(alpha = 0.08f)
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(14.dp),
+                                    modifier = Modifier.padding(12.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Icon(
                                         Icons.Default.ErrorOutline,
                                         null,
                                         tint = RedError,
-                                        modifier = Modifier.size(20.dp)
+                                        modifier = Modifier.size(18.dp)
                                     )
-                                    Spacer(Modifier.width(10.dp))
+                                    Spacer(Modifier.width(8.dp))
                                     Text(
                                         (authState as AuthUiState.Error).message,
                                         style = MaterialTheme.typography.bodySmall,
@@ -518,17 +518,17 @@ fun LoginScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 "By continuing, you agree to our Terms of Service",
                 style = MaterialTheme.typography.labelSmall,
                 color = Color.White.copy(alpha = 0.45f),
                 textAlign = TextAlign.Center,
-                fontSize = 11.sp
+                fontSize = 10.sp
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -543,30 +543,30 @@ private fun ToggleButton(
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier.height(48.dp),
-        shape = RoundedCornerShape(13.dp),
+        modifier = modifier.height(42.dp),
+        shape = RoundedCornerShape(11.dp),
         color = if (selected) OrangePrimary else Color.Transparent
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 14.dp),
+                .padding(horizontal = 12.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 icon,
                 contentDescription = null,
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(18.dp),
                 tint = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(6.dp))
             Text(
                 text,
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
                 color = if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 15.sp
+                fontSize = 14.sp
             )
         }
     }

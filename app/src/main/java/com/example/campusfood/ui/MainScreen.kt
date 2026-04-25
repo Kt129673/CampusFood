@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
@@ -122,7 +123,8 @@ fun MainScreen() {
                 // Premium NavigationBar with elevated feel
                 NavigationBar(
                     containerColor = MaterialTheme.colorScheme.surface,
-                    tonalElevation = 12.dp
+                    tonalElevation = 8.dp,
+                    modifier = Modifier.height(64.dp)
                 ) {
                     val currentDestination = navBackStackEntry?.destination
                     bottomNavItems.forEach { item ->
@@ -148,15 +150,15 @@ fun MainScreen() {
                                     Icon(
                                         if (isSelected) item.selectedIcon else item.unselectedIcon,
                                         contentDescription = item.name,
-                                        modifier = Modifier.size(26.dp)
+                                        modifier = Modifier.size(22.dp)
                                     )
                                 }
                             },
                             label = {
                                 Text(
                                     item.name,
-                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                    fontSize = 12.sp,
+                                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                                    fontSize = 11.sp,
                                     maxLines = 1
                                 )
                             },
