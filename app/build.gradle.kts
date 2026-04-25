@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.example.campusfood"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.campusfood"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -77,7 +77,6 @@ dependencies {
     implementation(libs.moshi.kotlin)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.material)
-    implementation(libs.core.ktx)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.core)

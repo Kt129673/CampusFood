@@ -21,7 +21,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
            "LEFT JOIN FETCH o.user " +
            "LEFT JOIN FETCH o.delivery d " +
            "LEFT JOIN FETCH d.deliveryPartner " +
-           "WHERE o.userId = :userId " +
+           "WHERE o.user.id = :userId " +
            "ORDER BY o.createdAt DESC")
     List<Order> findByUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
 
