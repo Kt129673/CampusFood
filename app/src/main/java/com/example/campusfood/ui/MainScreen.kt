@@ -351,14 +351,6 @@ fun MainScreen() {
                     isPlacingOrder = isPlacingOrder,
                     userMobile = currentUser?.mobile
                 )
-                    onBackToMenu = {
-                        navController.navigate(Screen.Menu.route) {
-                            popUpTo(Screen.Menu.route) { inclusive = true }
-                        }
-                    },
-                    viewModel = cartViewModel,
-                    isPlacingOrder = isPlacingOrder
-                )
             }
 
             // Orders Screen
