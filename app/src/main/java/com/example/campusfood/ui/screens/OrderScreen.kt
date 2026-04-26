@@ -36,6 +36,10 @@ fun OrderScreen(
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     val snackbarEvent by viewModel.snackbarEvent.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    
+    // Filter and sort state
+    var selectedFilter by remember { mutableStateOf("All") }
+    var sortOption by remember { mutableStateOf(com.example.campusfood.ui.components.SortOption.NEWEST_FIRST) }
 
     // Handle one-shot snackbar events
     LaunchedEffect(snackbarEvent) {
@@ -64,7 +68,7 @@ fun OrderScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
                             "My Orders",
                             style = MaterialTheme.typography.titleLarge,
@@ -78,21 +82,33 @@ fun OrderScreen(
                             fontSize = 10.sp
                         )
                     }
-                    // Order count badge
-                    if (uiState is OrderUiState.Success) {
-                        val count = (uiState as OrderUiState.Success).orders.size
-                        if (count > 0) {
-                            Surface(
-                                shape = RoundedCornerShape(10.dp),
-                                color = Color.White.copy(alpha = 0.15f)
-                            ) {
-                                Text(
-                                    "$count",
-                                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 13.sp
-                                )
+                    
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Sort button
+                        com.example.campusfood.ui.components.SortMenu(
+                            currentSort = sortOption,
+                            onSortSelected = { sortOption = it }
+                        )
+                        
+                        // Order count badge
+                        if (uiState is OrderUiState.Success) {
+                            val count = (uiState as OrderUiState.Success).orders.size
+                            if (count > 0) {
+                                Surface(
+                                    shape = RoundedCornerShape(10.dp),
+                                    color = Color.White.copy(alpha = 0.15f)
+                                ) {
+                                    Text(
+                                        "$count",
+                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 13.sp
+                                    )
+                                }
                             }
                         }
                     }
@@ -130,23 +146,63 @@ fun OrderScreen(
                             actionText = null
                         )
                     } else {
-                        PullToRefreshBox(
-                            isRefreshing = isRefreshing,
-                            onRefresh = { viewModel.refreshOrders() },
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            LazyColumn(
-                                modifier = Modifier.fillMaxSize(),
-                                contentPadding = PaddingValues(
-                                    start = 16.dp,
-                                    end = 16.dp,
-                                    top = 10.dp,
-                                    bottom = 12.dp
-                                ),
-                                verticalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                items(state.orders, key = { it.id }) { order ->
-                                    OrderCard(order = order, viewModel = viewModel)
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            // Filter chips
+                            com.example.campusfood.ui.components.OrderFilterChips(
+                                selectedFilter = selectedFilter,
+                                onFilterSelected = { selectedFilter = it }
+                            )
+                            
+                            // Filtered and sorted orders
+                            val filteredOrders = if (selectedFilter == "All") {
+                                state.orders
+                            } else {
+                                state.orders.filter { it.status == selectedFilter }
+                            }
+                            
+                            val sortedOrders = when (sortOption) {
+                                com.example.campusfood.ui.components.SortOption.NEWEST_FIRST -> 
+                                    filteredOrders.sortedByDescending { it.id }
+                                com.example.campusfood.ui.components.SortOption.OLDEST_FIRST -> 
+                                    filteredOrders.sortedBy { it.id }
+                                com.example.campusfood.ui.components.SortOption.HIGHEST_AMOUNT -> 
+                                    filteredOrders.sortedByDescending { it.totalAmount }
+                                com.example.campusfood.ui.components.SortOption.LOWEST_AMOUNT -> 
+                                    filteredOrders.sortedBy { it.totalAmount }
+                            }
+                            
+                            if (sortedOrders.isEmpty()) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    EmptyState(
+                                        emoji = "🔍",
+                                        title = "No orders found",
+                                        subtitle = "No orders match the selected filter.",
+                                        actionText = null
+                                    )
+                                }
+                            } else {
+                                PullToRefreshBox(
+                                    isRefreshing = isRefreshing,
+                                    onRefresh = { viewModel.refreshOrders() },
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    LazyColumn(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentPadding = PaddingValues(
+                                            start = 16.dp,
+                                            end = 16.dp,
+                                            top = 10.dp,
+                                            bottom = 12.dp
+                                        ),
+                                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                                    ) {
+                                        items(sortedOrders, key = { it.id }) { order ->
+                                            OrderCard(order = order, viewModel = viewModel)
+                                        }
+                                    }
                                 }
                             }
                         }

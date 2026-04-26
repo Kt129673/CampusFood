@@ -56,6 +56,10 @@ fun MenuScreen(
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     var debouncedSearchQuery by remember { mutableStateOf("") }
+    
+    val context = LocalContext.current
+    val networkMonitor = remember { com.example.campusfood.utils.NetworkMonitor(context) }
+    val isNetworkConnected by networkMonitor.isConnected.collectAsState(initial = true)
 
     // Debounce search query to avoid excessive filtering
     LaunchedEffect(searchQuery) {
@@ -83,6 +87,11 @@ fun MenuScreen(
         modifier = modifier,
         topBar = {
             Column {
+                // Network status banner
+                com.example.campusfood.ui.components.NetworkStatusBanner(
+                    isConnected = isNetworkConnected
+                )
+                
                 // Gradient header - compact & premium
                 Box(
                     modifier = Modifier
