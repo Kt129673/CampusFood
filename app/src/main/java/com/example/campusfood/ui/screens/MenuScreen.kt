@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
@@ -40,7 +41,6 @@ import com.example.campusfood.ui.components.ProductCard
 import com.example.campusfood.ui.components.ShimmerProductCard
 import com.example.campusfood.ui.theme.OrangePrimary
 import com.example.campusfood.ui.theme.OrangePrimaryDark
-import com.example.campusfood.ui.theme.OrangePrimaryLight
 import com.example.campusfood.ui.theme.GreenSuccess
 
 @OptIn(ExperimentalMaterial3Api::class)
