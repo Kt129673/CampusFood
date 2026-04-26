@@ -204,13 +204,12 @@ fun MenuScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp, vertical = 6.dp)
-                                .height(44.dp)
                                 .focusRequester(focusRequester),
                             placeholder = {
                                 Text(
                                     "Search food, snacks, drinks...",
                                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                                    fontSize = 12.sp
+                                    fontSize = 13.sp
                                 )
                             },
                             leadingIcon = {
@@ -218,10 +217,27 @@ fun MenuScreen(
                                     Icons.Default.Search,
                                     contentDescription = "Search products",
                                     tint = OrangePrimary,
-                                    modifier = Modifier.size(18.dp)
+                                    modifier = Modifier.size(20.dp)
                                 )
                             },
-                            shape = RoundedCornerShape(12.dp),
+                            trailingIcon = {
+                                if (searchQuery.isNotEmpty()) {
+                                    IconButton(
+                                        onClick = { 
+                                            searchQuery = "" 
+                                            debouncedSearchQuery = ""
+                                        },
+                                        modifier = Modifier.size(20.dp)
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Close,
+                                            contentDescription = "Clear search",
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            },
+                            shape = RoundedCornerShape(14.dp),
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor = OrangePrimary,
                                 unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
@@ -229,7 +245,7 @@ fun MenuScreen(
                                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                             ),
                             singleLine = true,
-                            textStyle = MaterialTheme.typography.bodyMedium.copy(fontSize = 13.sp),
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(fontSize = 14.sp),
                             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                             keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() })
                         )
@@ -305,10 +321,14 @@ fun MenuScreen(
                 }
             }
             is MenuUiState.Success -> {
-                val filteredProducts = state.products.filter {
-                    (selectedCategory == "All" || it.category.equals(selectedCategory, ignoreCase = true)) &&
-                            (it.name.contains(debouncedSearchQuery, ignoreCase = true) ||
-                             it.description?.contains(debouncedSearchQuery, ignoreCase = true) == true)
+                val filteredProducts by remember(state.products, selectedCategory, debouncedSearchQuery) {
+                    derivedStateOf {
+                        state.products.filter {
+                            (selectedCategory == "All" || it.category.equals(selectedCategory, ignoreCase = true)) &&
+                                    (it.name.contains(debouncedSearchQuery, ignoreCase = true) ||
+                                            it.description?.contains(debouncedSearchQuery, ignoreCase = true) == true)
+                        }
+                    }
                 }
 
                 if (filteredProducts.isEmpty()) {

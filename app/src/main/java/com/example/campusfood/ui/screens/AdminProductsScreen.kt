@@ -28,6 +28,8 @@ import coil.request.ImageRequest
 import com.example.campusfood.model.Product
 import com.example.campusfood.ui.components.EmptyState
 import com.example.campusfood.ui.components.ErrorState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
 import com.example.campusfood.ui.components.ShimmerProductCard
 import com.example.campusfood.ui.theme.*
 
@@ -237,13 +239,21 @@ fun AdminProductsScreen(
                 leadingIcon = {
                     Icon(Icons.Default.Search, null, tint = AdminPurple, modifier = Modifier.size(22.dp))
                 },
+                trailingIcon = {
+                    if (searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { searchQuery = "" }) {
+                            Icon(Icons.Default.Close, "Clear", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                },
                 shape = RoundedCornerShape(16.dp),
                 singleLine = true,
                 textStyle = MaterialTheme.typography.bodyLarge,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = AdminPurple,
                     unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
-                )
+                ),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search)
             )
 
             when (val state = productsState) {
@@ -267,9 +277,13 @@ fun AdminProductsScreen(
                     )
                 }
                 is AdminProductsState.Success -> {
-                    val filtered = state.products.filter {
-                        it.name.contains(searchQuery, ignoreCase = true) ||
-                        it.category.contains(searchQuery, ignoreCase = true)
+                    val filtered by remember(state.products, searchQuery) {
+                        derivedStateOf {
+                            state.products.filter {
+                                it.name.contains(searchQuery, ignoreCase = true) ||
+                                        it.category.contains(searchQuery, ignoreCase = true)
+                            }
+                        }
                     }
 
                     if (filtered.isEmpty()) {
