@@ -9,6 +9,7 @@ import androidx.compose.ui.semantics.*
 import androidx.compose.ui.platform.LocalContext
 import android.content.Context
 import android.view.accessibility.AccessibilityManager
+import java.util.Locale
 
 /**
  * Accessibility utilities for enhanced screen reader support.
@@ -28,6 +29,7 @@ fun isScreenReaderEnabled(): Boolean {
  * Enhanced clickable modifier with better accessibility support.
  * Automatically adds role and state descriptions.
  */
+@Composable
 fun Modifier.accessibleClickable(
     label: String,
     role: Role = Role.Button,
@@ -37,7 +39,7 @@ fun Modifier.accessibleClickable(
     .semantics {
         this.role = role
         this.contentDescription = label
-        this.disabled = !enabled
+        if (!enabled) disabled()
     }
     .clickable(
         enabled = enabled,
@@ -89,7 +91,7 @@ fun Modifier.liveRegion(
  * Formats price for screen reader announcement.
  */
 fun formatPriceForAccessibility(price: Double): String {
-    return "₹${String.format("%.0f", price)} rupees"
+    return "₹${String.format(Locale.getDefault(), "%.0f", price)} rupees"
 }
 
 /**
