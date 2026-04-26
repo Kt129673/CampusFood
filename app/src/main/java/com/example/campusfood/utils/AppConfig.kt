@@ -111,7 +111,7 @@ class AppConfig(private val context: Context) {
     suspend fun addSearchQuery(query: String) {
         context.configDataStore.edit { prefs ->
             val current = prefs[Keys.SEARCH_HISTORY] ?: emptySet()
-            val updated = (current + query).takeLast(10).toSet() // Keep last 10 searches
+            val updated = (current + query).toList().takeLast(10).toSet() // Keep last 10 searches
             prefs[Keys.SEARCH_HISTORY] = updated
         }
     }
