@@ -5,6 +5,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.semantics.*
 import androidx.compose.ui.platform.LocalContext
 import android.content.Context
@@ -22,21 +23,20 @@ import java.util.Locale
 fun isScreenReaderEnabled(): Boolean {
     val context = LocalContext.current
     val accessibilityManager = context.getSystemService(Context.ACCESSIBILITY_SERVICE) as? AccessibilityManager
-    return accessibilityManager?.isEnabled == true && accessibilityManager.isTouchExplorationEnabled
+    return (accessibilityManager?.isEnabled == true) && (accessibilityManager.isTouchExplorationEnabled == true)
 }
 
 /**
  * Enhanced clickable modifier with better accessibility support.
  * Automatically adds role and state descriptions.
  */
-@Composable
 fun Modifier.accessibleClickable(
     label: String,
     role: Role = Role.Button,
     enabled: Boolean = true,
-    onClick: () -> Unit
-): Modifier = this
-    .semantics {
+    onClick: () -> Unit,
+): Modifier = composed {
+    this.semantics {
         this.role = role
         this.contentDescription = label
         if (!enabled) disabled()
@@ -47,6 +47,7 @@ fun Modifier.accessibleClickable(
         indication = null,
         interactionSource = remember { MutableInteractionSource() }
     )
+}
 
 /**
  * Adds semantic properties for better screen reader announcements.
