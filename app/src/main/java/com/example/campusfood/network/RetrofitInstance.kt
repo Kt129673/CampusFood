@@ -22,11 +22,17 @@ object RetrofitInstance {
 
     /**
      * Backend endpoint selection:
-     * - IS_LOCAL = true  → connects to local dev server (emulator or LAN IP)
+     * - IS_LOCAL = true  → connects to local dev server
      * - IS_LOCAL = false → connects to AWS Elastic Beanstalk production
      */
     private const val IS_LOCAL = true
-    private val BASE_URL = if (IS_LOCAL) "http://172.20.10.6:5000/api/"
+
+    // Set this to:
+    // "10.0.2.2" for Android Emulator
+    // "172.20.10.6" for Physical Device (Match your PC's IP on the same network)
+    private const val LOCAL_IP = "172.20.10.6"
+
+    private val BASE_URL = if (IS_LOCAL) "http://$LOCAL_IP:5000/api/"
                            else "http://Campusfood-backend-env.eba-nwhwij87.eu-north-1.elasticbeanstalk.com/api/"
 
     private val moshi = Moshi.Builder()
