@@ -1,3 +1,103 @@
 <resources>
     <string name="app_name">ANISHA CAMPUS FOOD</string>
+    
+    <!-- Common -->
+    <string name="search_placeholder">Search food, snacks, drinks…</string>
+    <string name="retry">Try Again</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm">Confirm</string>
+    
+    <!-- Menu Screen -->
+    <string name="menu_title">ANISHA CAMPUS FOOD</string>
+    <string name="menu_subtitle">Fresh &amp; fast delivery 🚀</string>
+    <string name="backend_offline">Backend Offline ⚠️</string>
+    <string name="cart_button">Cart</string>
+    <string name="category_all">All</string>
+    <string name="no_items_found">No items found</string>
+    <string name="try_different_search">Try a different search or category</string>
+    
+    <!-- Cart Screen -->
+    <string name="my_cart">My Cart</string>
+    <string name="basket_empty">Your basket is empty</string>
+    <string name="items_selected">%d items selected</string>
+    <string name="clear_cart">Clear</string>
+    <string name="subtotal">Subtotal</string>
+    <string name="delivery_fee">Delivery Fee</string>
+    <string name="total">Total</string>
+    <string name="delivery_address">Delivery Address</string>
+    <string name="place_order">Place Order • ₹%s</string>
+    <string name="cart_empty_title">Your cart is empty</string>
+    <string name="cart_empty_subtitle">Looks like you haven\'t added anything yet.\nExplore our menu!</string>
+    <string name="browse_menu">Browse Menu</string>
+    <string name="item_removed">%s removed</string>
+    <string name="undo">Undo</string>
+    
+    <!-- Order Screen -->
+    <string name="my_orders">My Orders</string>
+    <string name="track_orders">Track your food orders</string>
+    <string name="order_number">Order #%d</string>
+    <string name="cancel_order">Cancel Order</string>
+    <string name="keep_order">Keep Order</string>
+    <string name="cancel_order_confirm">Are you sure you want to cancel order #%d?</string>
+    <string name="no_orders_title">No orders yet</string>
+    <string name="no_orders_subtitle">Your order history will appear here once you place your first order.</string>
+    <string name="couldnt_load_orders">Couldn\'t load orders</string>
+    
+    <!-- Profile Screen -->
+    <string name="my_profile">My Profile</string>
+    <string name="logout">Logout</string>
+    <string name="logout_confirm">Are you sure you want to logout?</string>
+    <string name="administrator">Administrator</string>
+    <string name="delivery_partner">Delivery Partner</string>
+    <string name="student">Student</string>
+    <string name="mobile">Mobile</string>
+    <string name="email">Email</string>
+    <string name="campus">Campus</string>
+    <string name="main_campus">Main Campus</string>
+    <string name="user_id">User ID</string>
+    <string name="member_since">Member Since</string>
+    <string name="notifications">Notifications</string>
+    <string name="notifications_subtitle">Order updates &amp; offers</string>
+    <string name="delivery_addresses">Delivery Addresses</string>
+    <string name="delivery_addresses_subtitle">Manage your addresses</string>
+    <string name="help_support">Help &amp; Support</string>
+    <string name="help_support_subtitle">Contact us, FAQ</string>
+    <string name="about_app">About CampusFood</string>
+    <string name="app_version">Version 1.0.0</string>
+    
+    <!-- Login Screen -->
+    <string name="welcome_student">Welcome, Student!</string>
+    <string name="sign_in_google">Sign in with your Google account\nto start ordering campus food</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="or_demo">or use demo account</string>
+    <string name="demo_login">Login as Rahul (Demo Student)</string>
+    <string name="admin_login">Admin Login</string>
+    <string name="admin_credentials">Enter your admin credentials</string>
+    <string name="mobile_number">Mobile Number</string>
+    <string name="mobile_placeholder">Enter 10-digit mobile</string>
+    <string name="password">Password</string>
+    <string name="password_placeholder">Enter your password</string>
+    <string name="login_as_admin">Login as Admin</string>
+    <string name="demo_credentials">Demo: 9999999999 / admin123</string>
+    <string name="terms_agreement">By continuing, you agree to our Terms of Service</string>
+    <string name="fresh_food_tagline">Fresh food, delivered fast on campus</string>
+    
+    <!-- Accessibility -->
+    <string name="add_to_cart">Add to cart</string>
+    <string name="added_to_cart">Added to cart</string>
+    <string name="remove_from_cart">Remove from cart</string>
+    <string name="increase_quantity">Increase quantity</string>
+    <string name="decrease_quantity">Decrease quantity</string>
+    <string name="product_image">Product image</string>
+    <string name="user_avatar">User avatar</string>
+    <string name="search_icon">Search products</string>
+    <string name="location_icon">Delivery location</string>
+    <string name="phone_icon">Phone number</string>
+    <string name="password_icon">Password</string>
+    <string name="toggle_password">Toggle password visibility</string>
+    
+    <!-- Error Messages -->
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="network_error">Network error. Please check your connection.</string>
+    <string name="server_error">Server error. Please try again later.</string>
 </resources>

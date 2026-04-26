@@ -20,11 +20,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
@@ -54,6 +60,7 @@ fun CartScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
+    val haptic = LocalHapticFeedback.current
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -196,10 +203,17 @@ fun CartScreen(
                             Spacer(modifier = Modifier.height(12.dp))
 
                             Button(
-                                onClick = { onCheckoutClick(deliveryAddress) },
+                                onClick = { 
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    onCheckoutClick(deliveryAddress) 
+                                },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(50.dp),
+                                    .height(50.dp)
+                                    .semantics {
+                                        contentDescription = "Place order for ₹${String.format("%.2f", total)}"
+                                        role = Role.Button
+                                    },
                                 shape = RoundedCornerShape(16.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = OrangePrimary
@@ -330,10 +344,16 @@ fun CartItemCard(
     onDecrement: () -> Unit,
     onRemove: () -> Unit
 ) {
+    val haptic = LocalHapticFeedback.current
+    
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .animateContentSize(),
+            .animateContentSize()
+            .semantics {
+                contentDescription = "${item.productName}, Quantity: ${item.quantity}, Price: ₹${String.format("%.2f", item.price * item.quantity)}"
+                role = Role.Button
+            },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
@@ -426,8 +446,16 @@ fun CartItemCard(
                         }
                     }
                     IconButton(
-                        onClick = onRemove,
-                        modifier = Modifier.size(28.dp)
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onRemove()
+                        },
+                        modifier = Modifier
+                            .size(28.dp)
+                            .semantics {
+                                contentDescription = "Remove ${item.productName} from cart"
+                                role = Role.Button
+                            }
                     ) {
                         Icon(
                             Icons.Default.Delete,
@@ -455,8 +483,16 @@ fun CartItemCard(
                             modifier = Modifier.padding(horizontal = 2.dp, vertical = 1.dp)
                         ) {
                             IconButton(
-                                onClick = onDecrement,
-                                modifier = Modifier.size(30.dp)
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    onDecrement()
+                                },
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .semantics {
+                                        contentDescription = "Decrease quantity of ${item.productName}"
+                                        role = Role.Button
+                                    }
                             ) {
                                 Icon(Icons.Default.Remove, "Decrease", modifier = Modifier.size(16.dp), tint = OrangePrimary)
                             }
@@ -468,8 +504,16 @@ fun CartItemCard(
                                 fontSize = 15.sp
                             )
                             IconButton(
-                                onClick = onIncrement,
-                                modifier = Modifier.size(30.dp)
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    onIncrement()
+                                },
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .semantics {
+                                        contentDescription = "Increase quantity of ${item.productName}"
+                                        role = Role.Button
+                                    }
                             ) {
                                 Icon(Icons.Default.Add, "Increase", modifier = Modifier.size(16.dp), tint = OrangePrimary)
                             }

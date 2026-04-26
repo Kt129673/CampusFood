@@ -19,8 +19,14 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -43,6 +49,8 @@ fun ProductCard(
     modifier: Modifier = Modifier
 ) {
     var isAdded by remember { mutableStateOf(false) }
+    val haptic = LocalHapticFeedback.current
+    
     val scale by animateFloatAsState(
         targetValue = if (isAdded) 0.97f else 1f,
         animationSpec = spring(
@@ -52,12 +60,36 @@ fun ProductCard(
         label = "cardScale"
     )
 
+    val isOutOfStock = product.stock != null && product.stock <= 0
+    val isLowStock = product.stock != null && product.stock in 1..10
+    val priceFormatted = String.format(Locale.getDefault(), "%.0f", product.price)
+    
+    // Enhanced semantic description for accessibility
+    val cardDescription = buildString {
+        append(product.name)
+        append(", ")
+        append(product.category)
+        append(", Price: ₹$priceFormatted")
+        if (isOutOfStock) {
+            append(", Out of stock")
+        } else if (isLowStock) {
+            append(", Only ${product.stock} left")
+        }
+        if (!product.description.isNullOrBlank()) {
+            append(", ${product.description}")
+        }
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 5.dp, horizontal = 16.dp)
             .scale(scale)
-            .animateContentSize(),
+            .animateContentSize()
+            .semantics {
+                contentDescription = cardDescription
+                role = Role.Button
+            },
         shape = RoundedCornerShape(18.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 1.dp,
@@ -221,15 +253,22 @@ fun ProductCard(
                         }
                     }
 
-                    // Add button
+                    // Add button with haptic feedback
                     FilledIconButton(
                         onClick = {
                             if (product.stock == null || product.stock > 0) {
+                                // Haptic feedback on successful add
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 isAdded = true
                                 onAddToCart(product)
                             }
                         },
-                        modifier = Modifier.size(36.dp),
+                        modifier = Modifier
+                            .size(36.dp)
+                            .semantics {
+                                contentDescription = if (isAdded) "Added to cart" else "Add ${product.name} to cart"
+                                role = Role.Button
+                            },
                         shape = RoundedCornerShape(11.dp),
                         enabled = product.stock == null || product.stock > 0,
                         colors = IconButtonDefaults.filledIconButtonColors(
