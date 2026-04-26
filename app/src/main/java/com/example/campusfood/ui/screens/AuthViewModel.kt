@@ -90,12 +90,12 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
      * Google Sign-In: auto-register or login the user.
      * Uses the new backend /api/auth/google endpoint.
      */
-    fun loginWithGoogle(name: String, email: String) {
+    fun loginWithGoogle(name: String, email: String, mobile: String? = null) {
         viewModelScope.launch {
             _authState.value = AuthUiState.Loading
             try {
                 val response = RetrofitInstance.api.googleLogin(
-                    GoogleLoginRequest(email = email, name = name)
+                    GoogleLoginRequest(email = email, name = name, mobile = mobile)
                 )
                 if (response.success && response.data != null) {
                     sessionManager.saveSession(response.data)
@@ -105,6 +105,25 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 }
             } catch (e: Exception) {
                 _authState.value = AuthUiState.Error(e.message ?: "Google sign-in failed")
+            }
+        }
+    }
+
+    /**
+     * Update user's mobile number after Google login
+     */
+    fun updateMobileNumber(mobile: String) {
+        viewModelScope.launch {
+            try {
+                val user = currentUser.value
+                if (user != null) {
+                    // Update the user with new mobile number
+                    val updatedUser = user.copy(mobile = mobile)
+                    sessionManager.saveSession(updatedUser)
+                    _authState.value = AuthUiState.Success(updatedUser)
+                }
+            } catch (e: Exception) {
+                // Silent fail - mobile number is optional
             }
         }
     }

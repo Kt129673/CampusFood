@@ -43,5 +43,6 @@ data class RegisterRequest(
 @JsonClass(generateAdapter = true)
 data class GoogleLoginRequest(
     val email: String,
-    val name: String
+    val name: String,
+    val mobile: String? = null
 )

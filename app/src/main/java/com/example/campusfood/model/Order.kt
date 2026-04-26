@@ -10,6 +10,7 @@ data class OrderRequest(
     val userId: Long,
     val items: List<OrderItemRequest>,
     val deliveryAddress: String?,
+    val contactNumber: String,
     val notes: String? = null
 )
 
@@ -30,6 +31,7 @@ data class OrderResponse(
     val status: String,
     val totalAmount: Double,
     val deliveryAddress: String?,
+    val contactNumber: String?,
     val notes: String?,
     val items: List<OrderItemResponse>?,
     val createdAt: String?,

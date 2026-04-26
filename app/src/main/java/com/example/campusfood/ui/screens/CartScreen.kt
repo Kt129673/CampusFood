@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
@@ -50,13 +51,15 @@ import com.example.campusfood.ui.theme.OrangeAccentSoft
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CartScreen(
-    onCheckoutClick: (String) -> Unit,
+    onCheckoutClick: (String, String) -> Unit,
     onBackToMenu: () -> Unit,
     viewModel: CartViewModel,
-    isPlacingOrder: Boolean = false
+    isPlacingOrder: Boolean = false,
+    userMobile: String? = null
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var deliveryAddress by remember { mutableStateOf("Campus Dorm A, Room 101") }
+    var contactNumber by remember { mutableStateOf(userMobile ?: "") }
     var showClearCartDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -210,6 +213,47 @@ fun CartScreen(
 
                             Spacer(modifier = Modifier.height(12.dp))
 
+                            // Contact Number
+                            OutlinedTextField(
+                                value = contactNumber,
+                                onValueChange = { if (it.length <= 10 && it.all { char -> char.isDigit() }) contactNumber = it },
+                                modifier = Modifier.fillMaxWidth(),
+                                label = { Text("Contact Number", fontSize = 12.sp) },
+                                placeholder = { Text("10-digit mobile number") },
+                                leadingIcon = {
+                                    Icon(
+                                        Icons.Default.Phone,
+                                        contentDescription = "Contact number",
+                                        tint = OrangePrimary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                },
+                                prefix = { Text("+91 ", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                                shape = RoundedCornerShape(14.dp),
+                                singleLine = true,
+                                textStyle = MaterialTheme.typography.bodyMedium,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = OrangePrimary,
+                                    focusedLabelColor = OrangePrimary,
+                                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                                ),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Phone,
+                                    imeAction = ImeAction.Done
+                                ),
+                                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                                supportingText = {
+                                    Text(
+                                        "${contactNumber.length}/10",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontSize = 10.sp
+                                    )
+                                }
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
                             // Delivery address
                             OutlinedTextField(
                                 value = deliveryAddress,
@@ -242,7 +286,7 @@ fun CartScreen(
                             Button(
                                 onClick = { 
                                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    onCheckoutClick(deliveryAddress) 
+                                    onCheckoutClick(deliveryAddress, contactNumber) 
                                 },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -256,7 +300,7 @@ fun CartScreen(
                                     containerColor = OrangePrimary
                                 ),
                                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp),
-                                enabled = deliveryAddress.isNotBlank() && !isPlacingOrder
+                                enabled = deliveryAddress.isNotBlank() && contactNumber.length == 10 && !isPlacingOrder
                             ) {
                                 if (isPlacingOrder) {
                                     CircularProgressIndicator(modifier = Modifier.size(22.dp), color = Color.White, strokeWidth = 2.5.dp)

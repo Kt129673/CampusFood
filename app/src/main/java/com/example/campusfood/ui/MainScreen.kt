@@ -54,6 +54,15 @@ fun MainScreen() {
     val scope = rememberCoroutineScope()
 
     val isAdmin = currentUser?.role == "ADMIN"
+    
+    // Show mobile number dialog if user logged in via Google without mobile
+    var showMobileDialog by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(currentUser) {
+        if (currentUser != null && currentUser?.mobile.isNullOrBlank() && currentUser?.role != "ADMIN") {
+            showMobileDialog = true
+        }
+    }
 
     // Update OrderViewModel with real userId when user changes
     LaunchedEffect(currentUser) {
@@ -96,6 +105,26 @@ fun MainScreen() {
             && currentRoute != Screen.AdminProducts.route
             && currentRoute != Screen.AdminAddProduct.route
             && currentRoute != Screen.AdminEditProduct.route
+
+    // Show mobile number dialog if user logged in via Google without mobile
+    if (showMobileDialog && currentUser != null) {
+        com.example.campusfood.ui.components.MobileNumberDialog(
+            userName = currentUser?.name ?: "User",
+            onConfirm = { mobile ->
+                authViewModel.updateMobileNumber(mobile)
+                showMobileDialog = false
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = "Mobile number saved!",
+                        duration = SnackbarDuration.Short
+                    )
+                }
+            },
+            onDismiss = {
+                showMobileDialog = false
+            }
+        )
+    }
 
     // Navigation items based on role
     val bottomNavItems = if (isAdmin) {
@@ -274,7 +303,7 @@ fun MainScreen() {
             // Cart Screen
             composable(Screen.Cart.route) {
                 CartScreen(
-                    onCheckoutClick = { address ->
+                    onCheckoutClick = { address, contactNumber ->
                         val user = currentUser ?: return@CartScreen
                         if (cartState is CartUiState.Success) {
                             val cartItems = (cartState as CartUiState.Success).items
@@ -283,7 +312,8 @@ fun MainScreen() {
                                 val orderRequest = OrderRequest(
                                     userId = user.id,
                                     items = orderItems,
-                                    deliveryAddress = address
+                                    deliveryAddress = address,
+                                    contactNumber = contactNumber
                                 )
                                 orderViewModel.placeOrder(orderRequest) { success, orderId ->
                                     if (success) {
@@ -312,6 +342,15 @@ fun MainScreen() {
                             }
                         }
                     },
+                    onBackToMenu = {
+                        navController.navigate(Screen.Menu.route) {
+                            popUpTo(Screen.Menu.route) { inclusive = true }
+                        }
+                    },
+                    viewModel = cartViewModel,
+                    isPlacingOrder = isPlacingOrder,
+                    userMobile = currentUser?.mobile
+                )
                     onBackToMenu = {
                         navController.navigate(Screen.Menu.route) {
                             popUpTo(Screen.Menu.route) { inclusive = true }
