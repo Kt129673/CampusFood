@@ -50,6 +50,7 @@ fun AdminDashboardScreen(
     val filters = listOf("ALL", "PLACED", "PACKING", "OUT_FOR_DELIVERY", "DELIVERED", "CANCELLED")
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0.dp),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             // Premium admin header

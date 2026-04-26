@@ -118,6 +118,7 @@ fun AdminProductFormScreen(
             && (price.toDoubleOrNull() ?: 0.0) > 0
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             Box(
                 modifier = Modifier

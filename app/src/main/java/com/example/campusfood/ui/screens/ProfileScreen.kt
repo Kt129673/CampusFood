@@ -89,6 +89,7 @@ fun ProfileScreen(
     val accentColor = if (isAdmin) AdminPurple else OrangePrimary
 
     Scaffold(
+        contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             Box(
                 modifier = Modifier

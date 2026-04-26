@@ -86,6 +86,7 @@ fun MenuScreen(
 
     Scaffold(
         modifier = modifier,
+        contentWindowInsets = WindowInsets(0.dp),
         topBar = {
             Column {
                 // Network status banner
