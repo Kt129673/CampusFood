@@ -175,7 +175,7 @@ fun CartScreen(
                                 leadingIcon = {
                                     Icon(
                                         Icons.Default.LocationOn,
-                                        null,
+                                        contentDescription = "Delivery location",
                                         tint = OrangePrimary,
                                         modifier = Modifier.size(20.dp)
                                     )

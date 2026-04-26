@@ -267,7 +267,7 @@ fun LoginScreen(
                                     label = { Text("Mobile Number") },
                                     placeholder = { Text("Enter 10-digit mobile") },
                                     leadingIcon = {
-                                        Icon(Icons.Default.Phone, null, tint = OrangePrimary, modifier = Modifier.size(22.dp))
+                                        Icon(Icons.Default.Phone, contentDescription = "Phone number", tint = OrangePrimary, modifier = Modifier.size(22.dp))
                                     },
                                     keyboardOptions = KeyboardOptions(
                                         keyboardType = KeyboardType.Phone,
@@ -291,7 +291,7 @@ fun LoginScreen(
                                     label = { Text("Password") },
                                     placeholder = { Text("Enter your password") },
                                     leadingIcon = {
-                                        Icon(Icons.Default.Lock, null, tint = OrangePrimary, modifier = Modifier.size(22.dp))
+                                        Icon(Icons.Default.Lock, contentDescription = "Password", tint = OrangePrimary, modifier = Modifier.size(22.dp))
                                     },
                                     trailingIcon = {
                                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -351,7 +351,7 @@ fun LoginScreen(
                                     } else {
                                         Icon(
                                             Icons.AutoMirrored.Filled.Login,
-                                            null,
+                                            contentDescription = null,
                                             modifier = Modifier.size(22.dp)
                                         )
                                         Spacer(Modifier.width(10.dp))

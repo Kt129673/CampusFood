@@ -198,7 +198,7 @@ fun MenuScreen(
                             leadingIcon = {
                                 Icon(
                                     Icons.Default.Search,
-                                    contentDescription = null,
+                                    contentDescription = "Search products",
                                     tint = OrangePrimary,
                                     modifier = Modifier.size(18.dp)
                                 )

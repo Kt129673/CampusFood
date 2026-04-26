@@ -142,7 +142,8 @@ fun ProductCard(
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 9.sp
+                        fontSize = 9.sp,
+                        maxLines = 1
                     )
                 }
 
