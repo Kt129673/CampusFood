@@ -47,18 +47,22 @@ class MenuViewModel : ViewModel() {
 
     /**
      * Monitor backend health status.
-     * Checks every 30 seconds. Uses a bounded retry to avoid infinite looping on error.
+     * Checks every 30 seconds. Properly cancels when ViewModel is destroyed.
      */
     private fun startHealthCheck() {
         viewModelScope.launch {
-            while (true) {
-                try {
-                    RetrofitInstance.api.getBackendHealth()
-                    _isBackendOnline.value = true
-                } catch (_: Exception) {
-                    _isBackendOnline.value = false
+            try {
+                while (true) {
+                    try {
+                        RetrofitInstance.api.getBackendHealth()
+                        _isBackendOnline.value = true
+                    } catch (_: Exception) {
+                        _isBackendOnline.value = false
+                    }
+                    kotlinx.coroutines.delay(30_000L)
                 }
-                kotlinx.coroutines.delay(30_000L)
+            } catch (_: kotlinx.coroutines.CancellationException) {
+                // Coroutine cancelled - cleanup properly
             }
         }
     }
@@ -71,9 +75,10 @@ class MenuViewModel : ViewModel() {
             _uiState.value = MenuUiState.Loading
             try {
                 val response = RetrofitInstance.api.getProducts()
-                if (response.success && response.data != null) {
+                if (response.success) {
+                    val products = response.data ?: emptyList()
                     _uiState.value = MenuUiState.Success(
-                        response.data.filter { it.available }
+                        products.filter { it.available }
                     )
                 } else {
                     _uiState.value = MenuUiState.Error(response.message)
@@ -94,9 +99,10 @@ class MenuViewModel : ViewModel() {
             _isRefreshing.value = true
             try {
                 val response = RetrofitInstance.api.getProducts()
-                if (response.success && response.data != null) {
+                if (response.success) {
+                    val products = response.data ?: emptyList()
                     _uiState.value = MenuUiState.Success(
-                        response.data.filter { it.available }
+                        products.filter { it.available }
                     )
                 }
             } catch (_: Exception) {

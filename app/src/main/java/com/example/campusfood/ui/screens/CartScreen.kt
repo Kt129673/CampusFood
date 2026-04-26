@@ -57,10 +57,47 @@ fun CartScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var deliveryAddress by remember { mutableStateOf("Campus Dorm A, Room 101") }
+    var showClearCartDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val haptic = LocalHapticFeedback.current
+
+    // Clear cart confirmation dialog
+    if (showClearCartDialog) {
+        AlertDialog(
+            onDismissRequest = { showClearCartDialog = false },
+            icon = { Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error) },
+            title = { Text("Clear Cart?", fontWeight = FontWeight.Bold) },
+            text = { Text("Are you sure you want to remove all items from your cart?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showClearCartDialog = false
+                        viewModel.clearCart()
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = "Cart cleared",
+                                duration = SnackbarDuration.Short
+                            )
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Clear Cart", fontWeight = FontWeight.SemiBold)
+                }
+            },
+            dismissButton = {
+                OutlinedButton(
+                    onClick = { showClearCartDialog = false },
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -101,7 +138,7 @@ fun CartScreen(
 
                     if (uiState is CartUiState.Success && (uiState as CartUiState.Success).items.isNotEmpty()) {
                         FilledTonalButton(
-                            onClick = { viewModel.clearCart() },
+                            onClick = { showClearCartDialog = true },
                             colors = ButtonDefaults.filledTonalButtonColors(
                                 containerColor = Color.White.copy(alpha = 0.15f),
                                 contentColor = Color.White

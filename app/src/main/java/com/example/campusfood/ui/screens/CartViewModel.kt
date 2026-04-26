@@ -35,7 +35,11 @@ class CartViewModel : ViewModel() {
     // Derived state: cart item count (automatically updates UI)
     val cartItemCount: StateFlow<Int> = uiState.map { state ->
         when (state) {
-            is CartUiState.Success -> state.items.sumOf { it.quantity }
+            is CartUiState.Success -> {
+                synchronized(cartItems) {
+                    state.items.sumOf { it.quantity }
+                }
+            }
             else -> 0
         }
     }.stateIn(
@@ -47,7 +51,11 @@ class CartViewModel : ViewModel() {
     // Derived state: total amount (automatically updates UI)
     val totalAmount: StateFlow<Double> = uiState.map { state ->
         when (state) {
-            is CartUiState.Success -> state.items.sumOf { it.price * it.quantity }
+            is CartUiState.Success -> {
+                synchronized(cartItems) {
+                    state.items.sumOf { it.price * it.quantity }
+                }
+            }
             else -> 0.0
         }
     }.stateIn(

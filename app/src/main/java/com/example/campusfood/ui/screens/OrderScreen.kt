@@ -255,7 +255,7 @@ private fun OrderCard(
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            item.productName ?: "Item #${item.productId}",
+                            item.productName ?: "Item #${item.productId ?: 0}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 12.sp
@@ -342,25 +342,34 @@ private fun OrderCard(
 
 /**
  * Formats an ISO datetime string to a more readable format.
+ * Safely handles malformed dates.
  */
 private fun formatOrderDate(isoString: String): String {
     return try {
         val parts = isoString.split("T")
+        if (parts.size < 2) return isoString
+        
         val date = parts[0]
-        val timeParts = parts.getOrNull(1)?.split(":")
-        val hour = timeParts?.getOrNull(0)?.toIntOrNull() ?: 0
-        val minute = timeParts?.getOrNull(1) ?: "00"
+        val timeParts = parts[1].split(":")
+        if (timeParts.isEmpty()) return date
+        
+        val hour = timeParts[0].toIntOrNull() ?: 0
+        val minute = timeParts.getOrNull(1) ?: "00"
         val amPm = if (hour >= 12) "PM" else "AM"
         val displayHour = if (hour == 0) 12 else if (hour > 12) hour - 12 else hour
+        
         val dateParts = date.split("-")
+        if (dateParts.size < 3) return date
+        
         val months = listOf(
             "", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
         )
-        val monthIndex = dateParts.getOrNull(1)?.toIntOrNull() ?: 0
-        val monthName = months.getOrElse(monthIndex) { dateParts.getOrElse(1) { "" } }
-        "${dateParts.getOrElse(2) { "" }} $monthName · $displayHour:$minute $amPm"
+        val monthIndex = dateParts[1].toIntOrNull() ?: 0
+        val monthName = if (monthIndex in 1..12) months[monthIndex] else dateParts[1]
+        
+        "${dateParts[2]} $monthName · $displayHour:$minute $amPm"
     } catch (_: Exception) {
-        isoString.split("T").getOrElse(0) { isoString }
+        isoString.split("T").firstOrNull() ?: isoString
     }
 }

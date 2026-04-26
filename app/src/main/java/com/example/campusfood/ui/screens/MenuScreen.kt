@@ -55,6 +55,13 @@ fun MenuScreen(
     val isOnline by viewModel.isBackendOnline.collectAsState()
     val isRefreshing by viewModel.isRefreshing.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
+    var debouncedSearchQuery by remember { mutableStateOf("") }
+
+    // Debounce search query to avoid excessive filtering
+    LaunchedEffect(searchQuery) {
+        kotlinx.coroutines.delay(300) // 300ms debounce
+        debouncedSearchQuery = searchQuery
+    }
 
     // Categories matching the seeded backend data
     val categories = listOf("All", "Snacks", "Beverages", "Hot Beverages", "Quick Bites", "Essentials", "Chocolates")
@@ -289,8 +296,8 @@ fun MenuScreen(
             is MenuUiState.Success -> {
                 val filteredProducts = state.products.filter {
                     (selectedCategory == "All" || it.category.equals(selectedCategory, ignoreCase = true)) &&
-                            (it.name.contains(searchQuery, ignoreCase = true) ||
-                             it.description?.contains(searchQuery, ignoreCase = true) == true)
+                            (it.name.contains(debouncedSearchQuery, ignoreCase = true) ||
+                             it.description?.contains(debouncedSearchQuery, ignoreCase = true) == true)
                 }
 
                 if (filteredProducts.isEmpty()) {

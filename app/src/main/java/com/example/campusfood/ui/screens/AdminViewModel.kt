@@ -82,9 +82,10 @@ class AdminViewModel : ViewModel() {
             _ordersState.value = AdminOrdersState.Loading
             try {
                 val response = RetrofitInstance.api.adminGetAllOrders(page = 0, size = 100)
-                if (response.success && response.data != null) {
+                if (response.success) {
+                    val orders = response.data?.content ?: emptyList()
                     _ordersState.value = AdminOrdersState.Success(
-                        response.data.content.sortedByDescending { it.id }
+                        orders.sortedByDescending { it.id }
                     )
                 } else {
                     _ordersState.value = AdminOrdersState.Error(response.message)
@@ -126,9 +127,10 @@ class AdminViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = RetrofitInstance.api.adminGetAllOrders(page = 0, size = 100)
-                if (response.success && response.data != null) {
+                if (response.success) {
+                    val orders = response.data?.content ?: emptyList()
                     _ordersState.value = AdminOrdersState.Success(
-                        response.data.content.sortedByDescending { it.id }
+                        orders.sortedByDescending { it.id }
                     )
                 }
             } catch (_: Exception) {
@@ -146,8 +148,9 @@ class AdminViewModel : ViewModel() {
             _productsState.value = AdminProductsState.Loading
             try {
                 val response = RetrofitInstance.api.getProducts()
-                if (response.success && response.data != null) {
-                    _productsState.value = AdminProductsState.Success(response.data)
+                if (response.success) {
+                    val products = response.data ?: emptyList()
+                    _productsState.value = AdminProductsState.Success(products)
                 } else {
                     _productsState.value = AdminProductsState.Error(response.message)
                 }
@@ -161,7 +164,7 @@ class AdminViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = RetrofitInstance.api.getProductById(productId)
-                if (response.success && response.data != null) {
+                if (response.success) {
                     _selectedProduct.value = response.data
                 }
             } catch (_: Exception) {
@@ -250,9 +253,14 @@ class AdminViewModel : ViewModel() {
             _productActionState.value = AdminProductActionState.Loading
             try {
                 val response = RetrofitInstance.api.uploadProductImage(filePart)
-                if (response.success && response.data != null) {
-                    _productActionState.value = AdminProductActionState.Idle // Reset so we don't show success msg for just image upload
-                    onSuccess(response.data.imageUrl)
+                if (response.success) {
+                    val imageUrl = response.data?.imageUrl
+                    if (imageUrl != null) {
+                        _productActionState.value = AdminProductActionState.Idle // Reset so we don't show success msg for just image upload
+                        onSuccess(imageUrl)
+                    } else {
+                        _productActionState.value = AdminProductActionState.Error("Image URL not returned")
+                    }
                 } else {
                     _productActionState.value = AdminProductActionState.Error(response.message)
                 }

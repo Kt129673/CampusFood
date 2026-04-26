@@ -62,22 +62,22 @@ fun MainScreen() {
         }
     }
 
-    // Handle login/logout navigation reactively instead of via startDestination
-    LaunchedEffect(isLoggedIn) {
-        if (!isLoggedIn) {
-            navController.navigate(Screen.Login.route) {
-                popUpTo(0) { inclusive = true }
+    // Handle navigation based on auth state - consolidated to avoid race conditions
+    LaunchedEffect(authState, isLoggedIn) {
+        when {
+            // User logged out - navigate to login
+            !isLoggedIn -> {
+                navController.navigate(Screen.Login.route) {
+                    popUpTo(0) { inclusive = true }
+                }
             }
-        }
-    }
-
-    // Navigate on auth success using authState so currentUser is guaranteed populated
-    LaunchedEffect(authState) {
-        if (authState is AuthUiState.Success) {
-            val user = (authState as AuthUiState.Success).user
-            val dest = if (user.role == "ADMIN") Screen.AdminDashboard.route else Screen.Menu.route
-            navController.navigate(dest) {
-                popUpTo(Screen.Login.route) { inclusive = true }
+            // User just logged in successfully - navigate to appropriate screen
+            authState is AuthUiState.Success -> {
+                val user = (authState as AuthUiState.Success).user
+                val dest = if (user.role == "ADMIN") Screen.AdminDashboard.route else Screen.Menu.route
+                navController.navigate(dest) {
+                    popUpTo(Screen.Login.route) { inclusive = true }
+                }
             }
         }
     }
@@ -285,17 +285,28 @@ fun MainScreen() {
                                     items = orderItems,
                                     deliveryAddress = address
                                 )
-                                orderViewModel.placeOrder(orderRequest) { orderId ->
-                                    cartViewModel.clearCart()
-                                    scope.launch {
-                                        val message = if (orderId != null) "🎉 Order #$orderId placed successfully!" else "🎉 Order placed successfully!"
-                                        snackbarHostState.showSnackbar(
-                                            message = message,
-                                            duration = SnackbarDuration.Short
-                                        )
-                                    }
-                                    navController.navigate(Screen.Orders.route) {
-                                        popUpTo(Screen.Menu.route)
+                                orderViewModel.placeOrder(orderRequest) { success, orderId ->
+                                    if (success) {
+                                        // Only clear cart if order was successful
+                                        cartViewModel.clearCart()
+                                        scope.launch {
+                                            val message = if (orderId != null) "🎉 Order #$orderId placed successfully!" else "🎉 Order placed successfully!"
+                                            snackbarHostState.showSnackbar(
+                                                message = message,
+                                                duration = SnackbarDuration.Short
+                                            )
+                                        }
+                                        navController.navigate(Screen.Orders.route) {
+                                            popUpTo(Screen.Menu.route)
+                                        }
+                                    } else {
+                                        // Show error but keep cart intact
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar(
+                                                message = "Failed to place order. Please try again.",
+                                                duration = SnackbarDuration.Long
+                                            )
+                                        }
                                     }
                                 }
                             }

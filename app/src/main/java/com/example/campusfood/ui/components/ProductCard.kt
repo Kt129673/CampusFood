@@ -83,7 +83,7 @@ fun ProductCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 5.dp, horizontal = 16.dp)
+            .padding(vertical = 8.dp, horizontal = 16.dp)
             .scale(scale)
             .animateContentSize()
             .semantics {
@@ -92,8 +92,9 @@ fun ProductCard(
             },
         shape = RoundedCornerShape(18.dp),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 1.dp,
-            pressedElevation = 6.dp
+            defaultElevation = 2.dp,
+            pressedElevation = 6.dp,
+            hoveredElevation = 4.dp
         ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -108,7 +109,7 @@ fun ProductCard(
             // Product Image
             Box(
                 modifier = Modifier
-                    .size(84.dp)
+                    .size(90.dp)
                     .clip(RoundedCornerShape(14.dp))
                     .background(OrangeAccentSoft)
             ) {
@@ -163,18 +164,18 @@ fun ProductCard(
                 Surface(
                     modifier = Modifier
                         .align(Alignment.BottomStart)
-                        .padding(5.dp),
-                    shape = RoundedCornerShape(6.dp),
+                        .padding(6.dp),
+                    shape = RoundedCornerShape(7.dp),
                     color = OrangePrimary,
-                    shadowElevation = 2.dp
+                    shadowElevation = 3.dp
                 ) {
                     Text(
                         text = product.category,
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp),
                         style = MaterialTheme.typography.labelSmall,
                         color = Color.White,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 9.sp,
+                        fontSize = 10.sp,
                         maxLines = 1
                     )
                 }
@@ -211,7 +212,7 @@ fun ProductCard(
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 // Description
                 if (!product.description.isNullOrBlank()) {
@@ -219,14 +220,14 @@ fun ProductCard(
                         text = product.description,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
+                        maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                         fontSize = 12.sp,
                         lineHeight = 16.sp
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 // Price + Stock + Add button
                 Row(
@@ -248,7 +249,7 @@ fun ProductCard(
                                 style = MaterialTheme.typography.labelSmall,
                                 color = RedError,
                                 fontWeight = FontWeight.SemiBold,
-                                fontSize = 9.sp
+                                fontSize = 10.sp
                             )
                         }
                     }
@@ -258,18 +259,18 @@ fun ProductCard(
                         onClick = {
                             if (product.stock == null || product.stock > 0) {
                                 // Haptic feedback on successful add
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                                 isAdded = true
                                 onAddToCart(product)
                             }
                         },
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(40.dp)
                             .semantics {
                                 contentDescription = if (isAdded) "Added to cart" else "Add ${product.name} to cart"
                                 role = Role.Button
                             },
-                        shape = RoundedCornerShape(11.dp),
+                        shape = RoundedCornerShape(12.dp),
                         enabled = product.stock == null || product.stock > 0,
                         colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = if (isAdded) GreenSuccess else OrangePrimary,
@@ -281,15 +282,15 @@ fun ProductCard(
                         AnimatedContent(
                             targetState = isAdded,
                             transitionSpec = {
-                                (scaleIn(animationSpec = tween(300)) + fadeIn()) togetherWith
-                                        (scaleOut(animationSpec = tween(300)) + fadeOut())
+                                (scaleIn(animationSpec = tween(250)) + fadeIn()) togetherWith
+                                        (scaleOut(animationSpec = tween(250)) + fadeOut())
                             },
                             label = "addButtonIcon"
                         ) { added ->
                             Icon(
                                 imageVector = if (added) Icons.Default.Check else Icons.Default.Add,
                                 contentDescription = if (added) "Added" else "Add to cart",
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(20.dp)
                             )
                         }
                     }
@@ -301,7 +302,7 @@ fun ProductCard(
     // Reset "Added" state after brief delay
     LaunchedEffect(isAdded) {
         if (isAdded) {
-            kotlinx.coroutines.delay(1800)
+            kotlinx.coroutines.delay(2000)
             isAdded = false
         }
     }

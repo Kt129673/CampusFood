@@ -55,6 +55,7 @@ class OrderViewModel : ViewModel() {
 
     fun getOrders() {
         if (userId == 0L) {
+            // Don't show loading state if user ID not set yet
             _uiState.value = OrderUiState.Success(emptyList())
             return
         }
@@ -62,10 +63,11 @@ class OrderViewModel : ViewModel() {
             _uiState.value = OrderUiState.Loading
             try {
                 val response = RetrofitInstance.api.getOrdersByUser(userId)
-                if (response.success && response.data != null) {
+                if (response.success) {
+                    val orders = response.data ?: emptyList()
                     // Sort by most recent first
                     _uiState.value = OrderUiState.Success(
-                        response.data.sortedByDescending { it.id }
+                        orders.sortedByDescending { it.id }
                     )
                 } else {
                     _uiState.value = OrderUiState.Error(response.message)
@@ -88,9 +90,10 @@ class OrderViewModel : ViewModel() {
             _isRefreshing.value = true
             try {
                 val response = RetrofitInstance.api.getOrdersByUser(userId)
-                if (response.success && response.data != null) {
+                if (response.success) {
+                    val orders = response.data ?: emptyList()
                     _uiState.value = OrderUiState.Success(
-                        response.data.sortedByDescending { it.id }
+                        orders.sortedByDescending { it.id }
                     )
                 }
             } catch (_: Exception) {
@@ -101,21 +104,21 @@ class OrderViewModel : ViewModel() {
         }
     }
 
-    fun placeOrder(orderRequest: OrderRequest, onSuccess: (Long?) -> Unit) {
+    fun placeOrder(orderRequest: OrderRequest, onComplete: (Boolean, Long?) -> Unit) {
         viewModelScope.launch {
             _isPlacingOrder.value = true
             try {
                 val response = RetrofitInstance.api.placeOrder(orderRequest)
                 if (response.success) {
                     getOrders()
-                    onSuccess(response.data?.id)
+                    onComplete(true, response.data?.id)
                 } else {
                     _snackbarEvent.value = "Order failed: ${response.message}"
-                    _uiState.value = OrderUiState.Error(response.message)
+                    onComplete(false, null)
                 }
             } catch (e: Exception) {
                 _snackbarEvent.value = "Order failed: ${e.message ?: "Network error"}"
-                _uiState.value = OrderUiState.Error(e.message ?: "Failed to place order")
+                onComplete(false, null)
             } finally {
                 _isPlacingOrder.value = false
             }
