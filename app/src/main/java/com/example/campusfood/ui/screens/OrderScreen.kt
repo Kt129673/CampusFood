@@ -37,6 +37,12 @@ fun OrderScreen(
     val snackbarEvent by viewModel.snackbarEvent.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     
+    val headerGradient = remember {
+        Brush.horizontalGradient(
+            listOf(OrangePrimary, OrangePrimaryDark, Color(0xFFBF360C))
+        )
+    }
+
     // Filter and sort state
     var selectedFilter by remember { mutableStateOf("All") }
     var sortOption by remember { mutableStateOf(com.example.campusfood.ui.components.SortOption.NEWEST_FIRST) }
@@ -56,11 +62,7 @@ fun OrderScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(
-                        Brush.horizontalGradient(
-                            listOf(OrangePrimary, OrangePrimaryDark, Color(0xFFBF360C))
-                        )
-                    )
+                    .background(headerGradient)
                     .statusBarsPadding()
                     .padding(horizontal = 16.dp, vertical = 12.dp)
             ) {

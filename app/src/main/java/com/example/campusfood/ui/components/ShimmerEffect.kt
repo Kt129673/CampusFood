@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
@@ -27,7 +29,7 @@ fun ShimmerProductCard(modifier: Modifier = Modifier) {
     )
 
     val transition = rememberInfiniteTransition(label = "shimmer")
-    val translateAnim = transition.animateFloat(
+    val translateAnim by transition.animateFloat(
         initialValue = 0f,
         targetValue = 1200f,
         animationSpec = infiniteRepeatable(
@@ -40,11 +42,15 @@ fun ShimmerProductCard(modifier: Modifier = Modifier) {
         label = "shimmerTranslate"
     )
 
-    val brush = Brush.linearGradient(
-        colors = shimmerColors,
-        start = Offset(translateAnim.value - 400f, 0f),
-        end = Offset(translateAnim.value, 0f)
-    )
+    val shimmerModifier = Modifier.drawBehind {
+        val x = translateAnim
+        val brush = Brush.linearGradient(
+            colors = shimmerColors,
+            start = Offset(x - 400f, 0f),
+            end = Offset(x, 0f)
+        )
+        drawRect(brush = brush)
+    }
 
     Row(
         modifier = modifier
@@ -60,7 +66,7 @@ fun ShimmerProductCard(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .size(84.dp)
                 .clip(RoundedCornerShape(14.dp))
-                .background(brush)
+                .then(shimmerModifier)
         )
 
         Spacer(modifier = Modifier.width(14.dp))
@@ -72,7 +78,7 @@ fun ShimmerProductCard(modifier: Modifier = Modifier) {
                     .fillMaxWidth(0.65f)
                     .height(16.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(brush)
+                    .then(shimmerModifier)
             )
             Spacer(modifier = Modifier.height(8.dp))
             // Description
@@ -81,7 +87,7 @@ fun ShimmerProductCard(modifier: Modifier = Modifier) {
                     .fillMaxWidth(0.85f)
                     .height(10.dp)
                     .clip(RoundedCornerShape(5.dp))
-                    .background(brush)
+                    .then(shimmerModifier)
             )
             Spacer(modifier = Modifier.height(14.dp))
             Row(
@@ -95,14 +101,14 @@ fun ShimmerProductCard(modifier: Modifier = Modifier) {
                         .width(55.dp)
                         .height(20.dp)
                         .clip(RoundedCornerShape(8.dp))
-                        .background(brush)
+                        .then(shimmerModifier)
                 )
                 // Button
                 Box(
                     modifier = Modifier
                         .size(36.dp)
                         .clip(RoundedCornerShape(11.dp))
-                        .background(brush)
+                        .then(shimmerModifier)
                 )
             }
         }
@@ -121,7 +127,7 @@ fun ShimmerOrderCard(modifier: Modifier = Modifier) {
     )
 
     val transition = rememberInfiniteTransition(label = "shimmerOrder")
-    val translateAnim = transition.animateFloat(
+    val translateAnim by transition.animateFloat(
         initialValue = 0f,
         targetValue = 1200f,
         animationSpec = infiniteRepeatable(
@@ -134,11 +140,15 @@ fun ShimmerOrderCard(modifier: Modifier = Modifier) {
         label = "shimmerOrderTranslate"
     )
 
-    val brush = Brush.linearGradient(
-        colors = shimmerColors,
-        start = Offset(translateAnim.value - 400f, 0f),
-        end = Offset(translateAnim.value, 0f)
-    )
+    val shimmerModifier = Modifier.drawBehind {
+        val x = translateAnim
+        val brush = Brush.linearGradient(
+            colors = shimmerColors,
+            start = Offset(x - 400f, 0f),
+            end = Offset(x, 0f)
+        )
+        drawRect(brush = brush)
+    }
 
     Column(
         modifier = modifier
@@ -157,7 +167,7 @@ fun ShimmerOrderCard(modifier: Modifier = Modifier) {
                         .width(90.dp)
                         .height(14.dp)
                         .clip(RoundedCornerShape(6.dp))
-                        .background(brush)
+                        .then(shimmerModifier)
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Box(
@@ -165,7 +175,7 @@ fun ShimmerOrderCard(modifier: Modifier = Modifier) {
                         .width(65.dp)
                         .height(10.dp)
                         .clip(RoundedCornerShape(5.dp))
-                        .background(brush)
+                        .then(shimmerModifier)
                 )
             }
             Box(
@@ -173,7 +183,7 @@ fun ShimmerOrderCard(modifier: Modifier = Modifier) {
                     .width(70.dp)
                     .height(26.dp)
                     .clip(RoundedCornerShape(13.dp))
-                    .background(brush)
+                    .then(shimmerModifier)
             )
         }
         Spacer(modifier = Modifier.height(12.dp))
@@ -184,7 +194,7 @@ fun ShimmerOrderCard(modifier: Modifier = Modifier) {
                     .fillMaxWidth(0.55f)
                     .height(10.dp)
                     .clip(RoundedCornerShape(5.dp))
-                    .background(brush)
+                    .then(shimmerModifier)
             )
             Spacer(modifier = Modifier.height(6.dp))
         }
@@ -199,14 +209,14 @@ fun ShimmerOrderCard(modifier: Modifier = Modifier) {
                     .width(60.dp)
                     .height(20.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(brush)
+                    .then(shimmerModifier)
             )
             Box(
                 modifier = Modifier
                     .width(80.dp)
                     .height(32.dp)
                     .clip(RoundedCornerShape(10.dp))
-                    .background(brush)
+                    .then(shimmerModifier)
             )
         }
     }

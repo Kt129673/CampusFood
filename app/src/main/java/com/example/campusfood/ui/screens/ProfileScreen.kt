@@ -81,11 +81,27 @@ fun ProfileScreen(
     }
 
     val isAdmin = user?.role == "ADMIN"
-    val headerGradient = if (isAdmin) {
+    
+    val adminGradient = remember {
         Brush.horizontalGradient(listOf(AdminPurple, Color(0xFF4A148C), Color(0xFF311B92)))
-    } else {
+    }
+    val userGradient = remember {
         Brush.horizontalGradient(listOf(OrangePrimary, OrangePrimaryDark, Color(0xFFBF360C)))
     }
+    
+    val headerGradient = if (isAdmin) adminGradient else userGradient
+    
+    val adminBorderBrush = remember {
+        Brush.linearGradient(listOf(AdminPurple, Color(0xFFCE93D8), Color(0xFF4A148C)))
+    }
+    val userBorderBrush = remember {
+        Brush.linearGradient(listOf(OrangePrimary, OrangePrimaryLight, OrangePrimaryDark))
+    }
+    
+    val logoutBorderBrush = remember {
+        Brush.linearGradient(listOf(RedError.copy(alpha = 0.4f), RedError.copy(alpha = 0.2f)))
+    }
+
     val accentColor = if (isAdmin) AdminPurple else OrangePrimary
 
     Scaffold(
@@ -125,12 +141,7 @@ fun ProfileScreen(
                         .size(88.dp)
                         .border(
                             width = 2.5.dp,
-                            brush = Brush.linearGradient(
-                                if (isAdmin)
-                                    listOf(AdminPurple, Color(0xFFCE93D8), Color(0xFF4A148C))
-                                else
-                                    listOf(OrangePrimary, OrangePrimaryLight, OrangePrimaryDark)
-                            ),
+                            brush = if (isAdmin) adminBorderBrush else userBorderBrush,
                             shape = CircleShape
                         )
                 )
@@ -304,7 +315,7 @@ fun ProfileScreen(
                     contentColor = RedError
                 ),
                 border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
-                    brush = Brush.linearGradient(listOf(RedError.copy(alpha = 0.4f), RedError.copy(alpha = 0.2f)))
+                    brush = logoutBorderBrush
                 )
             ) {
                 Icon(

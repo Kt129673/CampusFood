@@ -74,18 +74,22 @@ fun MainScreen() {
     // Handle navigation based on auth state - consolidated to avoid race conditions
     LaunchedEffect(authState, isLoggedIn) {
         when {
-            // User logged out - navigate to login
-            !isLoggedIn -> {
-                navController.navigate(Screen.Login.route) {
-                    popUpTo(0) { inclusive = true }
-                }
-            }
             // User just logged in successfully - navigate to appropriate screen
             authState is AuthUiState.Success -> {
                 val user = (authState as AuthUiState.Success).user
                 val dest = if (user.role == "ADMIN") Screen.AdminDashboard.route else Screen.Menu.route
-                navController.navigate(dest) {
-                    popUpTo(Screen.Login.route) { inclusive = true }
+                if (navController.currentDestination?.route != dest) {
+                    navController.navigate(dest) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                }
+            }
+            // User logged out - navigate to login
+            !isLoggedIn -> {
+                if (navController.currentDestination?.route != Screen.Login.route) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
             }
         }

@@ -76,6 +76,12 @@ fun MenuScreen(
     val focusManager = LocalFocusManager.current
     val listState = rememberLazyListState()
 
+    val headerGradient = remember {
+        Brush.horizontalGradient(
+            listOf(OrangePrimary, OrangePrimaryDark, Color(0xFFBF360C))
+        )
+    }
+
     // Removed: auto-focus on entry was forcing keyboard open every time
 
     LaunchedEffect(listState.isScrollInProgress) {
@@ -98,15 +104,7 @@ fun MenuScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(
-                                    OrangePrimary,
-                                    OrangePrimaryDark,
-                                    Color(0xFFBF360C)
-                                )
-                            )
-                        )
+                        .background(headerGradient)
                         .statusBarsPadding()
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
@@ -357,16 +355,10 @@ fun MenuScreen(
                             contentPadding = PaddingValues(vertical = 8.dp)
                         ) {
                             items(filteredProducts, key = { it.id ?: 0 }) { product ->
-                                AnimatedVisibility(
-                                    visible = true,
-                                    enter = fadeIn() + slideInVertically(),
-                                    exit = fadeOut()
-                                ) {
-                                    ProductCard(
-                                        product = product,
-                                        onAddToCart = { onProductClick(it) }
-                                    )
-                                }
+                                ProductCard(
+                                    product = product,
+                                    onAddToCart = { onProductClick(it) }
+                                )
                             }
                             item { Spacer(modifier = Modifier.height(8.dp)) }
                         }

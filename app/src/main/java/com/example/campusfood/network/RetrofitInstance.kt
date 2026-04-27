@@ -25,7 +25,7 @@ object RetrofitInstance {
      * - IS_LOCAL = true  → connects to local dev server
      * - IS_LOCAL = false → connects to AWS Elastic Beanstalk production
      */
-    private const val IS_LOCAL = true
+    private const val IS_LOCAL = false
 
     // Set this to:
     // "10.0.2.2" for Android Emulator

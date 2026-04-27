@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,9 +45,9 @@ fun StatusBadge(status: String) {
 
     // Active orders get a subtle pulse on the dot indicator
     val isActive = status in listOf("PLACED", "PACKING", "OUT_FOR_DELIVERY")
-    val pulseScale = if (isActive) {
-        val transition = rememberInfiniteTransition(label = "statusPulse")
-        val scale by transition.animateFloat(
+    val transition = rememberInfiniteTransition(label = "statusPulse")
+    val animatedScale = if (isActive) {
+        transition.animateFloat(
             initialValue = 0.85f,
             targetValue = 1.15f,
             animationSpec = infiniteRepeatable(
@@ -55,10 +56,7 @@ fun StatusBadge(status: String) {
             ),
             label = "statusPulseScale"
         )
-        scale
-    } else {
-        1f
-    }
+    } else null
 
     Surface(
         shape = RoundedCornerShape(20.dp),
@@ -72,7 +70,11 @@ fun StatusBadge(status: String) {
                 Box(
                     modifier = Modifier
                         .size(6.dp)
-                        .scale(pulseScale)
+                        .graphicsLayer {
+                            val scale = animatedScale?.value ?: 1f
+                            scaleX = scale
+                            scaleY = scale
+                        }
                         .background(color, shape = CircleShape)
                 )
                 Spacer(Modifier.width(5.dp))

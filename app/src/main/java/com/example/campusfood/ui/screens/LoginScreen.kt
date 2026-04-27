@@ -24,6 +24,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -69,6 +70,16 @@ fun LoginScreen(
         }
     }
 
+    val gradientBrush = remember {
+        Brush.verticalGradient(
+            colors = listOf(
+                OrangePrimary,
+                OrangePrimaryDark,
+                Color(0xFF1A0800)
+            )
+        )
+    }
+
     // Google Sign-In launcher
     @Suppress("DEPRECATION")
     val googleSignInLauncher = rememberLauncherForActivityResult(
@@ -98,15 +109,9 @@ fun LoginScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        OrangePrimary,
-                        OrangePrimaryDark,
-                        Color(0xFF1A0800)
-                    )
-                )
-            )
+            .drawBehind {
+                drawRect(brush = gradientBrush)
+            }
     ) {
         Column(
             modifier = Modifier
@@ -119,7 +124,7 @@ fun LoginScreen(
 
             // Floating logo animation
             val infiniteTransition = rememberInfiniteTransition(label = "logoFloat")
-            val logoOffset by infiniteTransition.animateFloat(
+            val logoOffset = infiniteTransition.animateFloat(
                 initialValue = -3f,
                 targetValue = 3f,
                 animationSpec = infiniteRepeatable(
@@ -143,7 +148,10 @@ fun LoginScreen(
                 Surface(
                     modifier = Modifier
                         .size(66.dp)
-                        .graphicsLayer { translationY = logoOffset.dp.toPx() },
+                        .graphicsLayer { 
+                            translationY = logoOffset.value.dp.toPx()
+                            // Composing to graphicsLayer avoids recomposition for every animation frame
+                        },
                     shape = CircleShape,
                     color = Color.White.copy(alpha = 0.14f)
                 ) {
@@ -424,6 +432,30 @@ fun LoginScreen(
 
                                     if (otpSent) {
                                         Spacer(modifier = Modifier.height(12.dp))
+                                        
+                                        // Demo Hint for OTP
+                                        Surface(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            shape = RoundedCornerShape(10.dp),
+                                            color = BlueInfo.copy(alpha = 0.1f)
+                                        ) {
+                                            Row(
+                                                modifier = Modifier.padding(10.dp),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Icon(Icons.Default.Info, null, tint = BlueInfo, modifier = Modifier.size(16.dp))
+                                                Spacer(Modifier.width(8.dp))
+                                                Text(
+                                                    "Demo Mode: Use OTP 123456",
+                                                    style = MaterialTheme.typography.labelMedium,
+                                                    color = BlueInfo,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
+                                        
+                                        Spacer(modifier = Modifier.height(12.dp))
+
                                         OutlinedTextField(
                                             value = otpValue,
                                             onValueChange = { if (it.length <= 6) otpValue = it },
@@ -524,6 +556,8 @@ fun LoginScreen(
                                         }
                                     }
 
+                                    // Login with Mobile OTP Hidden for now
+                                    /*
                                     Spacer(modifier = Modifier.height(12.dp))
 
                                     OutlinedButton(
@@ -536,6 +570,7 @@ fun LoginScreen(
                                         Spacer(Modifier.width(12.dp))
                                         Text("Login with Mobile OTP", fontWeight = FontWeight.SemiBold)
                                     }
+                                    */
                                 }
 
                                 Spacer(modifier = Modifier.height(18.dp))

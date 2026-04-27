@@ -64,6 +64,15 @@ fun ProductCard(
     val isLowStock = product.stock != null && product.stock in 1..10
     val priceFormatted = String.format(Locale.getDefault(), "%.0f", product.price)
     
+    val errorBrush = remember {
+        Brush.radialGradient(
+            listOf(
+                OrangePrimary.copy(alpha = 0.06f),
+                OrangePrimaryLight.copy(alpha = 0.12f)
+            )
+        )
+    }
+
     // Enhanced semantic description for accessibility
     val cardDescription = buildString {
         append(product.name)
@@ -85,7 +94,6 @@ fun ProductCard(
             .fillMaxWidth()
             .padding(vertical = 8.dp, horizontal = 16.dp)
             .scale(scale)
-            .animateContentSize()
             .semantics {
                 contentDescription = cardDescription
                 role = Role.Button
@@ -140,14 +148,7 @@ fun ProductCard(
                         Box(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(
-                                    Brush.radialGradient(
-                                        listOf(
-                                            OrangePrimary.copy(alpha = 0.06f),
-                                            OrangePrimaryLight.copy(alpha = 0.12f)
-                                        )
-                                    )
-                                ),
+                                .background(errorBrush),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
