@@ -110,8 +110,8 @@ jobs:
           echo "------------------------------------------------------------"
           if [ -n "$RELEASE_APK" ]; then
             echo "RELEASE APK SHA-1 (Signed with Debug Key):"
-            # Use -v to see full info and ignore grep exit code if needed
-            keytool -printcert -jarfile "$RELEASE_APK" | grep "SHA1" || echo "SHA-1 not found in keytool output"
+            # Extract SHA1 using a more robust regex
+            keytool -printcert -jarfile "$RELEASE_APK" | grep -Ei "SHA1|SHA-1" || (echo "Full keytool output for debugging:" && keytool -printcert -jarfile "$RELEASE_APK")
           else
             echo "Error: Release APK not found. Cannot extract SHA-1."
             exit 1

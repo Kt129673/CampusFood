@@ -23,15 +23,26 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        getByName("debug") {
+            // Force the default debug credentials so we know exactly what they are
+            storeFile = file(System.getProperty("user.home") + "/.android/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
-            // Use debug signing for this release build so it's installable without a production key
+            // Explicitly use the debug signing config for this release build
             signingConfig = signingConfigs.getByName("debug")
             
-            // Ensure V1 and V2 signing are enabled
-            @Suppress("UnstableApiUsage")
-            matchingFallbacks += listOf("debug")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {
