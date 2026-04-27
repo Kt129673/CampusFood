@@ -25,8 +25,9 @@ android {
 
     signingConfigs {
         getByName("debug") {
-            // Force the default debug credentials so we know exactly what they are
-            storeFile = file(System.getProperty("user.home") + "/.android/debug.keystore")
+            // Force the default debug credentials
+            // Note: We don't set storeFile explicitly to the default location to allow Gradle 
+            // to auto-generate it if it's missing (common on CI environments).
             storePassword = "android"
             keyAlias = "androiddebugkey"
             keyPassword = "android"
