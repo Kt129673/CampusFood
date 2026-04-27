@@ -90,16 +90,32 @@ jobs:
       - name: Get APK info and SHA-1
         if: success()
         run: |
+          # Find the APKs
           DEBUG_APK=$(find app/build/outputs/apk/debug -name "*.apk" | head -n 1)
           RELEASE_APK=$(find app/build/outputs/apk/release -name "*.apk" | head -n 1)
-          echo "DEBUG_SIZE=$(du -h "$DEBUG_APK" | cut -f1)" >> $GITHUB_ENV
-          echo "RELEASE_SIZE=$(du -h "$RELEASE_APK" | cut -f1)" >> $GITHUB_ENV
+          
+          echo "Debug APK found at: $DEBUG_APK"
+          echo "Release APK found at: $RELEASE_APK"
+          
+          # Set env variables for summary
+          if [ -n "$DEBUG_APK" ]; then
+            echo "DEBUG_SIZE=$(du -h "$DEBUG_APK" | cut -f1)" >> $GITHUB_ENV
+          fi
+          if [ -n "$RELEASE_APK" ]; then
+            echo "RELEASE_SIZE=$(du -h "$RELEASE_APK" | cut -f1)" >> $GITHUB_ENV
+          fi
           
           echo "------------------------------------------------------------"
           echo "SIGNING INFO FOR GOOGLE CLOUD CONSOLE"
           echo "------------------------------------------------------------"
-          echo "RELEASE APK SHA-1 (Signed with Debug Key):"
-          keytool -printcert -jarfile "$RELEASE_APK" | grep SHA1
+          if [ -n "$RELEASE_APK" ]; then
+            echo "RELEASE APK SHA-1 (Signed with Debug Key):"
+            # Use -v to see full info and ignore grep exit code if needed
+            keytool -printcert -jarfile "$RELEASE_APK" | grep "SHA1" || echo "SHA-1 not found in keytool output"
+          else
+            echo "Error: Release APK not found. Cannot extract SHA-1."
+            exit 1
+          fi
           echo "------------------------------------------------------------"
 
       - name: Build Summary
