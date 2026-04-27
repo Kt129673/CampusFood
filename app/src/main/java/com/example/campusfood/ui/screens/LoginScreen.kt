@@ -85,24 +85,29 @@ fun LoginScreen(
     val googleSignInLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            try {
-                val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
-                val account = task.getResult(ApiException::class.java)
-                val name = account?.displayName ?: "Campus User"
-                val email = account?.email ?: ""
-                if (email.isNotBlank()) {
-                    authViewModel.loginWithGoogle(name, email)
-                } else {
-                    authViewModel.setError("Google account does not have an email address.")
-                }
-            } catch (e: ApiException) {
-                Log.e("LoginScreen", "Google sign-in failed: ${e.statusCode}", e)
-                authViewModel.setError("Unable to sign in. Please try again or contact support.")
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            val name = account?.displayName ?: "Campus User"
+            val email = account?.email ?: ""
+            if (email.isNotBlank()) {
+                authViewModel.loginWithGoogle(name, email)
+            } else {
+                authViewModel.setError("Google account does not have an email address.")
             }
-        } else {
-            // User canceled or Google Play Services had an issue
-            authViewModel.setError("Google sign-in was canceled or failed to start.")
+        } catch (e: ApiException) {
+            val errorMsg = when (e.statusCode) {
+                10 -> "Developer Error (10): SHA-1 mismatch or Package Name mismatch in Google Console. Check Release SHA-1."
+                7 -> "Network Error: Check your internet connection."
+                12500 -> "Sign-in failed (12500): Google Play Services issue or configuration error."
+                12501 -> "Sign-in canceled by user."
+                else -> "Google Error (${e.statusCode}): ${e.message ?: "Unknown error"}"
+            }
+            Log.e("LoginScreen", "Google sign-in failed: ${e.statusCode}", e)
+            authViewModel.setError(errorMsg)
+        } catch (e: Exception) {
+            Log.e("LoginScreen", "Unexpected error", e)
+            authViewModel.setError("Unexpected error: ${e.localizedMessage}")
         }
     }
 
