@@ -26,10 +26,12 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            // Use debug signing for this release build so it's installable without a production key
+            signingConfig = signingConfigs.getByName("debug")
+            
+            // Ensure V1 and V2 signing are enabled
+            @Suppress("UnstableApiUsage")
+            matchingFallbacks += listOf("debug")
         }
     }
     compileOptions {

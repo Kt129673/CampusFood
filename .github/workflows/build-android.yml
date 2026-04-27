@@ -72,7 +72,7 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-      - name: Build Release APK (unsigned)
+      - name: Build Release APK (signed with debug key)
         if: success()
         run: ./gradlew :app:assembleRelease --stacktrace --no-daemon
         env:
@@ -87,13 +87,20 @@ jobs:
           retention-days: 30
           if-no-files-found: error
 
-      - name: Get APK info
+      - name: Get APK info and SHA-1
         if: success()
         run: |
           DEBUG_APK=$(find app/build/outputs/apk/debug -name "*.apk" | head -n 1)
           RELEASE_APK=$(find app/build/outputs/apk/release -name "*.apk" | head -n 1)
           echo "DEBUG_SIZE=$(du -h "$DEBUG_APK" | cut -f1)" >> $GITHUB_ENV
           echo "RELEASE_SIZE=$(du -h "$RELEASE_APK" | cut -f1)" >> $GITHUB_ENV
+          
+          echo "------------------------------------------------------------"
+          echo "SIGNING INFO FOR GOOGLE CLOUD CONSOLE"
+          echo "------------------------------------------------------------"
+          echo "RELEASE APK SHA-1 (Signed with Debug Key):"
+          keytool -printcert -jarfile "$RELEASE_APK" | grep SHA1
+          echo "------------------------------------------------------------"
 
       - name: Build Summary
         if: always()
