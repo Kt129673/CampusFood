@@ -46,3 +46,20 @@ data class GoogleLoginRequest(
     val name: String,
     val mobile: String? = null
 )
+
+/**
+ * Request to send OTP to mobile.
+ */
+@JsonClass(generateAdapter = true)
+data class OtpRequest(
+    val mobile: String
+)
+
+/**
+ * Request to verify OTP.
+ */
+@JsonClass(generateAdapter = true)
+data class OtpVerificationRequest(
+    val mobile: String,
+    val otp: String
+)

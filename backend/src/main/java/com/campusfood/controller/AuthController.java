@@ -1,6 +1,9 @@
 package com.campusfood.controller;
 
+import com.campusfood.dto.request.GoogleLoginRequest;
 import com.campusfood.dto.request.LoginRequest;
+import com.campusfood.dto.request.OtpRequest;
+import com.campusfood.dto.request.OtpVerificationRequest;
 import com.campusfood.dto.request.RegisterRequest;
 import com.campusfood.dto.response.ApiResponse;
 import com.campusfood.dto.response.UserResponse;
@@ -43,25 +46,22 @@ public class AuthController {
         UserResponse user = userService.googleLogin(request.getEmail(), request.getName());
         return ResponseEntity.ok(ApiResponse.success("Google login successful", user));
     }
-}
 
-class GoogleLoginRequest {
-    private String email;
-    private String name;
-
-    public String getEmail() {
-        return email;
+    @PostMapping("/otp/send")
+    public ResponseEntity<ApiResponse<String>> sendOtp(@RequestBody OtpRequest request) {
+        // In a real app, this would send an SMS. For now, we'll just return success.
+        return ResponseEntity.ok(ApiResponse.success("OTP sent to " + request.getMobile(), "123456"));
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    @PostMapping("/otp/verify")
+    public ResponseEntity<ApiResponse<UserResponse>> verifyOtp(@RequestBody OtpVerificationRequest request) {
+        // For demo purposes, we accept '123456' as the valid OTP.
+        if ("123456".equals(request.getOtp())) {
+            UserResponse user = userService.loginWithOtp(request.getMobile());
+            return ResponseEntity.ok(ApiResponse.success("Login successful", user));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ApiResponse.error("Invalid OTP"));
+        }
     }
 }

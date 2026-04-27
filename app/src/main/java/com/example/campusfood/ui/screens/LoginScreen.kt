@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -25,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -48,10 +50,22 @@ fun LoginScreen(
     val authState by authViewModel.authState.collectAsState()
     val context = LocalContext.current
 
+    // State
+    var isAdminMode by remember { mutableStateOf(false) }
+    var isOtpLogin by remember { mutableStateOf(false) }
+    var otpSent by remember { mutableStateOf(false) }
+    var mobile by remember { mutableStateOf("") }
+    var otpValue by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+
     // Watch for successful auth
     LaunchedEffect(authState) {
         if (authState is AuthUiState.Success) {
             onLoginSuccess()
+        } else if (authState is AuthUiState.OtpSent) {
+            otpSent = true
         }
     }
 
@@ -80,13 +94,6 @@ fun LoginScreen(
             authViewModel.setError("Google sign-in was canceled or failed to start.")
         }
     }
-
-    // State
-    var isAdminMode by remember { mutableStateOf(false) }
-    var mobile by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
-    val focusManager = LocalFocusManager.current
 
     Box(
         modifier = Modifier
@@ -136,7 +143,7 @@ fun LoginScreen(
                 Surface(
                     modifier = Modifier
                         .size(66.dp)
-                        .offset(y = logoOffset.dp),
+                        .graphicsLayer { translationY = logoOffset.dp.toPx() },
                     shape = CircleShape,
                     color = Color.White.copy(alpha = 0.14f)
                 ) {
@@ -188,7 +195,7 @@ fun LoginScreen(
                         .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Toggle: Student / Admin – taller
+                    // Toggle: User / Admin – taller
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -198,7 +205,7 @@ fun LoginScreen(
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         ToggleButton(
-                            text = "Student",
+                            text = "User",
                             icon = Icons.Default.School,
                             selected = !isAdminMode,
                             onClick = {
@@ -377,19 +384,20 @@ fun LoginScreen(
                                 }
                             }
                         } else {
-                            // Student / Customer Google Sign-In
+                            // User Login Options
                             Column(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    "Welcome, Student!",
+                                    if (isOtpLogin) "Login with OTP" else "Welcome!",
                                     style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.Bold
                                 )
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    "Sign in with your Google account\nto start ordering campus food",
+                                    if (isOtpLogin) "Enter your mobile to receive an OTP" 
+                                    else "Sign in with your Google account\nto start ordering campus food",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     textAlign = TextAlign.Center,
@@ -398,44 +406,135 @@ fun LoginScreen(
 
                                 Spacer(modifier = Modifier.height(24.dp))
 
-                                // Google Sign-In Button – premium
-                                @Suppress("DEPRECATION")
-                                OutlinedButton(
-                                    onClick = {
-                                        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                                            .requestEmail()
-                                            .requestProfile()
-                                            .build()
-                                        val client = GoogleSignIn.getClient(context, gso)
-                                        // Sign out first to always show account picker
-                                        client.signOut().addOnCompleteListener {
-                                            googleSignInLauncher.launch(client.signInIntent)
+                                if (isOtpLogin) {
+                                    // OTP Login Form
+                                    OutlinedTextField(
+                                        value = mobile,
+                                        onValueChange = { if (it.length <= 10) mobile = it },
+                                        modifier = Modifier.fillMaxWidth(),
+                                        label = { Text("Mobile Number") },
+                                        placeholder = { Text("10-digit mobile number") },
+                                        leadingIcon = {
+                                            Icon(Icons.Default.Phone, null, tint = OrangePrimary)
+                                        },
+                                        enabled = !otpSent,
+                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                                        shape = RoundedCornerShape(16.dp)
+                                    )
+
+                                    if (otpSent) {
+                                        Spacer(modifier = Modifier.height(12.dp))
+                                        OutlinedTextField(
+                                            value = otpValue,
+                                            onValueChange = { if (it.length <= 6) otpValue = it },
+                                            modifier = Modifier.fillMaxWidth(),
+                                            label = { Text("Enter OTP") },
+                                            placeholder = { Text("6-digit code") },
+                                            leadingIcon = {
+                                                Icon(Icons.Default.VpnKey, null, tint = OrangePrimary)
+                                            },
+                                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                            shape = RoundedCornerShape(16.dp)
+                                        )
+                                        
+                                        TextButton(
+                                            onClick = { 
+                                                otpSent = false
+                                                otpValue = ""
+                                            },
+                                            modifier = Modifier.align(Alignment.End)
+                                        ) {
+                                            Text("Resend / Change Number", fontSize = 12.sp, color = OrangePrimary)
                                         }
-                                    },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(48.dp),
-                                    shape = RoundedCornerShape(16.dp),
-                                    colors = ButtonDefaults.outlinedButtonColors(
-                                        contentColor = MaterialTheme.colorScheme.onSurface
-                                    ),
-                                    enabled = authState !is AuthUiState.Loading
-                                ) {
-                                    if (authState is AuthUiState.Loading) {
-                                        CircularProgressIndicator(
-                                            modifier = Modifier.size(24.dp),
-                                            strokeWidth = 2.5.dp
-                                        )
-                                    } else {
-                                        Text("G", fontWeight = FontWeight.Bold,
-                                            fontSize = 22.sp,
-                                            color = Color(0xFF4285F4))
-                                        Spacer(Modifier.width(14.dp))
-                                        Text(
-                                            "Continue with Google",
-                                            fontWeight = FontWeight.SemiBold,
-                                            fontSize = 16.sp
-                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.height(16.dp))
+
+                                    Button(
+                                        onClick = {
+                                            if (!otpSent) {
+                                                authViewModel.sendOtp(mobile)
+                                            } else {
+                                                authViewModel.verifyOtp(mobile, otpValue)
+                                            }
+                                        },
+                                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                                        shape = RoundedCornerShape(16.dp),
+                                        colors = ButtonDefaults.buttonColors(containerColor = OrangePrimary),
+                                        enabled = (if (!otpSent) mobile.length == 10 else otpValue.length == 6) 
+                                                && authState !is AuthUiState.Loading
+                                    ) {
+                                        if (authState is AuthUiState.Loading) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(24.dp),
+                                                color = Color.White,
+                                                strokeWidth = 2.dp
+                                            )
+                                        } else {
+                                            Text(if (!otpSent) "Send OTP" else "Verify & Login")
+                                        }
+                                    }
+
+                                    TextButton(
+                                        onClick = { isOtpLogin = false },
+                                        modifier = Modifier.padding(top = 8.dp)
+                                    ) {
+                                        Text("Use Google instead", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    }
+
+                                } else {
+                                    // Google Sign-In Button – premium
+                                    @Suppress("DEPRECATION")
+                                    OutlinedButton(
+                                        onClick = {
+                                            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                                                .requestEmail()
+                                                .requestProfile()
+                                                .build()
+                                            val client = GoogleSignIn.getClient(context, gso)
+                                            // Sign out first to always show account picker
+                                            client.signOut().addOnCompleteListener {
+                                                googleSignInLauncher.launch(client.signInIntent)
+                                            }
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(48.dp),
+                                        shape = RoundedCornerShape(16.dp),
+                                        colors = ButtonDefaults.outlinedButtonColors(
+                                            contentColor = MaterialTheme.colorScheme.onSurface
+                                        ),
+                                        enabled = authState !is AuthUiState.Loading
+                                    ) {
+                                        if (authState is AuthUiState.Loading) {
+                                            CircularProgressIndicator(
+                                                modifier = Modifier.size(24.dp),
+                                                strokeWidth = 2.5.dp
+                                            )
+                                        } else {
+                                            Text("G", fontWeight = FontWeight.Bold,
+                                                fontSize = 22.sp,
+                                                color = Color(0xFF4285F4))
+                                            Spacer(Modifier.width(14.dp))
+                                            Text(
+                                                "Continue with Google",
+                                                fontWeight = FontWeight.SemiBold,
+                                                fontSize = 16.sp
+                                            )
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(12.dp))
+
+                                    OutlinedButton(
+                                        onClick = { isOtpLogin = true },
+                                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                                        shape = RoundedCornerShape(16.dp),
+                                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
+                                    ) {
+                                        Icon(Icons.Default.Phone, null, modifier = Modifier.size(18.dp))
+                                        Spacer(Modifier.width(12.dp))
+                                        Text("Login with Mobile OTP", fontWeight = FontWeight.SemiBold)
                                     }
                                 }
 
@@ -472,7 +571,7 @@ fun LoginScreen(
                                     shape = RoundedCornerShape(12.dp)
                                 ) {
                                     Text(
-                                        "Login as Rahul (Demo Student)",
+                                        "Login as Rahul (Demo User)",
                                         color = OrangePrimary,
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 14.sp

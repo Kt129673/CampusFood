@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.campusfood.data.UserSessionManager
 import com.example.campusfood.model.GoogleLoginRequest
 import com.example.campusfood.model.LoginRequest
+import com.example.campusfood.model.OtpRequest
+import com.example.campusfood.model.OtpVerificationRequest
 import com.example.campusfood.model.RegisterRequest
 import com.example.campusfood.model.User
 import com.example.campusfood.network.RetrofitInstance
@@ -19,6 +21,7 @@ import kotlinx.coroutines.launch
 sealed interface AuthUiState {
     data object Idle : AuthUiState
     data object Loading : AuthUiState
+    data object OtpSent : AuthUiState
     data class Success(val user: User) : AuthUiState
     data class Error(val message: String) : AuthUiState
 }
@@ -124,6 +127,45 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 }
             } catch (e: Exception) {
                 // Silent fail - mobile number is optional
+            }
+        }
+    }
+
+    /**
+     * Send OTP to mobile
+     */
+    fun sendOtp(mobile: String) {
+        viewModelScope.launch {
+            _authState.value = AuthUiState.Loading
+            try {
+                val response = RetrofitInstance.api.sendOtp(OtpRequest(mobile))
+                if (response.success) {
+                    _authState.value = AuthUiState.OtpSent
+                } else {
+                    _authState.value = AuthUiState.Error(response.message)
+                }
+            } catch (e: Exception) {
+                _authState.value = AuthUiState.Error(e.message ?: "Failed to send OTP")
+            }
+        }
+    }
+
+    /**
+     * Verify OTP and login
+     */
+    fun verifyOtp(mobile: String, otp: String) {
+        viewModelScope.launch {
+            _authState.value = AuthUiState.Loading
+            try {
+                val response = RetrofitInstance.api.verifyOtp(OtpVerificationRequest(mobile, otp))
+                if (response.success && response.data != null) {
+                    sessionManager.saveSession(response.data)
+                    _authState.value = AuthUiState.Success(response.data)
+                } else {
+                    _authState.value = AuthUiState.Error(response.message)
+                }
+            } catch (e: Exception) {
+                _authState.value = AuthUiState.Error(e.message ?: "OTP verification failed")
             }
         }
     }

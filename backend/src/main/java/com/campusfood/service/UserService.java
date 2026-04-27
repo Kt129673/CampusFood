@@ -90,6 +90,31 @@ public class UserService {
         return mapToResponse(user);
     }
 
+    @Transactional
+    public UserResponse loginWithOtp(String mobile) {
+        User user = userRepository.findByMobile(mobile).orElse(null);
+        
+        if (user == null) {
+            // Auto-register if user doesn't exist
+            user = User.builder()
+                    .name("User " + mobile.substring(6))
+                    .mobile(mobile)
+                    .passwordHash(hashPassword(mobile)) // Placeholder
+                    .role(com.campusfood.enums.UserRole.CUSTOMER)
+                    .active(true)
+                    .build();
+            user = userRepository.save(user);
+            log.info("New OTP user registered: {}", mobile);
+        } else {
+            if (!user.getActive()) {
+                throw new InvalidOperationException("Account is deactivated");
+            }
+            log.info("OTP user logged in: {}", mobile);
+        }
+
+        return mapToResponse(user);
+    }
+
     public UserResponse getUserById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", id));

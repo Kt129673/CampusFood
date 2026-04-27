@@ -4,6 +4,8 @@ import com.example.campusfood.model.ApiResponse
 import com.example.campusfood.model.GoogleLoginRequest
 import com.example.campusfood.model.InventoryUpdateRequest
 import com.example.campusfood.model.LoginRequest
+import com.example.campusfood.model.OtpRequest
+import com.example.campusfood.model.OtpVerificationRequest
 import com.example.campusfood.model.OrderRequest
 import com.example.campusfood.model.OrderResponse
 import com.example.campusfood.model.PaginatedResponse
@@ -37,6 +39,12 @@ interface ApiService {
 
     @POST("auth/google")
     suspend fun googleLogin(@Body request: GoogleLoginRequest): ApiResponse<User>
+
+    @POST("auth/otp/send")
+    suspend fun sendOtp(@Body request: OtpRequest): ApiResponse<String>
+
+    @POST("auth/otp/verify")
+    suspend fun verifyOtp(@Body request: OtpVerificationRequest): ApiResponse<User>
 
     @GET("auth/user/{id}")
     suspend fun getUserById(@Path("id") id: Long): ApiResponse<User>
